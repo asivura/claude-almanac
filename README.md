@@ -378,28 +378,34 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-## Getting Started Recommendations
+## Quick Reference
 
-### For New Users
+| Feature     | Config Location         | Key Command              |
+| ----------- | ----------------------- | ------------------------ |
+| Hooks       | `.claude/settings.json` | -                        |
+| MCP Servers | `.claude/settings.json` | `claude mcp add`         |
+| Agents      | `.claude/agents/`       | `/agents`                |
+| Skills      | `.claude/skills/`       | `/skill-name`            |
+| Settings    | `.claude/settings.json` | `/config`                |
+| IDE         | Extension settings      | `Cmd+Esc`                |
+| Memory      | `CLAUDE.md`             | `/memory`                |
+| Rules       | `.claude/rules/`        | `/memory`                |
+| Headless    | CLI flags               | `claude -p`              |
+| Plugins     | `.claude/settings.json` | `/plugin`                |
+| Sandbox     | `.claude/settings.json` | `/sandbox`               |
+| Plan Mode   | CLI flag                | `--permission-mode plan` |
+| Sessions    | -                       | `/resume`                |
 
-1. **Start with CLAUDE.md** - Create a project memory file
-1. **Learn keyboard shortcuts** - Check IDE integration docs
-1. **Use built-in commands** - `/help`, `/init`, `/compact`
+______________________________________________________________________
 
-### For Power Users
+## Where to Start
 
-1. **Create custom skills** - Automate repetitive workflows
-1. **Set up hooks** - Automatic formatting and validation
-1. **Configure MCP servers** - Connect to your tools
-
-### For Teams
-
-1. **Commit `.claude/` directory** - Share settings and skills
-1. **Create project agents** - Standardize specialized tasks
-1. **Use managed settings** - Enforce organization policies
-
-### For Automation
-
-1. **Learn CLI flags** - `-p`, `--allowedTools`, `--output-format`
-1. **Set up GitHub Actions** - Automated code review
-1. **Explore the Agent SDK** - Build custom applications
+1. **New to Claude Code?** → Start with [Memory & Context](./features/memory-context.md) - create a CLAUDE.md file
+1. **Large project?** → Organize instructions with [Rules](./features/rules.md) for modular memory
+1. **Want automation?** → Check out [Hooks](./features/hooks.md) for automatic actions
+1. **Need external tools?** → Set up [MCP Servers](./features/mcp-servers.md)
+1. **Building workflows?** → Create [Skills](./features/skills.md) for reusable commands
+1. **Running in CI/CD?** → Use [Headless Mode](./features/headless-sdk.md)
+1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
+1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
+1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)
