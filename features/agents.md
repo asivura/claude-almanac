@@ -303,6 +303,34 @@ Research the authentication, database, and API modules in parallel using separat
 Use the code-reviewer agent to find issues, then use the fixer agent to resolve them
 ```
 
+## Resource Limits
+
+Agents operate within the following constraints:
+
+| Resource          | Limit                        | Notes                         |
+| ----------------- | ---------------------------- | ----------------------------- |
+| Context window    | Same as parent model         | Shared token budget           |
+| Max turns         | Configurable via `max_turns` | Default: unlimited            |
+| Timeout           | No hard limit                | Use `--max-turns` for control |
+| Concurrent agents | Platform-dependent           | Background tasks may queue    |
+
+**Controlling agent execution:**
+
+```bash
+# Limit agentic turns
+claude -p "Review code" --max-turns 10
+
+# Set spending limit
+claude -p "Analyze project" --max-budget-usd 5.00
+```
+
+**Environment variables:**
+
+| Variable                               | Purpose                          |
+| -------------------------------------- | -------------------------------- |
+| `CLAUDE_CODE_SUBAGENT_MODEL`           | Override model for all subagents |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | Disable background execution     |
+
 ## Context Management
 
 **Auto-compaction:**

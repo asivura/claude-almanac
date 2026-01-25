@@ -102,15 +102,39 @@ MCP_TIMEOUT=10000 claude  # 10-second timeout
 
 ## Popular MCP Servers
 
-- **GitHub**: Code reviews, PR management, issue tracking
-- **Sentry**: Error monitoring and debugging
-- **Notion**: Database access and content management
+### Databases
+
 - **PostgreSQL**: Database queries and operations
+- **MySQL**: MySQL database integration
+- **MongoDB**: Document database operations
+- **SQLite**: Local database queries
+- **Redis**: Key-value store and caching
+
+### Developer Tools
+
+- **GitHub**: Code reviews, PR management, issue tracking
+- **GitLab**: GitLab repository and CI/CD integration
+- **Sentry**: Error monitoring and debugging
+- **Linear**: Issue tracking and project management
+- **Vercel**: Deployment and serverless functions
+
+### Productivity
+
+- **Notion**: Database access and content management
 - **Google Workspace**: Gmail, Docs, Sheets, Calendar
 - **Slack**: Team communication integration
+- **Asana/JIRA**: Project management
+- **Airtable**: Spreadsheet-database hybrid
+
+### Other Integrations
+
 - **Figma**: Design system and file integration
 - **Stripe**: Payment processing and financial data
-- **Asana/JIRA**: Project management
+- **Twilio**: SMS and communication APIs
+- **AWS**: Cloud infrastructure management
+- **Anthropic Memory**: Persistent memory across sessions
+
+For a complete list, see the [MCP Servers Directory](https://github.com/modelcontextprotocol/servers).
 
 ## Examples
 

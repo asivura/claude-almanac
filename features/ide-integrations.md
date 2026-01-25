@@ -8,7 +8,7 @@ Claude Code integrates with multiple IDEs and editors to provide AI-assisted dev
 
 - Search "Claude Code" in Extensions (`Cmd+Shift+X` / `Ctrl+Shift+X`)
 - Direct link: [Install for VS Code](vscode:extension/anthropic.claude-code)
-- Requirements: VS Code 1.98.0 or higher
+- Requirements: VS Code 1.98.0+ (check [extension page](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) for current minimum)
 
 ### Core Features
 
@@ -123,7 +123,7 @@ If ESC doesn't interrupt Claude:
 - `i(`/`a(` - Inner/around parentheses
 - `i{`/`a{` - Inner/around braces
 
-## Chrome/Browser Integration (Beta)
+## Chrome/Browser Integration
 
 ### Prerequisites
 
@@ -226,7 +226,7 @@ Settings → Profiles → Keyboard → Check "Use Option as Meta Key"
 
 ### VSCode Spark Icon Not Visible
 
-- Ensure VS Code 1.98.0+ installed
+- Ensure VS Code meets minimum version requirements
 - Open a file (folder alone won't show icon)
 - Restart with "Developer: Reload Window"
 
