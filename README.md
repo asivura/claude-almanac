@@ -6,6 +6,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 
 | Feature                                                  | Description            | Use When                                                 |
 | -------------------------------------------------------- | ---------------------- | -------------------------------------------------------- |
+| [Tools](./features/tools.md)                             | Built-in tools         | Understand Read, Write, Edit, Bash, Grep, and more       |
 | [Hooks](./features/hooks.md)                             | Lifecycle automation   | Validate, format, protect files automatically            |
 | [MCP Servers](./features/mcp-servers.md)                 | External integrations  | Connect to databases, APIs, third-party tools            |
 | [Agents](./features/agents.md)                           | Specialized subagents  | Delegate complex tasks, isolate context                  |
