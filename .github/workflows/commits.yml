@@ -1,0 +1,22 @@
+name: Commit Messages Check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Validate commit messages
+        run: uvx --from commitizen cz check --rev-range origin/${{ github.base_ref }}..HEAD
