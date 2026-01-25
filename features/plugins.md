@@ -100,7 +100,7 @@ my-plugin/
 └── README.md
 ```
 
-**Important**: Component directories (`commands/`, `agents/`, `skills/`, `hooks/`) must be at the plugin root level, NOT inside `.claude-plugin/`.
+**⚠️ CRITICAL**: Component directories (`commands/`, `agents/`, `skills/`, `hooks/`) must be at the plugin root level, NOT inside `.claude-plugin/`. This is the most common mistake when creating plugins.
 
 ### Plugin Manifest (plugin.json)
 

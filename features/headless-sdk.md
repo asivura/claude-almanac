@@ -106,6 +106,8 @@ The Agent SDK gives you the same tools, agent loop, and context management that 
 
 ### Python Example: Simple Agent
 
+> **Note**: Verify current package name at [pypi.org](https://pypi.org/search/?q=claude+agent+sdk) or the [official SDK docs](https://platform.claude.com/docs/en/agent-sdk).
+
 ```python
 import asyncio
 from claude_agent_sdk import query, ClaudeAgentOptions
@@ -127,6 +129,8 @@ asyncio.run(main())
 ```
 
 ### TypeScript Example: Simple Agent
+
+> **Note**: Verify current package name at [npmjs.com](https://www.npmjs.com/search?q=claude%20agent%20sdk) or the [official SDK docs](https://platform.claude.com/docs/en/agent-sdk).
 
 ```typescript
 import { query } from "@anthropic-ai/claude-agent-sdk";

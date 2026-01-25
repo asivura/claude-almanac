@@ -106,6 +106,36 @@ Use the `$CLAUDE_PROJECT_DIR` environment variable to reference scripts in your 
 }
 ```
 
+## Execution Order
+
+When multiple hooks match the same event:
+
+1. **Settings hierarchy**: Managed → Local → Project → User (higher precedence first)
+1. **Within same file**: Hooks execute in array order (first to last)
+1. **Multiple matchers**: All matching hook groups execute sequentially
+1. **Early termination**: Exit code 2 stops subsequent hooks
+
+**Example with multiple hooks:**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Write", "hooks": [{ "type": "command", "command": "echo 'First'" }] },
+      { "matcher": "Write|Edit", "hooks": [{ "type": "command", "command": "echo 'Second'" }] }
+    ]
+  }
+}
+```
+
+For a `Write` tool, both hooks execute: "First" then "Second".
+
+**Stdout/stderr handling:**
+
+- Exit 0: stdout added to context (or shown in verbose mode)
+- Exit 2: stderr shown to Claude and user, blocks action
+- Other exit: stderr shown in verbose mode only
+
 ## Hook Input/Output Schema
 
 ### Hook Input

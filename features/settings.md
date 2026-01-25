@@ -24,7 +24,7 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
   "autoUpdatesChannel": "stable",
   "autoUpdates": true,
   "theme": "light",
-  "model": "claude-sonnet-4-5-20250929",
+  "model": "sonnet",
   "outputStyle": "Explanatory",
   "language": "english",
   "forceLoginMethod": "claudeai",

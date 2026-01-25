@@ -740,7 +740,12 @@ ______________________________________________________________________
 
 ## Sources
 
+**Official:**
+
 - [Claude Code CLI Reference](https://code.claude.com/docs/en/cli-reference)
+- [Claude Code GitHub Repository](https://github.com/anthropics/claude-code)
+
+**Community references** (unofficial, may be outdated):
+
 - [Claude Code Built-in Tools Reference](https://www.vtrivedy.com/posts/claudecode-tools-reference)
 - [Claude Code Tools and System Prompt](https://gist.github.com/wong2/e0f34aac66caf890a332f7b6f9e2ba8f)
-- [Claude Code GitHub Repository](https://github.com/anthropics/claude-code)

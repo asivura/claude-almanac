@@ -82,13 +82,27 @@ Run `/memory` to see all memory files currently loaded.
 
 ### Automatic Compaction
 
-When approaching context limit, Claude automatically:
+When approaching context limit (~95% by default), Claude automatically compacts:
 
-1. Clears older tool outputs first
-1. Summarizes older conversation history if needed
-1. Preserves your requests and key code snippets
-1. Preserves detailed instructions from CLAUDE.md
-1. Might lose detailed instructions from early conversation
+**What gets preserved:**
+
+- CLAUDE.md and rules (always kept in full)
+- Recent conversation history
+- Your most recent requests
+- Key code snippets from recent context
+- Current task state
+
+**What may be summarized or removed:**
+
+- Older tool outputs (file contents, command results)
+- Earlier conversation turns
+- Verbose search results
+- Intermediate debugging output
+
+**What triggers compaction:**
+
+- Default: 95% of context window used
+- Override: `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50` (triggers at 50%)
 
 ### Manual Compaction
 

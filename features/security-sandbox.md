@@ -32,13 +32,15 @@ Or configure in `settings.json`:
 
 ### Platform Support
 
-| Platform | Support           | Notes                    |
-| -------- | ----------------- | ------------------------ |
-| macOS    | Native            | Uses Seatbelt framework  |
-| Linux    | Requires packages | `bubblewrap` and `socat` |
-| WSL2     | Supported         | Uses bubblewrap          |
-| WSL1     | Not supported     | Missing kernel features  |
-| Windows  | Planned           | Native support coming    |
+| Platform | Support           | Notes                                                               |
+| -------- | ----------------- | ------------------------------------------------------------------- |
+| macOS    | ✅ Native         | Uses Seatbelt framework                                             |
+| Linux    | ✅ Supported      | Requires `bubblewrap` and `socat`                                   |
+| WSL2     | ✅ Supported      | Uses bubblewrap                                                     |
+| WSL1     | ❌ Not supported  | Missing kernel features                                             |
+| Windows  | 🔄 In development | Check [docs](https://code.claude.com/docs/en/sandbox.md) for status |
+
+> **Note**: Platform support evolves. Check the [official sandbox documentation](https://code.claude.com/docs/en/sandbox.md) for the latest status.
 
 ## Network Isolation
 
