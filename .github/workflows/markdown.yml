@@ -1,0 +1,23 @@
+name: Markdown Check
+
+on:
+  pull_request:
+    paths:
+      - "**.md"
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    name: Check Markdown Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Check markdown formatting
+        run: |
+          uvx --with mdformat-gfm --with mdformat-tables --with mdformat-frontmatter \
+            mdformat --check .
