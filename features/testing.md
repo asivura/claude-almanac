@@ -4,12 +4,12 @@ Validate Claude Code workspace configurations, skills, commands, and settings wi
 
 ## Why Test Claude Configurations?
 
-| Benefit | Description |
-|---------|-------------|
+| Benefit                | Description                                                   |
+| ---------------------- | ------------------------------------------------------------- |
 | **Catch errors early** | Validate JSON syntax, YAML frontmatter, and schema compliance |
-| **Enforce standards** | Ensure skills and commands follow naming conventions |
-| **CI/CD integration** | Run validation in pipelines before deployment |
-| **Team consistency** | Shared validation rules across team members |
+| **Enforce standards**  | Ensure skills and commands follow naming conventions          |
+| **CI/CD integration**  | Run validation in pipelines before deployment                 |
+| **Team consistency**   | Shared validation rules across team members                   |
 
 ## Test Framework Architecture
 
@@ -786,11 +786,11 @@ ______________________________________________________________________
 
 ### Test Organization
 
-| Category | Marker | Tests |
-|----------|--------|-------|
-| Schema validation | `schema` | JSON schema compliance |
-| Skill validation | `skills` | Frontmatter, naming, content |
-| Integration | `integration` | Full workspace checks |
+| Category          | Marker        | Tests                        |
+| ----------------- | ------------- | ---------------------------- |
+| Schema validation | `schema`      | JSON schema compliance       |
+| Skill validation  | `skills`      | Frontmatter, naming, content |
+| Integration       | `integration` | Full workspace checks        |
 
 ### CI Environment Detection
 
@@ -814,9 +814,9 @@ def test_external_repos(self, workspace_root: Path) -> None:
 When updating configuration formats:
 
 1. Update the schema in `schemas/__init__.py`
-2. Add tests for new fields
-3. Run validation locally before committing
-4. Update CI pipeline if needed
+1. Add tests for new fields
+1. Run validation locally before committing
+1. Update CI pipeline if needed
 
 ______________________________________________________________________
 
