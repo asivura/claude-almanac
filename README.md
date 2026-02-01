@@ -18,6 +18,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CI/CD, automation, custom agents                         |
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
 | [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies |
+| [Testing](./features/testing.md)                         | Config validation      | Validate settings, skills, schemas in CI/CD              |
 | [Additional Features](./features/additional-features.md) | Advanced capabilities  | GitHub Actions, git worktrees, images, sessions          |
 
 ______________________________________________________________________
@@ -327,6 +328,33 @@ claude --permission-mode plan
 
 ______________________________________________________________________
 
+### Testing Configuration
+
+**Purpose**: Validate Claude Code configurations with automated testing.
+
+**Key Capabilities**:
+
+- JSON schema validation for settings.json, cd-context.json
+- Skill frontmatter validation (name, description, format)
+- CI/CD integration with GitLab/GitHub Actions
+- Pre-commit hooks for local validation
+
+**Quick Start**:
+
+```bash
+# Create test structure
+mkdir -p .claude/tests/{src/claude_workspace_tests/{schemas,validators},tests}
+
+# Install and run tests
+cd .claude/tests
+uv sync
+uv run pytest -v
+```
+
+[Full Documentation →](./features/testing.md)
+
+______________________________________________________________________
+
 ### Additional Features
 
 **Purpose**: Advanced capabilities for power users.
@@ -375,6 +403,7 @@ ______________________________________________________________________
 | Headless/SDK        | High                 | Low         | High                | Medium         |
 | Plugins             | High                 | Moderate    | High                | Medium         |
 | Security/Sandbox    | Low                  | Moderate    | Low                 | Low            |
+| Testing             | Low                  | Moderate    | High                | Medium         |
 | Additional Features | Moderate             | High        | High                | Varies         |
 
 ______________________________________________________________________
@@ -394,6 +423,7 @@ ______________________________________________________________________
 | Headless    | CLI flags               | `claude -p`              |
 | Plugins     | `.claude/settings.json` | `/plugin`                |
 | Sandbox     | `.claude/settings.json` | `/sandbox`               |
+| Testing     | `.claude/tests/`        | `uv run pytest`          |
 | Plan Mode   | CLI flag                | `--permission-mode plan` |
 | Sessions    | -                       | `/resume`                |
 
@@ -407,6 +437,7 @@ ______________________________________________________________________
 1. **Need external tools?** → Set up [MCP Servers](./features/mcp-servers.md)
 1. **Building workflows?** → Create [Skills](./features/skills.md) for reusable commands
 1. **Running in CI/CD?** → Use [Headless Mode](./features/headless-sdk.md)
+1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
 1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
 1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
 1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)
