@@ -35,17 +35,17 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
 
 ## Advanced Settings
 
-| Setting              | Type    | Purpose                                    |
-| -------------------- | ------- | ------------------------------------------ |
-| `apiKeyHelper`       | string  | Script path for dynamic API key generation |
-| `otelHeadersHelper`  | string  | Script for OpenTelemetry headers           |
-| `cleanupPeriodDays`  | number  | Delete inactive sessions (0=immediate)     |
-| `attribution.commit` | string  | Commit message attribution                 |
-| `attribution.pr`     | string  | PR description attribution                 |
-| `statusLine`         | object  | Custom status line configuration           |
-| `respectGitignore`        | boolean | Exclude `.gitignore` files                                      |
-| `plansDirectory`          | string  | Custom plan file storage location                               |
-| `skipWebFetchPreflight`   | boolean | Skip WebFetch domain safety check (for enterprise environments) |
+| Setting                 | Type    | Purpose                                                         |
+| ----------------------- | ------- | --------------------------------------------------------------- |
+| `apiKeyHelper`          | string  | Script path for dynamic API key generation                      |
+| `otelHeadersHelper`     | string  | Script for OpenTelemetry headers                                |
+| `cleanupPeriodDays`     | number  | Delete inactive sessions (0=immediate)                          |
+| `attribution.commit`    | string  | Commit message attribution                                      |
+| `attribution.pr`        | string  | PR description attribution                                      |
+| `statusLine`            | object  | Custom status line configuration                                |
+| `respectGitignore`      | boolean | Exclude `.gitignore` files                                      |
+| `plansDirectory`        | string  | Custom plan file storage location                               |
+| `skipWebFetchPreflight` | boolean | Skip WebFetch domain safety check (for enterprise environments) |
 
 ## Environment Variables
 
@@ -91,14 +91,14 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
 
 ### Feature Flags
 
-| Variable                                 | Purpose                                    |
-| ---------------------------------------- | ------------------------------------------ |
-| `CLAUDE_CODE_ENABLE_TELEMETRY`           | Enable OpenTelemetry                       |
-| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS`   | Disable background operations              |
-| `DISABLE_AUTOUPDATER`                    | Disable auto-updates                       |
-| `DISABLE_TELEMETRY`                      | Opt out of telemetry                       |
-| `DISABLE_ERROR_REPORTING`                | Opt out of Sentry errors                   |
-| `CLAUDE_CODE_SKIP_WEBFETCH_PREFLIGHT`    | Skip WebFetch domain safety check          |
+| Variable                               | Purpose                           |
+| -------------------------------------- | --------------------------------- |
+| `CLAUDE_CODE_ENABLE_TELEMETRY`         | Enable OpenTelemetry              |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` | Disable background operations     |
+| `DISABLE_AUTOUPDATER`                  | Disable auto-updates              |
+| `DISABLE_TELEMETRY`                    | Opt out of telemetry              |
+| `DISABLE_ERROR_REPORTING`              | Opt out of Sentry errors          |
+| `CLAUDE_CODE_SKIP_WEBFETCH_PREFLIGHT`  | Skip WebFetch domain safety check |
 
 ## WebFetch Preflight Check
 
@@ -133,12 +133,12 @@ export CLAUDE_CODE_SKIP_WEBFETCH_PREFLIGHT=true
 
 ### Security Considerations
 
-| Risk                                          | Benefit                                             |
-| --------------------------------------------- | --------------------------------------------------- |
-| Bypasses Anthropic's domain blocklist          | Fixes WebFetch in restrictive corporate networks    |
-| Removes a prompt injection defense layer      | Eliminates domain name leakage to `api.anthropic.com` |
-| All-or-nothing (no per-domain granularity)    | Required for Bedrock/Vertex environments            |
-|                                               | Reduces latency (removes extra network round-trip)  |
+| Risk                                       | Benefit                                               |
+| ------------------------------------------ | ----------------------------------------------------- |
+| Bypasses Anthropic's domain blocklist      | Fixes WebFetch in restrictive corporate networks      |
+| Removes a prompt injection defense layer   | Eliminates domain name leakage to `api.anthropic.com` |
+| All-or-nothing (no per-domain granularity) | Required for Bedrock/Vertex environments              |
+|                                            | Reduces latency (removes extra network round-trip)    |
 
 Note: The `WebFetch(domain:...)` permission pattern provides a separate layer of domain filtering that remains active regardless of this setting.
 
