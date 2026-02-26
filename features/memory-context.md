@@ -69,6 +69,74 @@ Personal preferences: @~/.claude/my-preferences.md
 
 Run `/memory` to see all memory files currently loaded.
 
+## Auto Memory
+
+Auto memory is a persistent directory where Claude records learnings, patterns, and insights as it works. Unlike CLAUDE.md files that contain instructions you write for Claude, auto memory contains notes Claude writes for itself based on what it discovers during sessions.
+
+Auto memory is enabled by default. Toggle it on or off via `/memory` and selecting the auto-memory toggle.
+
+### What Claude Remembers
+
+As Claude works, it may save things like:
+
+- **Project patterns**: build commands, test conventions, code style preferences
+- **Debugging insights**: solutions to tricky problems, common error causes
+- **Architecture notes**: key files, module relationships, important abstractions
+- **Your preferences**: communication style, workflow habits, tool choices
+
+### Where Auto Memory Is Stored
+
+Each project gets its own memory directory at `~/.claude/projects/<project>/memory/`. The `<project>` path is derived from the git repository root, so all subdirectories within the same repo share one auto memory directory. Git worktrees get separate memory directories. Outside a git repo, the working directory is used instead.
+
+```
+~/.claude/projects/<project>/memory/
+├── MEMORY.md          # Concise index, loaded into every session
+├── debugging.md       # Detailed notes on debugging patterns
+├── api-conventions.md # API design decisions
+└── ...                # Any other topic files Claude creates
+```
+
+### How It Works
+
+- The first **200 lines** of `MEMORY.md` are loaded into Claude's system prompt at the start of every session. Content beyond 200 lines is not loaded automatically — Claude is instructed to keep it concise by moving detailed notes into separate topic files.
+- Topic files like `debugging.md` or `patterns.md` are **not** loaded at startup. Claude reads them on demand using its standard file tools when it needs the information.
+- Claude reads and writes memory files during your session, so you'll see memory updates happen as you work.
+
+### Managing Auto Memory
+
+Auto memory files are plain markdown — you can edit them at any time. Use `/memory` to open the file selector, which includes your auto memory entrypoint alongside your CLAUDE.md files.
+
+**Asking Claude to remember something:**
+
+- "Remember that we use pnpm, not npm"
+- "Save to memory that the API tests require a local Redis instance"
+
+**Asking Claude to forget something:**
+
+- "Forget that we use yarn"
+- "Stop remembering the old API endpoint"
+
+**Disabling auto memory globally:**
+
+```json
+// ~/.claude/settings.json
+{ "autoMemoryEnabled": false }
+```
+
+**Disabling via environment variable:**
+
+```bash
+export CLAUDE_AUTO_MEMORY_ENABLED=false
+```
+
+### Auto Memory Best Practices
+
+- **Keep `MEMORY.md` concise** — It acts as an index. Move detailed notes into topic files.
+- **Organize semantically** — Group by topic (e.g., `debugging.md`, `patterns.md`), not chronologically.
+- **Review periodically** — Remove outdated or incorrect memories.
+- **Don't duplicate CLAUDE.md** — Auto memory is for learnings, not instructions.
+- **Verify before saving** — Claude should confirm patterns across multiple interactions before writing.
+
 ## Context Window Management
 
 ### What Fills Context
