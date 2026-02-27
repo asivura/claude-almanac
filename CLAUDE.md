@@ -20,7 +20,6 @@ claude-almanac/
 │   ├── mcp-servers.md
 │   ├── agents.md
 │   ├── plugins.md
-│   ├── auto-memory.md
 │   ├── memory-context.md
 │   ├── ide-integrations.md
 │   ├── security-sandbox.md
