@@ -14,6 +14,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Settings](./features/settings.md)                       | Configuration options  | Customize behavior, permissions, API                     |
 | [IDE Integrations](./features/ide-integrations.md)       | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                    |
 | [Memory & Context](./features/memory-context.md)         | CLAUDE.md and context  | Persistent instructions, context management              |
+| [Auto Memory](./features/auto-memory.md)                 | MEMORY.md (automatic)  | Claude's self-maintained notes and learnings per project |
 | [Rules](./features/rules.md)                             | Modular memory files   | Path-conditional guidelines, organized by topic          |
 | [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CI/CD, automation, custom agents                         |
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
@@ -215,6 +216,36 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+### Auto Memory
+
+**Purpose**: Claude automatically saves learnings, patterns, and insights about your project.
+
+**Key Capabilities**:
+
+- Automatic memory recording by Claude as it works
+- Per-project storage in `~/.claude/projects/<project>/memory/`
+- `MEMORY.md` entrypoint (first 200 lines loaded at startup)
+- Topic files like `debugging.md`, `patterns.md` loaded on demand
+- Manage with `/memory` command or ask Claude to remember/forget
+
+**Quick Start**:
+
+```markdown
+# Tell Claude to remember
+"Remember that we use pnpm, not npm"
+"Save to memory that API tests require local Redis"
+
+# Tell Claude to forget
+"Forget that we use yarn"
+"Stop remembering the old API endpoint"
+```
+
+**Released**: Claude Code v2.1.59 (Feb 26, 2026)
+
+[Full Documentation →](./features/auto-memory.md)
+
+______________________________________________________________________
+
 ### Rules (Modular Memory)
 
 **Purpose**: Organize instructions into topic-specific, path-conditional files.
@@ -399,6 +430,7 @@ ______________________________________________________________________
 | Settings            | Low                  | High        | Moderate            | Low            |
 | IDE Integrations    | Moderate             | High        | High                | Low            |
 | Memory/Context      | Low                  | High        | High                | Low            |
+| Auto Memory         | Low                  | High        | High                | None           |
 | Rules               | Low                  | High        | High                | Low            |
 | Headless/SDK        | High                 | Low         | High                | Medium         |
 | Plugins             | High                 | Moderate    | High                | Medium         |
@@ -410,22 +442,23 @@ ______________________________________________________________________
 
 ## Quick Reference
 
-| Feature     | Config Location         | Key Command              |
-| ----------- | ----------------------- | ------------------------ |
-| Hooks       | `.claude/settings.json` | -                        |
-| MCP Servers | `.claude/settings.json` | `claude mcp add`         |
-| Agents      | `.claude/agents/`       | `/agents`                |
-| Skills      | `.claude/skills/`       | `/skill-name`            |
-| Settings    | `.claude/settings.json` | `/config`                |
-| IDE         | Extension settings      | `Cmd+Esc`                |
-| Memory      | `CLAUDE.md`             | `/memory`                |
-| Rules       | `.claude/rules/`        | `/memory`                |
-| Headless    | CLI flags               | `claude -p`              |
-| Plugins     | `.claude/settings.json` | `/plugin`                |
-| Sandbox     | `.claude/settings.json` | `/sandbox`               |
-| Testing     | `.claude/tests/`        | `uv run pytest`          |
-| Plan Mode   | CLI flag                | `--permission-mode plan` |
-| Sessions    | -                       | `/resume`                |
+| Feature     | Config Location         | Key Command               |
+| ----------- | ----------------------- | ------------------------- |
+| Hooks       | `.claude/settings.json` | -                         |
+| MCP Servers | `.claude/settings.json` | `claude mcp add`          |
+| Agents      | `.claude/agents/`       | `/agents`                 |
+| Skills      | `.claude/skills/`       | `/skill-name`             |
+| Settings    | `.claude/settings.json` | `/config`                 |
+| IDE         | Extension settings      | `Cmd+Esc`                 |
+| Memory      | `CLAUDE.md`             | `/memory`                 |
+| Auto Memory | Auto-maintained         | `/memory` (toggle on/off) |
+| Rules       | `.claude/rules/`        | `/memory`                 |
+| Headless    | CLI flags               | `claude -p`               |
+| Plugins     | `.claude/settings.json` | `/plugin`                 |
+| Sandbox     | `.claude/settings.json` | `/sandbox`                |
+| Testing     | `.claude/tests/`        | `uv run pytest`           |
+| Plan Mode   | CLI flag                | `--permission-mode plan`  |
+| Sessions    | -                       | `/resume`                 |
 
 ______________________________________________________________________
 
