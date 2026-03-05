@@ -40,8 +40,8 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
 | `apiKeyHelper`          | string  | Script path for dynamic API key generation                      |
 | `otelHeadersHelper`     | string  | Script for OpenTelemetry headers                                |
 | `cleanupPeriodDays`     | number  | Delete inactive sessions (0=immediate)                          |
-| `attribution.commit`    | string  | Commit message attribution                                      |
-| `attribution.pr`        | string  | PR description attribution                                      |
+| `attribution.commit`    | string  | Commit message attribution (empty string hides it)              |
+| `attribution.pr`        | string  | PR description attribution (empty string hides it)              |
 | `statusLine`            | object  | Custom status line configuration                                |
 | `respectGitignore`      | boolean | Exclude `.gitignore` files                                      |
 | `plansDirectory`        | string  | Custom plan file storage location                               |
