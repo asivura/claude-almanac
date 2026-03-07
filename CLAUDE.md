@@ -24,8 +24,8 @@ claude-almanac/
 │   ├── ide-integrations.md
 │   ├── security-sandbox.md
 │   ├── headless-sdk.md
+│   ├── github-actions.md
 │   └── additional-features.md
-└── github-workflows.md      # CI/CD workflow examples
 ```
 
 ## Development
