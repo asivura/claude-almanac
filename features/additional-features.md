@@ -4,17 +4,26 @@ Lesser-known but powerful features for advanced workflows.
 
 ## GitHub Actions Integration
 
-Official Claude Code Action for CI/CD automation.
+Official Claude Code Action for CI/CD automation. Supports API key, Max/Pro subscription (OAuth), Google Vertex AI, and AWS Bedrock authentication.
 
 ### Basic Setup
 
 ```yaml
+# With API key
 - uses: anthropics/claude-code-action@v1
   with:
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     prompt: "Review this PR for security issues"
-    claude_args: "--max-turns 10 --model opus"
+    claude_args: "--max-turns 10"
+
+# With Max/Pro subscription
+- uses: anthropics/claude-code-action@v1
+  with:
+    claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+    prompt: "Review this PR for security issues"
 ```
+
+Generate an OAuth token with `claude setup-token` on a machine with a browser (valid ~1 year). Available in Claude Code v1.0.44+.
 
 ### Capabilities
 
@@ -22,9 +31,9 @@ Official Claude Code Action for CI/CD automation.
 - Interactive mode (responds to mentions) and automation mode
 - Implements features, fixes bugs, creates PRs
 - Supports scheduled workflows via cron
-- Works with AWS Bedrock, Google Vertex AI, Microsoft Foundry
+- Works with AWS Bedrock, Google Vertex AI
 
-[Documentation](https://code.claude.com/docs/en/github-actions.md)
+[Full Documentation](./github-actions.md) | [Official Docs](https://code.claude.com/docs/en/github-actions)
 
 ______________________________________________________________________
 

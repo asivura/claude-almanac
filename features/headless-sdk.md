@@ -224,17 +224,36 @@ async def main():
 
 ## CI/CD Integration
 
-### GitHub Actions
+See [GitHub Actions and CI/CD](./github-actions.md) for comprehensive documentation including:
+
+- Authentication with API key, Max/Pro subscription (OAuth), Vertex AI, or Bedrock
+- Complete workflow examples (PR review, issue-to-PR, CI failure fixes)
+- Cost management and security best practices
+
+### Quick Examples
+
+**GitHub Actions (API key):**
 
 ```yaml
 - uses: anthropics/claude-code-action@v1
   with:
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     prompt: "Review this PR for security issues"
-    claude_args: "--max-turns 10 --model claude-opus-4-5-20251101"
+    claude_args: "--max-turns 10"
 ```
 
-### GitLab CI/CD
+**GitHub Actions (Max/Pro subscription):**
+
+```yaml
+- uses: anthropics/claude-code-action@v1
+  with:
+    claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+    prompt: "Review this PR for security issues"
+```
+
+Generate the token with `claude setup-token` on a machine with a browser.
+
+**GitLab CI/CD:**
 
 ```yaml
 claude-review:

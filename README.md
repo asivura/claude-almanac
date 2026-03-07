@@ -15,7 +15,8 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [IDE Integrations](./features/ide-integrations.md)       | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                    |
 | [Memory & Context](./features/memory-context.md)         | CLAUDE.md and context  | Persistent instructions, context management              |
 | [Rules](./features/rules.md)                             | Modular memory files   | Path-conditional guidelines, organized by topic          |
-| [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CI/CD, automation, custom agents                         |
+| [GitHub Actions](./features/github-actions.md)           | CI/CD integration      | PR review, issue-to-PR, automated workflows              |
+| [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CLI automation, custom agents, scripting                 |
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
 | [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies |
 | [Testing](./features/testing.md)                         | Config validation      | Validate settings, skills, schemas in CI/CD              |
@@ -245,16 +246,45 @@ paths:
 
 ______________________________________________________________________
 
+### GitHub Actions and CI/CD
+
+**Purpose**: Run Claude Code in GitHub Actions for automated code review, implementation, and CI/CD tasks.
+
+**Key Capabilities**:
+
+- Multiple auth methods: API key, Max/Pro subscription (OAuth), Vertex AI, Bedrock
+- Interactive mode (`@claude` mentions) and automation mode (prompt-driven)
+- Issue-to-PR automation, CI failure fixes, scheduled reviews
+- Use subscription quota instead of per-token API charges
+
+**Quick Start**:
+
+```yaml
+# With API key
+- uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# With Max/Pro subscription (no per-token charges)
+- uses: anthropics/claude-code-action@v1
+  with:
+    claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+```
+
+[Full Documentation →](./features/github-actions.md)
+
+______________________________________________________________________
+
 ### Headless Mode and Agent SDK
 
-**Purpose**: Run Claude Code programmatically for automation and CI/CD.
+**Purpose**: Run Claude Code programmatically for scripting, custom agents, and automation.
 
 **Key Capabilities**:
 
 - CLI `-p` flag for non-interactive execution
 - JSON and streaming output formats
-- Python and TypeScript SDKs
-- GitHub Actions integration
+- Python and TypeScript Agent SDKs
+- Session management and multi-turn conversations
 
 **Quick Start**:
 
@@ -263,11 +293,6 @@ ______________________________________________________________________
 claude -p "Review code for bugs" \
   --allowedTools "Read,Edit" \
   --output-format json
-
-# GitHub Actions
-- uses: anthropics/claude-code-action@v1
-  with:
-    prompt: "Review this PR"
 ```
 
 [Full Documentation →](./features/headless-sdk.md)
@@ -400,6 +425,7 @@ ______________________________________________________________________
 | IDE Integrations    | Moderate             | High        | High                | Low            |
 | Memory/Context      | Low                  | High        | High                | Low            |
 | Rules               | Low                  | High        | High                | Low            |
+| GitHub Actions      | High                 | Moderate    | High                | Low            |
 | Headless/SDK        | High                 | Low         | High                | Medium         |
 | Plugins             | High                 | Moderate    | High                | Medium         |
 | Security/Sandbox    | Low                  | Moderate    | Low                 | Low            |
@@ -410,22 +436,23 @@ ______________________________________________________________________
 
 ## Quick Reference
 
-| Feature     | Config Location         | Key Command              |
-| ----------- | ----------------------- | ------------------------ |
-| Hooks       | `.claude/settings.json` | -                        |
-| MCP Servers | `.claude/settings.json` | `claude mcp add`         |
-| Agents      | `.claude/agents/`       | `/agents`                |
-| Skills      | `.claude/skills/`       | `/skill-name`            |
-| Settings    | `.claude/settings.json` | `/config`                |
-| IDE         | Extension settings      | `Cmd+Esc`                |
-| Memory      | `CLAUDE.md`             | `/memory`                |
-| Rules       | `.claude/rules/`        | `/memory`                |
-| Headless    | CLI flags               | `claude -p`              |
-| Plugins     | `.claude/settings.json` | `/plugin`                |
-| Sandbox     | `.claude/settings.json` | `/sandbox`               |
-| Testing     | `.claude/tests/`        | `uv run pytest`          |
-| Plan Mode   | CLI flag                | `--permission-mode plan` |
-| Sessions    | -                       | `/resume`                |
+| Feature        | Config Location         | Key Command                        |
+| -------------- | ----------------------- | ---------------------------------- |
+| Hooks          | `.claude/settings.json` | -                                  |
+| MCP Servers    | `.claude/settings.json` | `claude mcp add`                   |
+| Agents         | `.claude/agents/`       | `/agents`                          |
+| Skills         | `.claude/skills/`       | `/skill-name`                      |
+| Settings       | `.claude/settings.json` | `/config`                          |
+| IDE            | Extension settings      | `Cmd+Esc`                          |
+| Memory         | `CLAUDE.md`             | `/memory`                          |
+| Rules          | `.claude/rules/`        | `/memory`                          |
+| GitHub Actions | `.github/workflows/`    | `anthropics/claude-code-action@v1` |
+| Headless       | CLI flags               | `claude -p`                        |
+| Plugins        | `.claude/settings.json` | `/plugin`                          |
+| Sandbox        | `.claude/settings.json` | `/sandbox`                         |
+| Testing        | `.claude/tests/`        | `uv run pytest`                    |
+| Plan Mode      | CLI flag                | `--permission-mode plan`           |
+| Sessions       | -                       | `/resume`                          |
 
 ______________________________________________________________________
 
@@ -436,7 +463,7 @@ ______________________________________________________________________
 1. **Want automation?** → Check out [Hooks](./features/hooks.md) for automatic actions
 1. **Need external tools?** → Set up [MCP Servers](./features/mcp-servers.md)
 1. **Building workflows?** → Create [Skills](./features/skills.md) for reusable commands
-1. **Running in CI/CD?** → Use [Headless Mode](./features/headless-sdk.md)
+1. **Running in CI/CD?** → Use [GitHub Actions](./features/github-actions.md) or [Headless Mode](./features/headless-sdk.md)
 1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
 1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
 1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
