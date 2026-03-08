@@ -467,6 +467,60 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+## Feature Compatibility in CI/CD
+
+Not all Claude Code features work in GitHub Actions. Runners are headless Linux VMs with no display.
+
+| Feature                           | Works in CI/CD? | Notes                                                  |
+| --------------------------------- | --------------- | ------------------------------------------------------ |
+| CLAUDE.md                         | Yes             | Auto-loaded from repo root                             |
+| Skills (`.claude/skills/`)        | Yes             | Invokable via `prompt: "/skill-name"`                  |
+| Custom agents (`.claude/agents/`) | Yes             | Available as subagents                                 |
+| Rules (`.claude/rules/`)          | Yes             | Auto-loaded based on path conditions                   |
+| MCP Servers (stdio)               | Yes             | Configure via `claude_args: "--mcp-config '...'"`      |
+| Bash commands                     | Yes             | Must be allowed via `--allowedTools`                   |
+| Image analysis                    | Yes             | Attach screenshots to issues, Claude can analyze them  |
+| Web search/fetch                  | Yes             | Available as tools                                     |
+| Plugins                           | Yes             | Install via `plugins` and `plugin_marketplaces` inputs |
+| Structured JSON output            | Yes             | Via `--json-schema` flag                               |
+| Chrome/browser automation         | No              | Requires local Chrome with extension                   |
+| MCP Servers (browser-based)       | No              | No display available on runners                        |
+| Interactive prompts               | No              | Runs must complete unattended                          |
+| Desktop app features              | No              | CLI only                                               |
+
+### Using Skills in CI/CD
+
+Skills from `.claude/skills/` are available automatically. Invoke them in the `prompt` input:
+
+```yaml
+- uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+    prompt: "/your-skill-name"
+```
+
+Or install marketplace plugins:
+
+```yaml
+- uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+    plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+    plugins: "code-review@claude-code-plugins"
+    prompt: "/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+```
+
+### Using MCP Servers in CI/CD
+
+Only stdio-based servers work (no browser or GUI servers):
+
+```yaml
+claude_args: |
+  --mcp-config '{"mcpServers":{"db":{"command":"npx","args":["-y","@bytebase/dbhub","--dsn","postgres://..."]}}}'
+```
+
+______________________________________________________________________
+
 ## GitLab CI/CD
 
 Claude Code also works in GitLab pipelines via the CLI:
