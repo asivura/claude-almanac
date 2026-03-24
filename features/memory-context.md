@@ -39,13 +39,21 @@ CLAUDE.md is a special file that Claude reads at the start of every session. It 
 
 ### Recursive Memory Discovery
 
-Claude Code reads memories by walking up the directory tree:
+Claude Code discovers CLAUDE.md files using both **upward** and **downward** traversal:
+
+**Upward Discovery (Loaded at Startup):**
 
 - Starts in current working directory
-- Recurses up to (but not including) root directory
-- Reads any `CLAUDE.md` or `CLAUDE.local.md` files found
-- Discovers `CLAUDE.md` files in subtrees under current directory
-- Nested subtree memories only included when Claude reads files in those subtrees
+- Walks up the directory tree to repository root
+- Loads all `CLAUDE.md` and `CLAUDE.local.md` files found along the path
+- Enables monorepo support by loading parent-level context
+
+**Downward Discovery (Loaded On-Demand):**
+
+- Discovers `CLAUDE.md` files in subdirectories below current working directory
+- Loads them only when you read files in those subdirectories
+- Prevents context bloat in large monorepos with many packages
+- Ensures you get relevant context without overwhelming the context window
 
 ### Memory Imports
 
@@ -68,6 +76,110 @@ Personal preferences: @~/.claude/my-preferences.md
 ### View Loaded Memory
 
 Run `/memory` to see all memory files currently loaded.
+
+## Monorepo and Large Codebase Support
+
+Claude Code's hierarchical memory system is designed for large codebases and monorepos with multiple packages, services, or components. It automatically discovers and loads CLAUDE.md files from parent and child directories based on where you're working.
+
+### How Hierarchical Discovery Works
+
+**Upward Traversal (Parent Directories)**
+
+When you start Claude Code, it walks **up** the directory tree from your current working directory to discover context:
+
+```
+/workspace/                      # Root CLAUDE.md (loaded)
+├── CLAUDE.md
+└── packages/
+    ├── CLAUDE.md                # Package-level CLAUDE.md (loaded)
+    └── web/
+        ├── CLAUDE.md            # Component CLAUDE.md (loaded)
+        └── src/                 # ← You run `claude` here
+```
+
+All CLAUDE.md files from your current directory up to the repository root are loaded **at startup**.
+
+**Downward Traversal (Child Directories)**
+
+Claude Code also discovers CLAUDE.md files in **subdirectories**, but loads them **on-demand** to prevent context bloat:
+
+```
+/workspace/packages/web/         # ← You run `claude` here
+├── CLAUDE.md                    # Loaded at startup
+├── src/
+│   ├── frontend/
+│   │   └── CLAUDE.md            # Loaded when you read files in frontend/
+│   └── backend/
+│       └── CLAUDE.md            # Loaded when you read files in backend/
+```
+
+**Why On-Demand Loading?**
+
+In a monorepo with 50 packages, loading all 50 CLAUDE.md files at startup would bloat your context. Instead, Claude loads subdirectory memories only when you actually work with files in those directories.
+
+### Example: Multi-Package Monorepo
+
+```
+monorepo/
+├── CLAUDE.md                    # System overview, modernization strategy
+├── packages/
+│   ├── CLAUDE.md                # Component architecture, technical debt
+│   ├── ui/
+│   │   └── CLAUDE.md            # UI patterns, component library
+│   ├── api-client/
+│   │   └── CLAUDE.md            # API design, data modules
+│   └── test-cases/
+│       └── CLAUDE.md            # Test coverage, test patterns
+```
+
+**When you run `claude` from `packages/ui/`:**
+
+- ✅ Loaded at startup: `monorepo/CLAUDE.md`, `packages/CLAUDE.md`, `packages/ui/CLAUDE.md`
+- ⏳ Loaded on-demand: `api-client/CLAUDE.md` (when you read files in `api-client/`)
+- ⏳ Loaded on-demand: `test-cases/CLAUDE.md` (when you read files in `test-cases/`)
+
+### Controlling Discovery with `claudeMdExcludes`
+
+In large monorepos, you may want to exclude certain CLAUDE.md files (e.g., from other teams' packages). Use the `claudeMdExcludes` setting:
+
+**In `.claude/settings.json`:**
+
+```json
+{
+  "claudeMdExcludes": [
+    "**/node_modules/**",
+    "packages/legacy-*/**",
+    "team-b/**"
+  ]
+}
+```
+
+This prevents Claude from loading CLAUDE.md files matching these patterns, even when discovering them upward or on-demand.
+
+### Best Practices for Monorepos
+
+1. **Root-level CLAUDE.md**: System overview, shared conventions, team structure
+2. **Package/service-level CLAUDE.md**: Component-specific architecture, dependencies
+3. **Feature-level CLAUDE.md**: Highly specific context for complex subdirectories
+4. **Use `claudeMdExcludes`**: Filter out unrelated packages/teams
+5. **Keep each file focused**: Avoid duplicating information between levels
+
+### Working from Different Directories
+
+The memory that gets loaded depends on where you start Claude:
+
+```bash
+# From root - loads only root CLAUDE.md
+cd /workspace && claude
+
+# From packages/web - loads root + packages + web
+cd /workspace/packages/web && claude
+
+# From packages/api - loads root + packages + api
+cd /workspace/packages/api && claude
+```
+
+Each location gives you the right level of context for the code you're working on.
 
 ## Context Window Management
 
