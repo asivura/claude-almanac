@@ -159,10 +159,10 @@ This prevents Claude from loading CLAUDE.md files matching these patterns, even 
 ### Best Practices for Monorepos
 
 1. **Root-level CLAUDE.md**: System overview, shared conventions, team structure
-2. **Package/service-level CLAUDE.md**: Component-specific architecture, dependencies
-3. **Feature-level CLAUDE.md**: Highly specific context for complex subdirectories
-4. **Use `claudeMdExcludes`**: Filter out unrelated packages/teams
-5. **Keep each file focused**: Avoid duplicating information between levels
+1. **Package/service-level CLAUDE.md**: Component-specific architecture, dependencies
+1. **Feature-level CLAUDE.md**: Highly specific context for complex subdirectories
+1. **Use `claudeMdExcludes`**: Filter out unrelated packages/teams
+1. **Keep each file focused**: Avoid duplicating information between levels
 
 ### Working from Different Directories
 
