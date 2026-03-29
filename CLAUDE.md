@@ -19,6 +19,7 @@ claude-almanac/
 │   ├── skills.md
 │   ├── mcp-servers.md
 │   ├── agents.md
+│   ├── agent-teams.md
 │   ├── plugins.md
 │   ├── memory-context.md
 │   ├── ide-integrations.md
