@@ -18,6 +18,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Auto Memory](./features/auto-memory.md)                 | MEMORY.md (automatic)  | Claude's self-maintained notes and learnings per project |
 | [Rules](./features/rules.md)                             | Modular memory files   | Path-conditional guidelines, organized by topic          |
 | [GitHub Actions](./features/github-actions.md)           | CI/CD integration      | PR review, issue-to-PR, automated workflows              |
+| [Remote Control](./features/remote-control.md)           | Mobile/web access      | Control terminal sessions from phone, tablet, or browser |
 | [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CLI automation, custom agents, scripting                 |
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
 | [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies |
@@ -340,6 +341,33 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+### Remote Control
+
+**Purpose**: Control a terminal Claude Code session from your phone, tablet, or any browser.
+
+**Key Capabilities**:
+
+- Session stays local, control from anywhere via claude.ai or mobile app
+- QR code, URL, or app-based connection
+- Syncs conversation across all connected devices
+- Server mode for multiple concurrent sessions
+
+**Quick Start**:
+
+```bash
+# Start remote control
+claude remote-control
+
+# Or from an existing session
+/remote-control My Project
+```
+
+**Requirements**: Claude Code v2.1.51+, Pro/Max/Team/Enterprise plan.
+
+[Full Documentation →](./features/remote-control.md)
+
+______________________________________________________________________
+
 ### Headless Mode and Agent SDK
 
 **Purpose**: Run Claude Code programmatically for scripting, custom agents, and automation.
@@ -493,6 +521,7 @@ ______________________________________________________________________
 | Auto Memory         | Low                  | High        | High                | None           |
 | Rules               | Low                  | High        | High                | Low            |
 | GitHub Actions      | High                 | Moderate    | High                | Low            |
+| Remote Control      | Moderate             | High        | High                | Low            |
 | Headless/SDK        | High                 | Low         | High                | Medium         |
 | Plugins             | High                 | Moderate    | High                | Medium         |
 | Security/Sandbox    | Low                  | Moderate    | Low                 | Low            |
@@ -516,6 +545,7 @@ ______________________________________________________________________
 | Auto Memory    | Auto-maintained         | `/memory` (toggle on/off)                     |
 | Rules          | `.claude/rules/`        | `/memory`                                     |
 | GitHub Actions | `.github/workflows/`    | `anthropics/claude-code-action@v1`            |
+| Remote Control | CLI flag                | `claude remote-control`                       |
 | Headless       | CLI flags               | `claude -p`                                   |
 | Plugins        | `.claude/settings.json` | `/plugin`                                     |
 | Sandbox        | `.claude/settings.json` | `/sandbox`                                    |
@@ -532,6 +562,7 @@ ______________________________________________________________________
 1. **Want automation?** → Check out [Hooks](./features/hooks.md) for automatic actions
 1. **Need external tools?** → Set up [MCP Servers](./features/mcp-servers.md)
 1. **Building workflows?** → Create [Skills](./features/skills.md) for reusable commands
+1. **On the go?** → Set up [Remote Control](./features/remote-control.md) for phone/tablet access
 1. **Running in CI/CD?** → Use [GitHub Actions](./features/github-actions.md) or [Headless Mode](./features/headless-sdk.md)
 1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
 1. **Parallel collaboration?** → Set up [Agent Teams](./features/agent-teams.md) for multi-instance work

@@ -24,6 +24,7 @@ claude-almanac/
 │   ├── memory-context.md
 │   ├── ide-integrations.md
 │   ├── security-sandbox.md
+│   ├── remote-control.md
 │   ├── headless-sdk.md
 │   ├── github-actions.md
 │   └── additional-features.md
