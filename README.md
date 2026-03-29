@@ -10,6 +10,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Hooks](./features/hooks.md)                             | Lifecycle automation   | Validate, format, protect files automatically            |
 | [MCP Servers](./features/mcp-servers.md)                 | External integrations  | Connect to databases, APIs, third-party tools            |
 | [Agents](./features/agents.md)                           | Specialized subagents  | Delegate complex tasks, isolate context                  |
+| [Agent Teams](./features/agent-teams.md)                 | Multi-agent sessions   | Coordinate parallel work across independent instances    |
 | [Skills](./features/skills.md)                           | Custom slash commands  | Create reusable commands and workflows                   |
 | [Settings](./features/settings.md)                       | Configuration options  | Customize behavior, permissions, API                     |
 | [IDE Integrations](./features/ide-integrations.md)       | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                    |
@@ -105,6 +106,39 @@ Review code for quality, security, and maintainability.
 ```
 
 [Full Documentation →](./features/agents.md)
+
+______________________________________________________________________
+
+### Agent Teams
+
+**Purpose**: Coordinate multiple independent Claude Code instances working together on shared tasks.
+
+**Key Capabilities**:
+
+- Team lead orchestrates work while teammates execute independently
+- Direct inter-agent communication via mailbox system
+- Shared task list with self-coordination
+- Display modes: in-process, tmux split panes, auto
+- Quality gate hooks: TeammateIdle, TaskCreated, TaskCompleted
+
+**Quick Start**:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+```
+Create an agent team to review PR #142. Spawn three reviewers:
+- One focused on security implications
+- One checking performance impact
+- One validating test coverage
+```
+
+[Full Documentation →](./features/agent-teams.md)
 
 ______________________________________________________________________
 
@@ -451,6 +485,7 @@ ______________________________________________________________________
 | Hooks               | Moderate             | High        | High                | Medium         |
 | MCP Servers         | High                 | Moderate    | High                | Medium         |
 | Agents              | High                 | Moderate    | High                | Low            |
+| Agent Teams         | High                 | Moderate    | High                | Medium         |
 | Skills              | Moderate             | High        | High                | Low            |
 | Settings            | Low                  | High        | Moderate            | Low            |
 | IDE Integrations    | Moderate             | High        | High                | Low            |
@@ -468,24 +503,25 @@ ______________________________________________________________________
 
 ## Quick Reference
 
-| Feature        | Config Location         | Key Command                        |
-| -------------- | ----------------------- | ---------------------------------- |
-| Hooks          | `.claude/settings.json` | -                                  |
-| MCP Servers    | `.claude/settings.json` | `claude mcp add`                   |
-| Agents         | `.claude/agents/`       | `/agents`                          |
-| Skills         | `.claude/skills/`       | `/skill-name`                      |
-| Settings       | `.claude/settings.json` | `/config`                          |
-| IDE            | Extension settings      | `Cmd+Esc`                          |
-| Memory         | `CLAUDE.md`             | `/memory`                          |
-| Auto Memory    | Auto-maintained         | `/memory` (toggle on/off)          |
-| Rules          | `.claude/rules/`        | `/memory`                          |
-| GitHub Actions | `.github/workflows/`    | `anthropics/claude-code-action@v1` |
-| Headless       | CLI flags               | `claude -p`                        |
-| Plugins        | `.claude/settings.json` | `/plugin`                          |
-| Sandbox        | `.claude/settings.json` | `/sandbox`                         |
-| Testing        | `.claude/tests/`        | `uv run pytest`                    |
-| Plan Mode      | CLI flag                | `--permission-mode plan`           |
-| Sessions       | -                       | `/resume`                          |
+| Feature        | Config Location         | Key Command                                   |
+| -------------- | ----------------------- | --------------------------------------------- |
+| Hooks          | `.claude/settings.json` | -                                             |
+| MCP Servers    | `.claude/settings.json` | `claude mcp add`                              |
+| Agents         | `.claude/agents/`       | `/agents`                                     |
+| Agent Teams    | `~/.claude/teams/`      | env: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| Skills         | `.claude/skills/`       | `/skill-name`                                 |
+| Settings       | `.claude/settings.json` | `/config`                                     |
+| IDE            | Extension settings      | `Cmd+Esc`                                     |
+| Memory         | `CLAUDE.md`             | `/memory`                                     |
+| Auto Memory    | Auto-maintained         | `/memory` (toggle on/off)                     |
+| Rules          | `.claude/rules/`        | `/memory`                                     |
+| GitHub Actions | `.github/workflows/`    | `anthropics/claude-code-action@v1`            |
+| Headless       | CLI flags               | `claude -p`                                   |
+| Plugins        | `.claude/settings.json` | `/plugin`                                     |
+| Sandbox        | `.claude/settings.json` | `/sandbox`                                    |
+| Testing        | `.claude/tests/`        | `uv run pytest`                               |
+| Plan Mode      | CLI flag                | `--permission-mode plan`                      |
+| Sessions       | -                       | `/resume`                                     |
 
 ______________________________________________________________________
 
@@ -498,6 +534,7 @@ ______________________________________________________________________
 1. **Building workflows?** → Create [Skills](./features/skills.md) for reusable commands
 1. **Running in CI/CD?** → Use [GitHub Actions](./features/github-actions.md) or [Headless Mode](./features/headless-sdk.md)
 1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
+1. **Parallel collaboration?** → Set up [Agent Teams](./features/agent-teams.md) for multi-instance work
 1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
 1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
 1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)
