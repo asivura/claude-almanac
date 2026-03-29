@@ -15,9 +15,11 @@ Key properties:
 ## Requirements
 
 - Claude Code v2.1.51 or later
-- Pro, Max, Team, or Enterprise plan (not API keys)
+- Pro, Max, Team, or Enterprise plan via claude.ai
 - Authenticated with claude.ai (`/login` if needed)
 - Workspace trust accepted (run `claude` in your project once)
+
+**Not supported**: API keys, Vertex AI, Bedrock, or Foundry authentication. Remote Control requires claude.ai OAuth. If you have `CLAUDE_CODE_USE_VERTEX` or `CLAUDE_CODE_USE_BEDROCK` set, Remote Control will not activate.
 
 ## Starting a Session
 
