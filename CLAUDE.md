@@ -20,6 +20,7 @@ claude-almanac/
 │   ├── mcp-servers.md
 │   ├── agents.md
 │   ├── agent-teams.md
+│   ├── agent-teams-setup.md
 │   ├── plugins.md
 │   ├── memory-context.md
 │   ├── ide-integrations.md
