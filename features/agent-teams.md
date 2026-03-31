@@ -4,6 +4,8 @@ Agent teams coordinate multiple independent Claude Code instances working togeth
 
 > **Status**: Experimental. Requires Claude Code v2.1.32+.
 
+For environment setup (Ghostty, tmux, Starship, VS Code integration), see [Agent Teams: Environment Setup](agent-teams-setup.md).
+
 ## Overview
 
 Agent teams differ fundamentally from subagents. Subagents run within a single session and can only report results back to the parent. Agent team teammates share a task list, claim work, and message each other directly.
