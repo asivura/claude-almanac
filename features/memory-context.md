@@ -351,6 +351,98 @@ paths:
 - Write specific prompts (details reduce back-and-forth)
 - Manage context proactively with `/clear` and `/compact`
 
+## Progressive Disclosure
+
+Don't embed all knowledge in CLAUDE.md -- tell Claude **where to find** information instead of loading it all upfront. This recovers significant context budget.
+
+**Instead of:**
+
+```markdown
+## API Error Codes
+- 400: Bad Request -- missing required fields
+- 401: Unauthorized -- invalid or expired token
+... (20 more lines)
+```
+
+**Use a pointer:**
+
+```markdown
+## API Conventions
+For error codes and response formats: see docs/api-conventions.md
+```
+
+**Mechanisms:**
+
+| Mechanism | How | When loaded |
+| --- | --- | --- |
+| `@path/to/file` imports | Inline reference in CLAUDE.md | When CLAUDE.md is loaded (up to 5 levels deep) |
+| `.claude/rules/` files | Auto-discovered markdown files | At session start, alongside CLAUDE.md |
+| Skills | `.claude/skills/<name>/SKILL.md` | On-demand, triggered by relevance |
+| Reference pointers | Plain text "see docs/x.md" | When Claude reads the referenced file |
+
+Progressive disclosure can recover ~15,000 tokens per session compared to loading everything upfront.
+
+## CLAUDE.md vs Skills vs Hooks
+
+Three mechanisms serve different purposes:
+
+| Mechanism | When to use | Behavior | Compliance |
+| --- | --- | --- | --- |
+| **CLAUDE.md** | Static context that rarely changes | Always loaded, advisory | ~80% |
+| **Skills** | Domain knowledge loaded on demand | Triggered by relevance | ~80% |
+| **Hooks** | Rules enforced 100% of the time | Deterministic, automated | 100% |
+
+**CLAUDE.md** is for conventions, architecture, and commands Claude needs every session. **Skills** are for detailed workflows that only apply sometimes (e.g., deployment guide). **Hooks** are for non-negotiable rules (e.g., linting before commits).
+
+Key insight: CLAUDE.md is advisory. The system prompt even says "this context may or may not be relevant to your tasks." If something must happen without exception, make it a hook.
+
+## Size and Token Budget
+
+CLAUDE.md is loaded into every conversation turn and survives context compaction -- it's always present. This makes it powerful but expensive.
+
+**Guidelines:**
+
+- **Target under 200 lines** -- adherence degrades with longer files
+- **Monitor with `/context`** -- CLAUDE.md should use less than 10-15% of context budget
+- **Every line must earn its place** -- "Would removing this cause Claude to make mistakes?" If no, cut it
+- **Start small, grow carefully** -- 5 rules initially, add one per week, prune monthly
+- **It's a system prompt, not documentation** -- README informs humans, CLAUDE.md directs AI behavior
+
+## Give Claude Verification Methods
+
+The highest-leverage content in CLAUDE.md is how Claude can **check its own work**:
+
+- **Exact test commands** -- `uv run pytest tests/ -x` not just "pytest"
+- **Expected outputs** -- what success looks like
+- **Quality check sequence** -- lint, type check, format, test
+
+Claude performs dramatically better when it can verify its own work.
+
+## Formatting Recommendations
+
+Official Anthropic guidance and community best practices for CLAUDE.md formatting:
+
+- **Use markdown headers and bullets** -- structure helps Claude scan quickly
+- **One header per topic** -- clear section boundaries
+- **Code blocks for all commands** -- exact invocations, not descriptions
+- **Brief rationale for each constraint** -- "why" helps Claude judge edge cases
+- **No tables required** -- bullet lists work equally well; use tables only when comparing side-by-side options
+- **Well-structured files outperform short unstructured ones** -- formatting is signal
+
+## Common Anti-Patterns
+
+**Over-specified** -- including code style rules that a linter enforces. Never send an LLM to do a linter's job.
+
+**Kitchen-sink growth** -- adding rules every time something goes wrong without pruning. Treat CLAUDE.md like code: review, prune, test.
+
+**Auto-generated without review** -- `/init` output often includes obvious information Claude already knows.
+
+**Non-universal instructions** -- task-specific instructions that only apply to one feature. These belong in skills or the conversation prompt.
+
+**No verification methods** -- telling Claude what to do but not how to check if it did it correctly.
+
+**Negative-only rules** -- a file full of "don't do X" without positive guidance wastes tokens on low-value constraints.
+
 ## References
 
 - [Memory Management](https://code.claude.com/docs/en/memory.md)
