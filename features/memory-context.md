@@ -373,12 +373,12 @@ For error codes and response formats: see docs/api-conventions.md
 
 **Mechanisms:**
 
-| Mechanism | How | When loaded |
-| --- | --- | --- |
-| `@path/to/file` imports | Inline reference in CLAUDE.md | When CLAUDE.md is loaded (up to 5 levels deep) |
-| `.claude/rules/` files | Auto-discovered markdown files | At session start, alongside CLAUDE.md |
-| Skills | `.claude/skills/<name>/SKILL.md` | On-demand, triggered by relevance |
-| Reference pointers | Plain text "see docs/x.md" | When Claude reads the referenced file |
+| Mechanism               | How                              | When loaded                                    |
+| ----------------------- | -------------------------------- | ---------------------------------------------- |
+| `@path/to/file` imports | Inline reference in CLAUDE.md    | When CLAUDE.md is loaded (up to 5 levels deep) |
+| `.claude/rules/` files  | Auto-discovered markdown files   | At session start, alongside CLAUDE.md          |
+| Skills                  | `.claude/skills/<name>/SKILL.md` | On-demand, triggered by relevance              |
+| Reference pointers      | Plain text "see docs/x.md"       | When Claude reads the referenced file          |
 
 Progressive disclosure can recover ~15,000 tokens per session compared to loading everything upfront.
 
@@ -386,11 +386,11 @@ Progressive disclosure can recover ~15,000 tokens per session compared to loadin
 
 Three mechanisms serve different purposes:
 
-| Mechanism | When to use | Behavior | Compliance |
-| --- | --- | --- | --- |
-| **CLAUDE.md** | Static context that rarely changes | Always loaded, advisory | ~80% |
-| **Skills** | Domain knowledge loaded on demand | Triggered by relevance | ~80% |
-| **Hooks** | Rules enforced 100% of the time | Deterministic, automated | 100% |
+| Mechanism     | When to use                        | Behavior                 | Compliance |
+| ------------- | ---------------------------------- | ------------------------ | ---------- |
+| **CLAUDE.md** | Static context that rarely changes | Always loaded, advisory  | ~80%       |
+| **Skills**    | Domain knowledge loaded on demand  | Triggered by relevance   | ~80%       |
+| **Hooks**     | Rules enforced 100% of the time    | Deterministic, automated | 100%       |
 
 **CLAUDE.md** is for conventions, architecture, and commands Claude needs every session. **Skills** are for detailed workflows that only apply sometimes (e.g., deployment guide). **Hooks** are for non-negotiable rules (e.g., linting before commits).
 
