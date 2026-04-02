@@ -20,6 +20,10 @@ Agent teams differ fundamentally from subagents. Subagents run within a single s
 
 ## Agent Teams vs. Subagents
 
+![Subagents vs Agent Teams architecture](../resources/images/subagents-vs-agent-teams.png)
+
+*Source: [Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)*
+
 | Aspect            | Subagents                                   | Agent Teams                                     |
 | ----------------- | ------------------------------------------- | ----------------------------------------------- |
 | **Context**       | Own window; results return to caller        | Own window; fully independent                   |
@@ -100,6 +104,14 @@ Task tools work with the shared task list:
 | `TaskUpdate`  | Change task status (`pending` -> `in_progress` -> `completed`) |
 | `TaskList`    | Return all tasks and ownership status                          |
 | `SendMessage` | Direct communication between teammates                         |
+
+## In Practice
+
+An agent team running in tmux mode, with the team lead coordinating a frontend security audit across multiple teammates:
+
+![Agent teams tmux session with multiple teammates](../resources/images/agent-teams-tmux-session.png)
+
+The team lead (left pane) assigns tasks and reviews results, while teammates (right panes) work independently on frontend auditing, infrastructure auditing, API endpoint fixes, and backend security audits.
 
 ## Display Modes
 
