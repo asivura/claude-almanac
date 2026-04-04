@@ -12,6 +12,21 @@ import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { GuidePrelude } from '@/components/page-layouts/guide-prelude';
+import { CaseStudyHeader } from '@/components/page-layouts/case-study-header';
+import {
+  FooterLinks,
+  type FooterLink,
+} from '@/components/page-layouts/footer-links';
+
+// Three layout variants keyed off `page.data.type`:
+//   reference  → default DocsPage (title, description, body, right ToC)
+//   guide      → DocsPage + prelude banner above body + "Next steps" footer
+//   caseStudy  → DocsPage + narrative header above body + "Related" footer
+//
+// The discriminator comes from fumadocs-core's `multiple()` helper in
+// source.ts, which injects `type: "reference" | "guide" | "caseStudy"`
+// from the collection key names.
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -20,6 +35,21 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const data = page.data as {
+    type?: string;
+    time?: string;
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
+    author?: string;
+    prerequisites?: string[];
+    outcome?: string;
+    nextSteps?: FooterLink[];
+    date?: string;
+    duration?: string;
+    themes?: string[];
+    stack?: string[];
+    related?: FooterLink[];
+  };
+  const type = data.type;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
@@ -32,6 +62,27 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
+
+      {type === 'guide' ? (
+        <GuidePrelude
+          time={data.time}
+          difficulty={data.difficulty}
+          author={data.author}
+          prerequisites={data.prerequisites}
+          outcome={data.outcome}
+        />
+      ) : null}
+
+      {type === 'caseStudy' ? (
+        <CaseStudyHeader
+          date={data.date}
+          duration={data.duration}
+          author={data.author}
+          themes={data.themes}
+          stack={data.stack}
+        />
+      ) : null}
+
       <DocsBody>
         <MDX
           components={getMDXComponents({
@@ -40,6 +91,14 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           })}
         />
       </DocsBody>
+
+      {type === 'guide' ? (
+        <FooterLinks title="Next steps" items={data.nextSteps} />
+      ) : null}
+
+      {type === 'caseStudy' ? (
+        <FooterLinks title="Related" items={data.related} />
+      ) : null}
     </DocsPage>
   );
 }
