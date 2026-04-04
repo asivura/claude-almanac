@@ -7,7 +7,7 @@
 ## Context
 
 We are building a public documentation website for claude-almanac, hosted at
-`almanac.sivura.com`. The site will expose 30+ markdown feature docs from this repo
+`claude-almanac.sivura.com`. The site will expose 30+ markdown feature docs from this repo
 to a broader audience than GitHub's markdown viewer reaches.
 
 Requirements:
