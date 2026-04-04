@@ -445,6 +445,6 @@ claude --debug --plugin-dir ./my-plugin
 
 ## References
 
-- [Plugins Documentation](https://code.claude.com/docs/en/plugins.md)
-- [Creating Plugins](https://code.claude.com/docs/en/creating-plugins.md)
-- [Plugin Marketplaces](https://code.claude.com/docs/en/plugin-marketplaces.md)
+- [Plugins Documentation](https://code.claude.com/docs/en/plugins)
+- [Plugins Reference](https://code.claude.com/docs/en/plugins-reference)
+- [Plugin Marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)

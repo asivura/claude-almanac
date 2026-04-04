@@ -55,7 +55,7 @@ claude
 - Sessions grouped by git branch in `/resume`
 - Perfect for long-running tasks
 
-[Documentation](https://code.claude.com/docs/en/common-workflows.md#run-parallel-claude-code-sessions-with-git-worktrees)
+[Documentation](https://code.claude.com/docs/en/common-workflows#run-parallel-claude-code-sessions-with-git-worktrees)
 
 ______________________________________________________________________
 
@@ -77,7 +77,7 @@ Claude Code has multimodal capabilities.
 - Extract data from diagrams
 - Interpret visual documentation
 
-[Documentation](https://code.claude.com/docs/en/common-workflows.md#work-with-images)
+[Documentation](https://code.claude.com/docs/en/common-workflows#work-with-images)
 
 ______________________________________________________________________
 
@@ -127,7 +127,7 @@ claude --permission-mode plan -p "Your prompt"
 - Sensitive projects
 - Learning new codebases
 
-[Documentation](https://code.claude.com/docs/en/common-workflows.md#use-plan-mode-for-safe-code-analysis)
+[Documentation](https://code.claude.com/docs/en/common-workflows#use-plan-mode-for-safe-code-analysis)
 
 ______________________________________________________________________
 
@@ -154,7 +154,7 @@ claude --continue                 # Resume most recent
 | `A` | Toggle current dir vs all projects |
 | `/` | Search/filter sessions             |
 
-[Documentation](https://code.claude.com/docs/en/common-workflows.md#resume-previous-conversations)
+[Documentation](https://code.claude.com/docs/en/common-workflows#resume-previous-conversations)
 
 ______________________________________________________________________
 
@@ -184,7 +184,7 @@ Tracks: sessions, tokens, commits, PRs, cost per model.
 - Reduce MCP server overhead
 - Move CLAUDE.md details to skills
 
-[Documentation](https://code.claude.com/docs/en/costs.md)
+[Documentation](https://code.claude.com/docs/en/costs)
 
 ______________________________________________________________________
 
@@ -266,7 +266,7 @@ claude --chrome
 - Test local web applications
 - Record demo GIFs
 
-[Documentation](https://code.claude.com/docs/en/chrome.md)
+[Documentation](https://code.claude.com/docs/en/chrome)
 
 ______________________________________________________________________
 
@@ -281,7 +281,7 @@ Mention `@Claude` in Slack threads.
 - Returns pull requests in thread
 - Bug report → PR workflow
 
-[Documentation](https://code.claude.com/docs/en/slack.md)
+[Documentation](https://code.claude.com/docs/en/slack)
 
 ______________________________________________________________________
 
@@ -296,7 +296,7 @@ Native desktop app with GUI.
 - Launch local or cloud sessions
 - Browser control integration
 
-[Documentation](https://code.claude.com/docs/en/desktop.md)
+[Documentation](https://code.claude.com/docs/en/desktop)
 
 ______________________________________________________________________
 
@@ -317,7 +317,7 @@ claude --remote "Fix the login bug"  # Create web session
 claude --teleport                    # Resume web session locally
 ```
 
-[Documentation](https://code.claude.com/docs/en/devcontainer.md)
+[Documentation](https://code.claude.com/docs/en/devcontainer)
 
 ______________________________________________________________________
 
@@ -376,8 +376,8 @@ Enable with `/vim` or configure via `/config`.
 
 ## References
 
-- [Common Workflows](https://code.claude.com/docs/en/common-workflows.md)
-- [Interactive Mode](https://code.claude.com/docs/en/interactive-mode.md)
-- [GitHub Actions](https://code.claude.com/docs/en/github-actions.md)
-- [Chrome Integration](https://code.claude.com/docs/en/chrome.md)
-- [Desktop Preview](https://code.claude.com/docs/en/desktop.md)
+- [Common Workflows](https://code.claude.com/docs/en/common-workflows)
+- [Interactive Mode](https://code.claude.com/docs/en/interactive-mode)
+- [GitHub Actions](https://code.claude.com/docs/en/github-actions)
+- [Chrome Integration](https://code.claude.com/docs/en/chrome)
+- [Desktop Preview](https://code.claude.com/docs/en/desktop)

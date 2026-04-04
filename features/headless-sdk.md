@@ -372,8 +372,8 @@ claude -p "Generate a security audit report" \
 
 ## References
 
-- [Claude Code Headless Docs](https://code.claude.com/docs/en/headless.md)
-- [CLI Reference](https://code.claude.com/docs/en/cli-reference.md)
+- [Claude Code Headless Docs](https://code.claude.com/docs/en/headless)
+- [CLI Reference](https://code.claude.com/docs/en/cli-reference)
 - [Agent SDK Overview](https://platform.claude.com/docs/en/agent-sdk/overview)
 - [Agent SDK Quickstart](https://platform.claude.com/docs/en/agent-sdk/quickstart)
-- [GitHub Actions Integration](https://code.claude.com/docs/en/github-actions.md)
+- [GitHub Actions Integration](https://code.claude.com/docs/en/github-actions)

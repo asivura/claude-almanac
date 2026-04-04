@@ -455,5 +455,5 @@ ______________________________________________________________________
 
 ## References
 
-- [Claude Code Memory Documentation](https://code.claude.com/docs/en/memory.md)
+- [Claude Code Memory Documentation](https://code.claude.com/docs/en/memory)
 - [Memory & Context Guide](./memory-context.md)

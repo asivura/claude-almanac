@@ -445,6 +445,6 @@ Official Anthropic guidance and community best practices for CLAUDE.md formattin
 
 ## References
 
-- [Memory Management](https://code.claude.com/docs/en/memory.md)
-- [Best Practices](https://code.claude.com/docs/en/best-practices.md)
-- [Context Management](https://code.claude.com/docs/en/interactive-mode.md)
+- [Memory Management](https://code.claude.com/docs/en/memory)
+- [Best Practices](https://code.claude.com/docs/en/best-practices)
+- [Context Management](https://code.claude.com/docs/en/interactive-mode)

@@ -401,6 +401,6 @@ Denylist takes absolute precedence over allowlist. Both options can be combined.
 
 ## References
 
-- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp.md)
+- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp)
 - [Model Context Protocol Official Site](https://modelcontextprotocol.io/)
 - [MCP Server Development Guide](https://modelcontextprotocol.io/docs/develop/build-server)

@@ -322,6 +322,6 @@ agent: Explore
 
 ## References
 
-- [Skills Documentation](https://code.claude.com/docs/en/skills.md)
-- [Interactive Mode Reference](https://code.claude.com/docs/en/interactive-mode.md)
-- [CLI Reference](https://code.claude.com/docs/en/cli-reference.md)
+- [Skills Documentation](https://code.claude.com/docs/en/skills)
+- [Interactive Mode Reference](https://code.claude.com/docs/en/interactive-mode)
+- [CLI Reference](https://code.claude.com/docs/en/cli-reference)

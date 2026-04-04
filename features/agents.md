@@ -417,6 +417,6 @@ claude -p "Analyze project" --max-budget-usd 5.00
 
 ## References
 
-- [Subagents Documentation](https://code.claude.com/docs/en/sub-agents.md)
-- [Common Workflows](https://code.claude.com/docs/en/common-workflows.md)
-- [Best Practices](https://code.claude.com/docs/en/best-practices.md)
+- [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
+- [Common Workflows](https://code.claude.com/docs/en/common-workflows)
+- [Best Practices](https://code.claude.com/docs/en/best-practices)

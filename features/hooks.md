@@ -476,5 +476,5 @@ sys.exit(0)
 
 ## References
 
-- [Official Hooks Documentation](https://code.claude.com/docs/en/hooks.md)
-- [Hooks Get Started Guide](https://code.claude.com/docs/en/hooks-guide.md)
+- [Official Hooks Documentation](https://code.claude.com/docs/en/hooks)
+- [Hooks Get Started Guide](https://code.claude.com/docs/en/hooks-guide)

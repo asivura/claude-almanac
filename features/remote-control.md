@@ -69,4 +69,4 @@ Remote Control is **off by default** for Team and Enterprise plans. An organizat
 
 ## References
 
-- [Remote Control Docs](https://code.claude.com/docs/en/remote-control.md)
+- [Remote Control Docs](https://code.claude.com/docs/en/remote-control)
