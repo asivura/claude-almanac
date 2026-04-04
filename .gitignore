@@ -1,1 +1,10 @@
 tmp/
+
+# Fumadocs site build artifacts
+site/node_modules/
+site/.next/
+site/out/
+site/.turbo/
+site/.open-next/
+site/.source/
+site/next-env.d.ts
