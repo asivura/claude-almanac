@@ -78,7 +78,7 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
 | `BASH_MAX_OUTPUT_LENGTH`          | Bash output character limit | System-dependent |
 | `BASH_DEFAULT_TIMEOUT_MS`         | Default bash timeout        | 120000           |
 | `BASH_MAX_TIMEOUT_MS`             | Maximum bash timeout        | 600000           |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | Auto-compaction trigger     | 90%              |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | Auto-compaction trigger     | 95%              |
 
 ### MCP Configuration
 

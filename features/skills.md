@@ -41,7 +41,6 @@ Slash commands (starting with `/`) are custom actions you can invoke directly in
 | `/theme`                  | Change color theme                        |
 | `/todos`                  | List current TODO items                   |
 | `/usage`                  | Show plan usage limits                    |
-| `/vim`                    | Enable vim-style editing                  |
 | `/terminal-setup`         | Configure terminal for extended shortcuts |
 
 **MCP Prompts:** MCP servers expose prompts as `/mcp__<server>__<prompt>`
