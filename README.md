@@ -21,6 +21,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Remote Control](./features/remote-control.md)           | Mobile/web access      | Control terminal sessions from phone, tablet, or browser |
 | [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CLI automation, custom agents, scripting                 |
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
+| [Auto Mode](./features/auto-mode.md)                     | Permission automation  | Reduce permission prompts with AI-powered safety checks  |
 | [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies |
 | [Testing](./features/testing.md)                         | Config validation      | Validate settings, skills, schemas in CI/CD              |
 | [Plans & Pricing](./features/pricing.md)                 | Plan comparison        | Pricing, Claude Code access, feature matrix by plan      |
@@ -447,6 +448,35 @@ claude --permission-mode plan
 
 ______________________________________________________________________
 
+### Auto Mode (Permission Automation)
+
+**Purpose**: Eliminate permission prompts with AI-powered safety classification.
+
+**Key Capabilities**:
+
+- Two-stage classifier (Sonnet 4.6) evaluates actions before execution
+- Prompt-injection probe scans tool outputs server-side
+- Configurable trust boundaries for infrastructure
+- Subagent action monitoring at spawn, runtime, and return
+- Automatic fallback to manual prompts after repeated blocks
+
+**Quick Start**:
+
+```bash
+# Enable auto mode
+claude --enable-auto-mode
+
+# Start directly in auto mode
+claude --permission-mode auto
+
+# View default classifier rules
+claude auto-mode defaults
+```
+
+[Full Documentation →](./features/auto-mode.md)
+
+______________________________________________________________________
+
 ### Testing Configuration
 
 **Purpose**: Validate Claude Code configurations with automated testing.
@@ -525,6 +555,7 @@ ______________________________________________________________________
 | Remote Control      | Moderate             | High        | High                | Low            |
 | Headless/SDK        | High                 | Low         | High                | Medium         |
 | Plugins             | High                 | Moderate    | High                | Medium         |
+| Auto Mode           | Low                  | High        | High                | Medium         |
 | Security/Sandbox    | Low                  | Moderate    | Low                 | Low            |
 | Testing             | Low                  | Moderate    | High                | Medium         |
 | Additional Features | Moderate             | High        | High                | Varies         |
@@ -533,26 +564,27 @@ ______________________________________________________________________
 
 ## Quick Reference
 
-| Feature        | Config Location         | Key Command                                   |
-| -------------- | ----------------------- | --------------------------------------------- |
-| Hooks          | `.claude/settings.json` | -                                             |
-| MCP Servers    | `.claude/settings.json` | `claude mcp add`                              |
-| Agents         | `.claude/agents/`       | `/agents`                                     |
-| Agent Teams    | `~/.claude/teams/`      | env: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
-| Skills         | `.claude/skills/`       | `/skill-name`                                 |
-| Settings       | `.claude/settings.json` | `/config`                                     |
-| IDE            | Extension settings      | `Cmd+Esc`                                     |
-| Memory         | `CLAUDE.md`             | `/memory`                                     |
-| Auto Memory    | Auto-maintained         | `/memory` (toggle on/off)                     |
-| Rules          | `.claude/rules/`        | `/memory`                                     |
-| GitHub Actions | `.github/workflows/`    | `anthropics/claude-code-action@v1`            |
-| Remote Control | CLI flag                | `claude remote-control`                       |
-| Headless       | CLI flags               | `claude -p`                                   |
-| Plugins        | `.claude/settings.json` | `/plugin`                                     |
-| Sandbox        | `.claude/settings.json` | `/sandbox`                                    |
-| Testing        | `.claude/tests/`        | `uv run pytest`                               |
-| Plan Mode      | CLI flag                | `--permission-mode plan`                      |
-| Sessions       | -                       | `/resume`                                     |
+| Feature        | Config Location           | Key Command                                   |
+| -------------- | ------------------------- | --------------------------------------------- |
+| Hooks          | `.claude/settings.json`   | -                                             |
+| MCP Servers    | `.claude/settings.json`   | `claude mcp add`                              |
+| Agents         | `.claude/agents/`         | `/agents`                                     |
+| Agent Teams    | `~/.claude/teams/`        | env: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| Skills         | `.claude/skills/`         | `/skill-name`                                 |
+| Settings       | `.claude/settings.json`   | `/config`                                     |
+| IDE            | Extension settings        | `Cmd+Esc`                                     |
+| Memory         | `CLAUDE.md`               | `/memory`                                     |
+| Auto Memory    | Auto-maintained           | `/memory` (toggle on/off)                     |
+| Rules          | `.claude/rules/`          | `/memory`                                     |
+| GitHub Actions | `.github/workflows/`      | `anthropics/claude-code-action@v1`            |
+| Remote Control | CLI flag                  | `claude remote-control`                       |
+| Headless       | CLI flags                 | `claude -p`                                   |
+| Plugins        | `.claude/settings.json`   | `/plugin`                                     |
+| Auto Mode      | `~/.claude/settings.json` | `claude --enable-auto-mode`                   |
+| Sandbox        | `.claude/settings.json`   | `/sandbox`                                    |
+| Testing        | `.claude/tests/`          | `uv run pytest`                               |
+| Plan Mode      | CLI flag                  | `--permission-mode plan`                      |
+| Sessions       | -                         | `/resume`                                     |
 
 ______________________________________________________________________
 
@@ -568,5 +600,6 @@ ______________________________________________________________________
 1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
 1. **Parallel collaboration?** → Set up [Agent Teams](./features/agent-teams.md) for multi-instance work
 1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
+1. **Reducing prompts?** → Enable [Auto Mode](./features/auto-mode.md) for AI-powered safety checks
 1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
 1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)

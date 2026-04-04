@@ -24,6 +24,7 @@ claude-almanac/
 │   ├── plugins.md
 │   ├── memory-context.md
 │   ├── ide-integrations.md
+│   ├── auto-mode.md
 │   ├── security-sandbox.md
 │   ├── remote-control.md
 │   ├── headless-sdk.md
