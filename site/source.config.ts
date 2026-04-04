@@ -85,6 +85,14 @@ export const guide = defineDocs({
         prerequisites: z.array(z.string()).optional(),
         outcome: z.string().optional(),
         author: z.string().optional(),
+        nextSteps: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({ title: z.string(), href: z.string() }),
+            ]),
+          )
+          .optional(),
         icon: z.string().optional(),
         full: z.boolean().optional(),
       }),
@@ -108,6 +116,14 @@ export const caseStudy = defineDocs({
         themes: z.array(z.string()).optional(),
         stack: z.array(z.string()).optional(),
         outcome: z.string().optional(),
+        related: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({ title: z.string(), href: z.string() }),
+            ]),
+          )
+          .optional(),
         icon: z.string().optional(),
         full: z.boolean().optional(),
       }),
