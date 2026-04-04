@@ -182,6 +182,69 @@ gh api repos/{owner}/{repo}/branches/main/protection -X PUT \
   -f "restrictions=null"
 ```
 
+## Teammate Lifecycle (Agent Teams)
+
+When working as the lead of an agent team, manage teammate lifecycle deliberately. Idle teammates accumulate quickly and make it hard to track what's active.
+
+### Shutting down teammates
+
+Shut down a teammate as soon as their work is complete - do NOT let idle teammates accumulate.
+
+**Protocol shutdown** (the normal path):
+
+```
+SendMessage({
+  to: "<teammate-name>",
+  message: {"type": "shutdown_request"}
+})
+```
+
+The teammate should respond with `{"type": "shutdown_approved", ...}` and exit. You will receive a `teammate_terminated` system message shortly after.
+
+### When to shut down
+
+- Immediately after their PR is created (do not wait for it to be merged)
+- When their assigned task is completed
+- When you realize they are no longer needed for the current work
+
+### Dealing with stuck teammates
+
+Sometimes teammates become unresponsive to shutdown requests. Signs:
+
+- Idle notifications keep arriving after shutdown requests
+- Multiple shutdown requests fail to terminate the teammate
+- Agent reports they have completed work but will not exit
+
+**Recovery steps:**
+
+1. Send the shutdown request again (sometimes messages queue up)
+1. Ask the user to manually kill the tmux pane (`tmux kill-pane -t <pane_id>`)
+1. Do NOT try to force kill from the lead session
+
+### Best practices
+
+- Keep active teammate count low (3-5 maximum at any time)
+- Shut down before spawning more when possible
+- Track active teammates mentally - know who is alive and why
+- Do not spawn teammates for trivial work - use the lead session for short tasks
+- Batch related tasks for one teammate rather than spawning a new one per task
+
+### Team cleanup at end of work
+
+When all work is complete:
+
+1. Ensure every teammate has been shut down (check with `TeamDelete` - it will list any active members)
+1. Call `TeamDelete` to remove the team directory and task list
+
+`TeamDelete` fails if any teammates are still active.
+
+### Anti-patterns to avoid
+
+- Spawning a new teammate for every small task
+- Letting teammates sit idle "in case they are needed later"
+- Forgetting to send shutdown requests after teammates complete their work
+- Running 6+ teammates in parallel on a single project
+
 ## Contributing
 
 When adding new feature documentation:
