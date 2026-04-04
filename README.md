@@ -23,6 +23,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization      |
 | [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies |
 | [Testing](./features/testing.md)                         | Config validation      | Validate settings, skills, schemas in CI/CD              |
+| [Plans & Pricing](./features/pricing.md)                 | Plan comparison        | Pricing, Claude Code access, feature matrix by plan      |
 | [Additional Features](./features/additional-features.md) | Advanced capabilities  | GitHub Actions, git worktrees, images, sessions          |
 
 ______________________________________________________________________
