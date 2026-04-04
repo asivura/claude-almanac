@@ -1,12 +1,15 @@
 # Claude Code Security and Sandbox
 
-Claude Code features comprehensive security controls including native sandboxing, permission boundaries, and enterprise-grade policy management.
+Claude Code features comprehensive security controls including native sandboxing, permission boundaries, and enterprise-grade policy management. In testing, sandboxing achieved an **84% reduction in permission prompts**, addressing approval fatigue and enabling more autonomous workflows.
+
+![Sandboxing Architecture](../resources/images/sandboxing-architecture.png)
+*Source: [Beyond permission prompts: making Claude Code more secure and autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing)*
 
 ## Sandbox Mode
 
 ### Overview
 
-Native sandboxing provides filesystem and network isolation while reducing permission prompts.
+Native sandboxing provides filesystem and network isolation while reducing permission prompts. Instead of asking permission for each bash command, sandboxing creates defined boundaries where Claude Code can work more freely with reduced risk. The sandboxed bash tool uses OS-level primitives to enforce both filesystem and network isolation.
 
 ### Sandbox Modes
 
@@ -32,17 +35,24 @@ Or configure in `settings.json`:
 
 ### Platform Support
 
-| Platform | Support           | Notes                                                               |
-| -------- | ----------------- | ------------------------------------------------------------------- |
-| macOS    | ✅ Native         | Uses Seatbelt framework                                             |
-| Linux    | ✅ Supported      | Requires `bubblewrap` and `socat`                                   |
-| WSL2     | ✅ Supported      | Uses bubblewrap                                                     |
-| WSL1     | ❌ Not supported  | Missing kernel features                                             |
-| Windows  | 🔄 In development | Check [docs](https://code.claude.com/docs/en/sandbox.md) for status |
+| Platform | Support          | Notes                                                               |
+| -------- | ---------------- | ------------------------------------------------------------------- |
+| macOS    | ✅ Native        | Uses Seatbelt framework                                             |
+| Linux    | ✅ Supported     | Requires `bubblewrap` and `socat`                                   |
+| WSL2     | ✅ Supported     | Uses bubblewrap                                                     |
+| WSL1     | ❌ Not supported | Missing kernel features (bubblewrap requires WSL2)                  |
+| Windows  | 🔄 Planned       | Check [docs](https://code.claude.com/docs/en/sandboxing) for status |
 
-> **Note**: Platform support evolves. Check the [official sandbox documentation](https://code.claude.com/docs/en/sandbox.md) for the latest status.
+> **Note**: Platform support evolves. Check the [official sandbox documentation](https://code.claude.com/docs/en/sandboxing) for the latest status.
+
+If the sandbox cannot start (missing dependencies, unsupported platform), Claude Code shows a warning and runs commands without sandboxing. To make this a hard failure instead, set `sandbox.failIfUnavailable` to `true` in your settings. This is intended for managed deployments that require sandboxing as a security gate.
 
 ## Network Isolation
+
+Network access is controlled through a proxy server running outside the sandbox. This ensures restrictions apply to all scripts, programs, and subprocesses spawned by commands.
+
+![Git Integration Proxy](../resources/images/git-integration-proxy.png)
+*Source: [Beyond permission prompts: making Claude Code more secure and autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing)*
 
 ### Cloud Environment
 
@@ -62,6 +72,8 @@ Includes:
 - Package managers (npm, PyPI, RubyGems, etc.)
 - Cloud platforms (AWS, Azure, GCP)
 
+When Claude Code attempts to access a domain not in the allowlist, the operation is blocked at the OS level and you receive a notification. You can deny the request, allow it once, or permanently update your configuration.
+
 ### Configuration
 
 ```json
@@ -76,6 +88,8 @@ Includes:
   }
 }
 ```
+
+When `allowManagedDomainsOnly` is enabled in managed settings, non-allowed domains are blocked automatically without user prompts.
 
 ## File System Restrictions
 
@@ -105,6 +119,31 @@ claude --add-dir /path/to/directory
 }
 ```
 
+### Subprocess Write Access
+
+If subprocess commands like `kubectl`, `terraform`, or `npm` need to write outside the project directory:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "allowWrite": ["~/.kube", "/tmp/build"]
+    }
+  }
+}
+```
+
+Path prefixes:
+
+| Prefix            | Meaning                                                                    |
+| ----------------- | -------------------------------------------------------------------------- |
+| `/`               | Absolute path from filesystem root                                         |
+| `~/`              | Relative to home directory                                                 |
+| `./` or no prefix | Relative to project root (project settings) or `~/.claude` (user settings) |
+
+When `allowWrite`, `denyWrite`, `denyRead`, or `allowRead` is defined in multiple settings scopes, the arrays are **merged** (not replaced).
+
 ### Blocked Directories
 
 Cannot modify by default:
@@ -112,6 +151,22 @@ Cannot modify by default:
 - `/bin/`, system binaries
 - `.bashrc`, `.zshrc`
 - Critical system files
+
+### Escape Hatch
+
+When a command fails due to sandbox restrictions, Claude Code may retry with the `dangerouslyDisableSandbox` parameter. Commands using this parameter go through the normal permissions flow requiring user approval.
+
+To disable this escape hatch entirely:
+
+```json
+{
+  "sandbox": {
+    "allowUnsandboxedCommands": false
+  }
+}
+```
+
+When disabled, all commands must run sandboxed or be explicitly listed in `excludedCommands`.
 
 ## Permission System
 
@@ -268,6 +323,20 @@ export OTEL_RESOURCE_ATTRIBUTES="team=frontend,department=engineering"
 - Command injection detection with warnings
 - Fail-closed matching (unmatched defaults to manual approval)
 
+## Security Limitations
+
+- **Network filtering**: The network proxy restricts domains but does not inspect traffic content. Users are responsible for only allowing trusted domains. Broad domains like `github.com` may allow data exfiltration. Domain fronting may bypass network filtering in some cases.
+- **Unix sockets**: The `allowUnixSockets` configuration can grant access to powerful system services (e.g., `/var/run/docker.sock`) that could bypass the sandbox.
+- **Filesystem escalation**: Overly broad write permissions to directories containing executables in `$PATH`, system config directories, or shell config files can enable privilege escalation.
+- **Linux nested sandbox**: The `enableWeakerNestedSandbox` mode for Docker environments considerably weakens security and should only be used where additional isolation is otherwise enforced.
+
+## What Sandboxing Does Not Cover
+
+The sandbox isolates Bash subprocesses. Other tools have different boundaries:
+
+- **Built-in file tools**: Read, Edit, and Write use the permission system directly rather than running through the sandbox.
+- **Computer use**: When Claude controls your screen, it runs on your actual desktop rather than in an isolated environment. Per-app permission prompts gate each application.
+
 ## Development Containers
 
 ### Security Benefits
@@ -320,9 +389,22 @@ claude --permission-mode plan
 }
 ```
 
-## References
+## Open Source Sandbox Runtime
 
-- [Security Guide](https://code.claude.com/docs/en/security.md)
-- [Sandboxing](https://code.claude.com/docs/en/sandboxing.md)
-- [Identity & Access Management](https://code.claude.com/docs/en/iam.md)
-- [Development Containers](https://code.claude.com/docs/en/devcontainer.md)
+The sandbox runtime is available as an open source npm package for use in your own agent projects:
+
+```bash
+npx @anthropic-ai/sandbox-runtime <command-to-sandbox>
+```
+
+This enables the broader AI agent community to build safer autonomous systems. It can also sandbox other programs, such as MCP servers.
+
+For implementation details and source code, visit the [GitHub repository](https://github.com/anthropic-experimental/sandbox-runtime).
+
+## Sources
+
+- [Official Sandboxing Docs](https://code.claude.com/docs/en/sandboxing)
+- [Security Docs](https://code.claude.com/docs/en/security)
+- [Beyond permission prompts (Engineering Blog)](https://www.anthropic.com/engineering/claude-code-sandboxing)
+- [Identity & Access Management](https://code.claude.com/docs/en/iam)
+- [Development Containers](https://code.claude.com/docs/en/devcontainer)
