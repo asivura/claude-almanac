@@ -1,3 +1,9 @@
+---
+title: Headless Mode and Agent SDK
+description: Run Claude Code non-interactively from the CLI or programmatically via the Python and TypeScript SDKs.
+category: surfaces
+---
+
 # Claude Code Headless Mode and Agent SDK
 
 Headless mode (now called SDK mode) allows you to run Claude Code non-interactively from the command line or within application code.

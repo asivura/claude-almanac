@@ -1,3 +1,9 @@
+---
+title: MCP Servers
+description: Open standard for connecting Claude Code to external tools, databases, APIs, and data sources.
+category: integrations
+---
+
 # Claude Code MCP (Model Context Protocol) Servers
 
 MCP is an open-source standard for connecting AI applications to external systems. Think of MCP like a USB-C port for AI applications - it provides a standardized way to integrate Claude Code with external tools, databases, APIs, and data sources.

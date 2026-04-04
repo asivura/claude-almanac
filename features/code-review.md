@@ -1,3 +1,9 @@
+---
+title: Code Review
+description: Automated PR review using multi-agent analysis to catch logic errors, security issues, and regressions.
+category: ci-cd
+---
+
 # Claude Code Review
 
 > **Status**: Research preview. Available for Team and Enterprise subscriptions. Not available with Zero Data Retention enabled.

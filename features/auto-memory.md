@@ -1,3 +1,9 @@
+---
+title: Auto Memory
+description: Persistent directory where Claude Code records learnings and insights as it works.
+category: foundational
+---
+
 # Auto Memory (MEMORY.md)
 
 Introduced in **Claude Code v2.1.59** (February 26, 2026), auto memory is a persistent directory where Claude Code automatically records learnings, patterns, and insights as it works. Unlike CLAUDE.md files — which are instructions you write for Claude — auto memory contains notes that Claude writes for itself based on what it discovers during sessions.

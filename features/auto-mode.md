@@ -1,3 +1,9 @@
+---
+title: Auto Mode
+description: Execute actions without permission prompts using an AI-powered safety classifier.
+category: security
+---
+
 # Claude Code Auto Mode
 
 Auto mode lets Claude execute actions without permission prompts, using a separate classifier model to block unsafe or out-of-scope operations in real time.

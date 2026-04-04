@@ -1,3 +1,9 @@
+---
+title: Checkpointing
+description: Automatic tracking of file edits, letting you undo changes and rewind to previous states.
+category: workflows
+---
+
 # Claude Code Checkpointing
 
 Claude Code automatically tracks file edits as you work, allowing you to quickly undo changes and rewind to previous states.

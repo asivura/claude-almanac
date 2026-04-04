@@ -1,3 +1,9 @@
+---
+title: IDE Integrations
+description: Claude Code integrations with VS Code, JetBrains, desktop, web, Chrome, and the terminal.
+category: surfaces
+---
+
 # Claude Code IDE Integrations
 
 Claude Code integrates with multiple IDEs, editors, and surfaces to provide AI-assisted development directly in your workflow.

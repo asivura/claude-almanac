@@ -1,3 +1,9 @@
+---
+title: Plans and Pricing
+description: Overview of Claude plans, pricing tiers, and Claude Code feature availability per plan.
+category: workflows
+---
+
 # Claude Code Plans and Pricing
 
 Overview of all Claude plans, pricing, and Claude Code feature availability.

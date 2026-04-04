@@ -1,3 +1,9 @@
+---
+title: Rules
+description: Modular, topic-specific instruction files in .claude/rules/ for organizing project guidelines.
+category: core
+---
+
 # Claude Code Rules
 
 Modular, topic-specific instruction files for organizing project guidelines.

@@ -1,3 +1,9 @@
+---
+title: Remote Control
+description: Control a terminal Claude Code session from your phone, tablet, or any browser via claude.ai.
+category: surfaces
+---
+
 # Claude Code Remote Control
 
 Control a terminal Claude Code session from your phone, tablet, or any browser. Claude keeps running entirely on your machine while you interact from anywhere.

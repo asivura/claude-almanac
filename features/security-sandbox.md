@@ -1,3 +1,9 @@
+---
+title: Security and Sandbox
+description: Native sandboxing, permission boundaries, and enterprise policy management for Claude Code.
+category: security
+---
+
 # Claude Code Security and Sandbox
 
 Claude Code features comprehensive security controls including native sandboxing, permission boundaries, and enterprise-grade policy management. In testing, sandboxing achieved an **84% reduction in permission prompts**, addressing approval fatigue and enabling more autonomous workflows.

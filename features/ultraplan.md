@@ -1,3 +1,9 @@
+---
+title: Ultraplan
+description: Draft a plan on the web in plan mode, then execute it in the cloud or send it back to the terminal.
+category: workflows
+---
+
 # Claude Code Ultraplan
 
 > **Status**: Research preview. Requires a Claude Code on the web account and a GitHub repository.

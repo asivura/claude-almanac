@@ -1,3 +1,9 @@
+---
+title: How Claude Code Works
+description: 'The core architecture: the agentic loop, context gathering, action taking, and session persistence.'
+category: foundational
+---
+
 # How Claude Code Works
 
 Claude Code is an agentic assistant that runs in your terminal, IDE, browser, or CI/CD pipeline. While it excels at coding, it can help with anything you can do from the command line: writing docs, running builds, searching files, researching topics, and more.

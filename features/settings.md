@@ -1,3 +1,9 @@
+---
+title: Settings and Configuration
+description: Multi-level configuration system for Claude Code settings, permissions, and customization.
+category: core
+---
+
 # Claude Code Settings and Configuration
 
 Claude Code uses a multi-level configuration system for settings, permissions, and customization.
