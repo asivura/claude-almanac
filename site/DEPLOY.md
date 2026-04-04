@@ -154,14 +154,14 @@ Or use `next-bundle-analyzer` if a page drifts above the budget.
 
 ## 5. When things go wrong
 
-| Symptom                          | Check                                            |
-| -------------------------------- | ------------------------------------------------ |
-| 404 on `/docs/<slug>`            | Rebuild ran; slug collision in source.ts at load |
-| Images broken (404)              | Prebuild `copy-images.mjs` ran; see deploy log   |
-| Accept: markdown returns HTML    | `functions/_middleware.ts` deployed?             |
-| Middleware returns 500           | CF Pages → Functions logs tab                    |
-| Search box returns nothing       | `/api/search/route.json` exists in `out/`        |
-| Theme looks wrong                | `site/src/styles/theme.css` imported in global.css |
+| Symptom                       | Check                                              |
+| ----------------------------- | -------------------------------------------------- |
+| 404 on `/docs/<slug>`         | Rebuild ran; slug collision in source.ts at load   |
+| Images broken (404)           | Prebuild `copy-images.mjs` ran; see deploy log     |
+| Accept: markdown returns HTML | `functions/_middleware.ts` deployed?               |
+| Middleware returns 500        | CF Pages → Functions logs tab                      |
+| Search box returns nothing    | `/api/search/route.json` exists in `out/`          |
+| Theme looks wrong             | `site/src/styles/theme.css` imported in global.css |
 
 ## Related
 
