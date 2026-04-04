@@ -28,6 +28,7 @@ claude-almanac/
 │   ├── remote-control.md
 │   ├── headless-sdk.md
 │   ├── github-actions.md
+│   ├── pricing.md
 │   └── additional-features.md
 ```
 
