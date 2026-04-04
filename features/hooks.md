@@ -18,23 +18,36 @@ Hooks allow you to:
 
 ## Available Hook Events
 
-Claude Code supports **11 hook events** in the session lifecycle:
+Claude Code supports **26 hook events** in the session lifecycle:
 
-| Hook Event           | When It Fires                                         | Use Case                                 |
-| -------------------- | ----------------------------------------------------- | ---------------------------------------- |
-| `SessionStart`       | Session begins or resumes                             | Load context, set environment variables  |
-| `UserPromptSubmit`   | User submits a prompt                                 | Validate prompts, add context            |
-| `PreToolUse`         | Before tool execution                                 | Validate/approve/deny commands           |
-| `PermissionRequest`  | Permission dialog appears                             | Auto-allow/deny permissions              |
-| `PostToolUse`        | After tool succeeds                                   | Verify results, format code              |
-| `PostToolUseFailure` | After tool fails                                      | Handle errors                            |
-| `SubagentStart`      | Subagent is spawned                                   | Monitor subagent creation                |
-| `SubagentStop`       | Subagent finishes                                     | Evaluate subagent completion             |
-| `Stop`               | Claude finishes responding                            | Decide if Claude should continue         |
-| `PreCompact`         | Before context compaction                             | Logging/monitoring                       |
-| `SessionEnd`         | Session terminates                                    | Cleanup tasks, logging                   |
-| `Notification`       | Claude sends notifications                            | Custom notification handling             |
-| `Setup`              | Init with `--init`, `--init-only`, or `--maintenance` | One-time setup, dependencies, migrations |
+| Hook Event           | When It Fires                             | Can Block |
+| -------------------- | ----------------------------------------- | --------- |
+| `SessionStart`       | Session begins or resumes                 | No        |
+| `InstructionsLoaded` | CLAUDE.md or `.claude/rules/*.md` loaded  | No        |
+| `UserPromptSubmit`   | User submits a prompt                     | Yes       |
+| `PreToolUse`         | Before tool execution                     | Yes       |
+| `PermissionRequest`  | Permission dialog appears                 | Yes       |
+| `PermissionDenied`   | Auto mode denies a tool call              | No        |
+| `PostToolUse`        | After tool succeeds                       | No        |
+| `PostToolUseFailure` | After tool fails                          | No        |
+| `Notification`       | Claude sends notifications                | No        |
+| `SubagentStart`      | Subagent is spawned                       | No        |
+| `SubagentStop`       | Subagent finishes                         | Yes       |
+| `TaskCreated`        | Task created via TaskCreate               | Yes       |
+| `TaskCompleted`      | Task marked completed                     | Yes       |
+| `Stop`               | Claude finishes responding                | Yes       |
+| `StopFailure`        | Turn ends due to API error                | No        |
+| `TeammateIdle`       | Agent team teammate going idle            | Yes       |
+| `CwdChanged`         | Working directory changes                 | No        |
+| `FileChanged`        | Watched file changes on disk              | No        |
+| `WorktreeCreate`     | Worktree created                          | Yes       |
+| `WorktreeRemove`     | Worktree removed                          | No        |
+| `PreCompact`         | Before context compaction                 | No        |
+| `PostCompact`        | After context compaction completes        | No        |
+| `Elicitation`        | MCP server requests user input            | Yes       |
+| `ElicitationResult`  | User responds to MCP elicitation          | Yes       |
+| `ConfigChange`       | Configuration file changes during session | Yes       |
+| `SessionEnd`         | Session terminates                        | No        |
 
 ## Configuration
 
@@ -79,10 +92,14 @@ Hooks are configured in settings files:
 
 - **hooks**: Array of hook definitions
 
-  - `type`: Either `"command"` (bash) or `"prompt"` (LLM-based)
+  - `type`: `"command"` (bash), `"prompt"` (LLM-based), `"agent"` (multi-turn), or `"http"` (POST to URL)
   - `command`: The bash command to execute (for `type: "command"`)
-  - `prompt`: LLM prompt text (for `type: "prompt"`)
-  - `timeout`: Optional timeout in seconds (default: 60)
+  - `prompt`: LLM prompt text (for `type: "prompt"` or `type: "agent"`)
+  - `url`: POST endpoint (for `type: "http"`)
+  - `if`: Permission rule syntax filter, e.g., `"Bash(git *)"` (tool events only, v2.1.85+)
+  - `timeout`: Optional timeout in seconds (default: 600 for command, 30 for prompt, 60 for agent)
+  - `async`: Run in background without blocking (for `type: "command"`)
+  - `statusMessage`: Custom spinner text shown during execution
 
 ### Project-Specific Hook Scripts
 
@@ -111,9 +128,9 @@ Use the `$CLAUDE_PROJECT_DIR` environment variable to reference scripts in your 
 When multiple hooks match the same event:
 
 1. **Settings hierarchy**: Managed → Local → Project → User (higher precedence first)
-1. **Within same file**: Hooks execute in array order (first to last)
-1. **Multiple matchers**: All matching hook groups execute sequentially
-1. **Early termination**: Exit code 2 stops subsequent hooks
+1. **Parallel execution**: All matching hooks run in parallel; identical commands are deduplicated
+1. **Most restrictive wins**: For decisions, `deny` > `defer` > `ask` > `allow`
+1. **Exit code 2**: Blocks the action (stderr shown to Claude/user) but does not stop other hooks
 
 **Example with multiple hooks:**
 
@@ -151,7 +168,9 @@ All hooks receive JSON via stdin with this structure:
   "hook_event_name": "EventName",
   "tool_name": "ToolName",
   "tool_input": { },
-  "tool_response": { }
+  "tool_response": { },
+  "agent_id": "agent-abc123",
+  "agent_type": "Explore"
 }
 ```
 
@@ -177,13 +196,64 @@ Hooks communicate using exit codes and JSON output:
   "systemMessage": "string",
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
-    "permissionDecision": "allow|deny|ask",
+    "permissionDecision": "allow|deny|ask|defer",
     "permissionDecisionReason": "string",
     "updatedInput": { },
     "additionalContext": "string"
   }
 }
 ```
+
+## Conditional Hooks with `if`
+
+The `if` field (v2.1.85+) uses permission rule syntax to filter hooks by tool name
+and arguments, so the hook only spawns when the tool call matches:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git *)",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-git-policy.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The `if` field only works on tool events: `PreToolUse`, `PostToolUse`, `PostToolUseFailure`,
+`PermissionRequest`, and `PermissionDenied`.
+
+## The `defer` Decision (v2.1.89+)
+
+For `PreToolUse` hooks in non-interactive mode (`-p`), a fourth permission decision
+is available:
+
+```json
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "defer"
+  }
+}
+```
+
+This pauses Claude Code and exits with `stop_reason: "tool_deferred"`. The deferred
+tool call is included in the SDK result. Resume with:
+
+```bash
+claude -p --resume <session-id>
+```
+
+The hook fires again on resume, where you can return `"allow"` with the answer in
+`updatedInput`.
 
 ## Examples
 
@@ -367,20 +437,42 @@ sys.exit(0)
 
 ### Debugging
 
+1. Type `/hooks` to browse all configured hooks grouped by event
 1. Run `claude --debug` to see detailed hook execution logs
+1. Toggle verbose mode with `Ctrl+O` to see hook output in the transcript
 1. Test hook commands manually first
 1. Verify JSON syntax in settings files
 1. Check that scripts are executable and have correct shebangs
 
+### Matcher Reference by Event
+
+| Event Type                                                                 | Matches On     | Examples                                         |
+| -------------------------------------------------------------------------- | -------------- | ------------------------------------------------ |
+| `PreToolUse`, `PostToolUse`, `PermissionRequest`, `PermissionDenied`       | tool name      | `Bash`, `Edit\|Write`, `mcp__.*`                 |
+| `SessionStart`                                                             | session source | `startup`, `resume`, `clear`, `compact`          |
+| `SessionEnd`                                                               | end reason     | `clear`, `resume`, `logout`, `prompt_input_exit` |
+| `Notification`                                                             | type           | `permission_prompt`, `idle_prompt`               |
+| `SubagentStart`, `SubagentStop`                                            | agent type     | `Bash`, `Explore`, `Plan`, custom names          |
+| `PreCompact`, `PostCompact`                                                | trigger        | `manual`, `auto`                                 |
+| `ConfigChange`                                                             | source         | `user_settings`, `project_settings`, `skills`    |
+| `InstructionsLoaded`                                                       | load reason    | `session_start`, `path_glob_match`, `compact`    |
+| `StopFailure`                                                              | error type     | `rate_limit`, `server_error`, `billing_error`    |
+| `FileChanged`                                                              | filename       | `.envrc`, `.env`                                 |
+| `Elicitation`, `ElicitationResult`                                         | MCP server     | configured server names                          |
+| `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCreated`, `TaskCompleted` | no matcher     | always fires                                     |
+
 ## Limitations
 
-- **Timeout**: 60-second default per hook (configurable)
-- **Parallelization**: All matching hooks run in parallel
-- **Deduplication**: Identical hook commands run only once
-- **Snapshot behavior**: Hooks are captured at session startup; changes require new session
+- **Timeout**: 600-second (10 min) default for command hooks, 30s for prompt, 60s for agent (configurable)
+- **Parallelization**: All matching hooks run in parallel; identical commands deduplicated
+- **Output limit**: Hook output capped at 10,000 characters (excess saved to file with preview)
+- **PostToolUse**: Cannot undo actions since the tool has already executed
+- **PermissionRequest**: Does not fire in non-interactive mode (`-p`); use `PreToolUse` instead
+- **Stop hooks**: Fire whenever Claude finishes responding, not only at task completion; do not fire on user interrupts; API errors fire `StopFailure` instead
+- **PreToolUse precedence**: A `deny` decision blocks even in `bypassPermissions` mode, but `allow` does not bypass deny rules from settings
+- **updatedInput conflicts**: When multiple PreToolUse hooks modify the same tool's input, last to finish wins (non-deterministic)
 - **Enterprise policy**: Administrators can use `allowManagedHooksOnly` to block user/project hooks
-- **Skills/agents**: Only `PreToolUse`, `PostToolUse`, and `Stop` events supported
-- **Prompt-based hooks**: Only certain events supported
+- **File watcher**: Settings file edits are normally picked up automatically; if not, restart the session
 
 ## References
 
