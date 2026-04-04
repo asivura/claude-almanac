@@ -13,6 +13,10 @@ const repoRoot = path.resolve(__dirname, '..');
 const config = {
   output: 'export',
   reactStrictMode: true,
+  // Static export can't run the Next.js Image Optimization API at request
+  // time, so we serve images as-is (fumadocs-ui wraps markdown images in
+  // next/image, which requires `unoptimized` in export mode).
+  images: { unoptimized: true },
   turbopack: {
     root: repoRoot,
   },
