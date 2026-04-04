@@ -37,6 +37,8 @@ claude-almanac/
 │   ├── slack-integration.md
 │   ├── gitlab-cicd.md
 │   ├── voice-dictation.md
+│   ├── computer-use.md
+│   ├── ultraplan.md
 │   └── additional-features.md
 ```
 
