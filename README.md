@@ -4,41 +4,73 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 
 ## Quick Navigation
 
-| Feature                                                  | Description            | Use When                                                    |
-| -------------------------------------------------------- | ---------------------- | ----------------------------------------------------------- |
-| [Tools](./features/tools.md)                             | Built-in tools         | Understand Read, Write, Edit, Bash, Grep, and more          |
-| [Hooks](./features/hooks.md)                             | Lifecycle automation   | Validate, format, protect files automatically               |
-| [MCP Servers](./features/mcp-servers.md)                 | External integrations  | Connect to databases, APIs, third-party tools               |
-| [Agents](./features/agents.md)                           | Specialized subagents  | Delegate complex tasks, isolate context                     |
-| [Agent Teams](./features/agent-teams.md)                 | Multi-agent sessions   | Coordinate parallel work across independent instances       |
-| [Skills](./features/skills.md)                           | Custom slash commands  | Create reusable commands and workflows                      |
-| [Settings](./features/settings.md)                       | Configuration options  | Customize behavior, permissions, API                        |
-| [IDE Integrations](./features/ide-integrations.md)       | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                       |
-| [Memory & Context](./features/memory-context.md)         | CLAUDE.md and context  | Persistent instructions, context management                 |
-| [Auto Memory](./features/auto-memory.md)                 | MEMORY.md (automatic)  | Claude's self-maintained notes and learnings per project    |
-| [Rules](./features/rules.md)                             | Modular memory files   | Path-conditional guidelines, organized by topic             |
-| [GitHub Actions](./features/github-actions.md)           | CI/CD integration      | PR review, issue-to-PR, automated workflows                 |
-| [Remote Control](./features/remote-control.md)           | Mobile/web access      | Control terminal sessions from phone, tablet, or browser    |
-| [Headless/SDK](./features/headless-sdk.md)               | Programmatic usage     | CLI automation, custom agents, scripting                    |
-| [Plugins](./features/plugins.md)                         | Shareable packages     | Distribute tools, LSP servers, team standardization         |
-| [Auto Mode](./features/auto-mode.md)                     | Permission automation  | Reduce permission prompts with AI-powered safety checks     |
-| [Security & Sandbox](./features/security-sandbox.md)     | Isolation and controls | Secure execution, network isolation, enterprise policies    |
-| [Testing](./features/testing.md)                         | Config validation      | Validate settings, skills, schemas in CI/CD                 |
-| [Plans & Pricing](./features/pricing.md)                 | Plan comparison        | Pricing, Claude Code access, feature matrix by plan         |
-| [Scheduled Tasks](./features/scheduled-tasks.md)         | Recurring automation   | Cloud cron jobs, desktop tasks, CLI loops                   |
-| [Checkpointing](./features/checkpointing.md)             | Session recovery       | Undo changes, rewind to previous states, explore safely     |
-| [Code Review](./features/code-review.md)                 | Automated PR review    | Multi-agent analysis for bugs, security, regressions        |
-| [Channels](./features/channels.md)                       | Persistent AI threads  | Long-running projects, recurring workflows, team context    |
-| [Slack Integration](./features/slack-integration.md)     | Slack-based control    | Chat with Claude in Slack, trigger tasks from channels      |
-| [GitLab CI/CD](./features/gitlab-cicd.md)                | GitLab pipelines       | MR automation, @claude mentions, Bedrock/Vertex auth        |
-| [Voice Dictation](./features/voice-dictation.md)         | Speech input           | Speak prompts instead of typing, coding vocabulary          |
-| [Computer Use](./features/computer-use.md)               | GUI automation         | Native app testing, visual debugging, simulator control     |
-| [Ultraplan](./features/ultraplan.md)                     | Cloud planning         | Draft plans on the web, review in browser, execute anywhere |
-| [Additional Features](./features/additional-features.md) | Advanced capabilities  | Git worktrees, images, sessions, plan mode                  |
+| Feature                                                      | Description            | Use When                                                    |
+| ------------------------------------------------------------ | ---------------------- | ----------------------------------------------------------- |
+| [How Claude Code Works](./features/how-claude-code-works.md) | Core architecture      | Understand the agentic loop, sessions, and what Claude sees |
+| [`.claude` Directory](./features/claude-directory.md)        | Config file reference  | Learn what lives in `.claude/` and `~/.claude/`             |
+| [Tools](./features/tools.md)                                 | Built-in tools         | Understand Read, Write, Edit, Bash, Grep, and more          |
+| [Hooks](./features/hooks.md)                                 | Lifecycle automation   | Validate, format, protect files automatically               |
+| [MCP Servers](./features/mcp-servers.md)                     | External integrations  | Connect to databases, APIs, third-party tools               |
+| [Agents](./features/agents.md)                               | Specialized subagents  | Delegate complex tasks, isolate context                     |
+| [Agent Teams](./features/agent-teams.md)                     | Multi-agent sessions   | Coordinate parallel work across independent instances       |
+| [Skills](./features/skills.md)                               | Custom slash commands  | Create reusable commands and workflows                      |
+| [Settings](./features/settings.md)                           | Configuration options  | Customize behavior, permissions, API                        |
+| [IDE Integrations](./features/ide-integrations.md)           | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                       |
+| [Memory & Context](./features/memory-context.md)             | CLAUDE.md and context  | Persistent instructions, context management                 |
+| [Auto Memory](./features/auto-memory.md)                     | MEMORY.md (automatic)  | Claude's self-maintained notes and learnings per project    |
+| [Rules](./features/rules.md)                                 | Modular memory files   | Path-conditional guidelines, organized by topic             |
+| [GitHub Actions](./features/github-actions.md)               | CI/CD integration      | PR review, issue-to-PR, automated workflows                 |
+| [Remote Control](./features/remote-control.md)               | Mobile/web access      | Control terminal sessions from phone, tablet, or browser    |
+| [Headless/SDK](./features/headless-sdk.md)                   | Programmatic usage     | CLI automation, custom agents, scripting                    |
+| [Plugins](./features/plugins.md)                             | Shareable packages     | Distribute tools, LSP servers, team standardization         |
+| [Auto Mode](./features/auto-mode.md)                         | Permission automation  | Reduce permission prompts with AI-powered safety checks     |
+| [Security & Sandbox](./features/security-sandbox.md)         | Isolation and controls | Secure execution, network isolation, enterprise policies    |
+| [Testing](./features/testing.md)                             | Config validation      | Validate settings, skills, schemas in CI/CD                 |
+| [Plans & Pricing](./features/pricing.md)                     | Plan comparison        | Pricing, Claude Code access, feature matrix by plan         |
+| [Scheduled Tasks](./features/scheduled-tasks.md)             | Recurring automation   | Cloud cron jobs, desktop tasks, CLI loops                   |
+| [Checkpointing](./features/checkpointing.md)                 | Session recovery       | Undo changes, rewind to previous states, explore safely     |
+| [Code Review](./features/code-review.md)                     | Automated PR review    | Multi-agent analysis for bugs, security, regressions        |
+| [Channels](./features/channels.md)                           | Persistent AI threads  | Long-running projects, recurring workflows, team context    |
+| [Slack Integration](./features/slack-integration.md)         | Slack-based control    | Chat with Claude in Slack, trigger tasks from channels      |
+| [GitLab CI/CD](./features/gitlab-cicd.md)                    | GitLab pipelines       | MR automation, @claude mentions, Bedrock/Vertex auth        |
+| [Voice Dictation](./features/voice-dictation.md)             | Speech input           | Speak prompts instead of typing, coding vocabulary          |
+| [Computer Use](./features/computer-use.md)                   | GUI automation         | Native app testing, visual debugging, simulator control     |
+| [Ultraplan](./features/ultraplan.md)                         | Cloud planning         | Draft plans on the web, review in browser, execute anywhere |
+| [Additional Features](./features/additional-features.md)     | Advanced capabilities  | Git worktrees, images, sessions, plan mode                  |
 
 ______________________________________________________________________
 
 ## Feature Summaries
+
+### How Claude Code Works
+
+**Purpose**: Understand the core architecture before diving into individual features.
+
+**Key Concepts**:
+
+- The agentic loop: prompt → gather context → take action → verify → repeat
+- Tools as the primitives that turn a language model into an agent
+- Sessions, context windows, and checkpoints
+- Resume vs fork for session continuity
+
+[Full Documentation →](./features/how-claude-code-works.md)
+
+______________________________________________________________________
+
+### The `.claude` Directory
+
+**Purpose**: Reference for every file Claude Code reads from your project and home directory.
+
+**Key Concepts**:
+
+- Project scope (`.claude/`) vs user scope (`~/.claude/`) vs managed scope
+- Settings precedence order (managed > CLI flags > local > project > user)
+- Subdirectories: `rules/`, `skills/`, `commands/`, `agents/`, `agent-memory/`, `output-styles/`
+- How to inspect what actually loaded: `/context`, `/memory`, `/hooks`, `/doctor`
+
+[Full Documentation →](./features/claude-directory.md)
+
+______________________________________________________________________
 
 ### Hooks
 
