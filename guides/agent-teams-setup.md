@@ -1,3 +1,18 @@
+---
+title: Agent Teams Setup with Ghostty + tmux
+description: Configure your terminal environment for Claude Code agent teams
+type: guide
+category: setup
+time: 15 min
+difficulty: intermediate
+prerequisites:
+  - macOS (other platforms have partial support)
+  - Homebrew
+  - Familiarity with terminal emulators and shell config
+outcome: A Ghostty terminal running tmux, configured for Claude Code agent teams
+author: Alexander Sivura
+---
+
 # Agent Teams: Environment Setup
 
 Tools, configuration, and IDE integration for running multiple Claude Code sessions in parallel. Install these once and you're ready to use the [coordination patterns](agent-teams.md).
