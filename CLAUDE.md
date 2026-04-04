@@ -44,6 +44,21 @@ claude-almanac/
 
 ## Development
 
+### Pre-commit Hooks
+
+This repo uses [pre-commit](https://pre-commit.com/) to enforce formatting before commits:
+
+```bash
+# Install hooks (one time)
+uv tool install pre-commit
+pre-commit install
+
+# Run against all files
+pre-commit run --all-files
+```
+
+The config (`.pre-commit-config.yaml`) runs standard hygiene hooks plus `mdformat` with the same plugins as CI.
+
 ### Linting
 
 Markdown files are checked with `mdformat`:
