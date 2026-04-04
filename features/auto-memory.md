@@ -147,7 +147,7 @@ From the [Claude Code v2.1.59 changelog](https://github.com/anthropics/claude-co
 
 > Claude automatically saves useful context to auto-memory. Manage with /memory
 
-## References
+## Sources
 
 - [Memory Management (Official Docs)](https://docs.anthropic.com/docs/en/memory)
 - [Claude Code Settings](https://docs.anthropic.com/docs/en/settings)

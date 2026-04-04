@@ -126,7 +126,7 @@ screens, and tell me if any screen takes more than a second to load.
 | macOS permissions prompt keeps reappearing         | Quit Claude Code completely and restart. Confirm your terminal app is listed in System Settings > Privacy & Security > Screen Recording                   |
 | `computer-use` doesn't appear in `/mcp`            | Requires macOS, Claude Code v2.1.85+, Pro or Max plan, claude.ai auth (not Bedrock/Vertex/Foundry), and an interactive session (not `-p` non-interactive) |
 
-## References
+## Sources
 
 - [Computer Use (CLI)](https://code.claude.com/docs/en/computer-use)
 - [Computer Use (Desktop)](https://code.claude.com/docs/en/desktop#let-claude-use-your-computer)

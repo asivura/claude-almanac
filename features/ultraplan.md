@@ -82,7 +82,7 @@ Your terminal shows the plan in a dialog titled **Ultraplan approved** with thre
 
 If you start a new session, Claude prints a `claude --resume` command so you can return to your previous conversation later.
 
-## References
+## Sources
 
 - [Ultraplan](https://code.claude.com/docs/en/ultraplan)
 - [Claude Code on the Web](https://code.claude.com/docs/en/claude-code-on-the-web)

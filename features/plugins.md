@@ -443,7 +443,7 @@ claude --debug --plugin-dir ./my-plugin
 /plugin  # See "Errors" tab
 ```
 
-## References
+## Sources
 
 - [Plugins Documentation](https://code.claude.com/docs/en/plugins)
 - [Plugins Reference](https://code.claude.com/docs/en/plugins-reference)

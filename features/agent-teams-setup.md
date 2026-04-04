@@ -359,3 +359,11 @@ The fix is always the same: explicitly mention `TeamCreate` and `team_name` in y
 ## Next Steps
 
 Your environment is ready. Head to [Agent Teams](agent-teams.md) for architecture details, display modes, hooks, and the full tool reference.
+
+## Sources
+
+- [Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
+- [Ghostty Terminal](https://ghostty.org/)
+- [tmux](https://github.com/tmux/tmux/wiki)
+- [Starship Prompt](https://starship.rs/)
+- [Agent Teams](agent-teams.md) - Architecture, display modes, hooks, and tool reference

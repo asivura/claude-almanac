@@ -115,7 +115,7 @@ Automode requires all of the following:
 | Pay only for what you use          | **API**                                      |
 | Highest context + compliance       | **Enterprise**                               |
 
-## References
+## Sources
 
 - [Claude Pricing](https://claude.com/pricing)
 - [Using Claude Code with Pro/Max](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)

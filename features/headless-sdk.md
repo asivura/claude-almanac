@@ -370,7 +370,7 @@ claude -p "Generate a security audit report" \
 | Context persistence | `--resume session_id`        | `resume=session_id`             |
 | Custom validation   | Post-process JSON            | `hooks={"PostToolUse": [...]}`  |
 
-## References
+## Sources
 
 - [Claude Code Headless Docs](https://code.claude.com/docs/en/headless)
 - [CLI Reference](https://code.claude.com/docs/en/cli-reference)

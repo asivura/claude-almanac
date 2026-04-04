@@ -427,7 +427,7 @@ Settings → Profiles → Keyboard → Check "Use Option as Meta Key"
 - Check for conflicting IDE shortcuts
 - Run `/terminal-setup`
 
-## References
+## Sources
 
 - [VS Code Integration](https://code.claude.com/docs/en/vs-code)
 - [JetBrains Integration](https://code.claude.com/docs/en/jetbrains)

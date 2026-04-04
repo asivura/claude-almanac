@@ -86,7 +86,7 @@ Checkpoints are designed for quick, session-level recovery:
 - Think of checkpoints as "local undo" and Git as "permanent history"
 - Checkpoints complement but don't replace proper version control
 
-## References
+## Sources
 
 - [Checkpointing](https://code.claude.com/docs/en/checkpointing)
 - [Interactive Mode](https://code.claude.com/docs/en/interactive-mode)

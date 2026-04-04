@@ -374,7 +374,7 @@ Enable with `/vim` or configure via `/config`.
 - Text objects: `iw/aw`, `i"/a"`, `i(/a(`
 - Yank/paste: `yy`, `yw`, `p/P`
 
-## References
+## Sources
 
 - [Common Workflows](https://code.claude.com/docs/en/common-workflows)
 - [Interactive Mode](https://code.claude.com/docs/en/interactive-mode)

@@ -443,7 +443,7 @@ Official Anthropic guidance and community best practices for CLAUDE.md formattin
 
 **Negative-only rules** -- a file full of "don't do X" without positive guidance wastes tokens on low-value constraints.
 
-## References
+## Sources
 
 - [Memory Management](https://code.claude.com/docs/en/memory)
 - [Best Practices](https://code.claude.com/docs/en/best-practices)

@@ -358,7 +358,7 @@ claude --model opus
 }
 ```
 
-## References
+## Sources
 
 - [Settings Documentation](https://code.claude.com/docs/en/settings)
 - [IAM & Permissions](https://code.claude.com/docs/en/iam)

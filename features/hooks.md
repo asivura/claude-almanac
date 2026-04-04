@@ -474,7 +474,7 @@ sys.exit(0)
 - **Enterprise policy**: Administrators can use `allowManagedHooksOnly` to block user/project hooks
 - **File watcher**: Settings file edits are normally picked up automatically; if not, restart the session
 
-## References
+## Sources
 
 - [Official Hooks Documentation](https://code.claude.com/docs/en/hooks)
 - [Hooks Get Started Guide](https://code.claude.com/docs/en/hooks-guide)

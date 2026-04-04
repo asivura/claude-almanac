@@ -302,7 +302,7 @@ When set, this replaces the Anthropic allowlist entirely. An empty array blocks 
 | **Remote Control**     | Drive local session from claude.ai or mobile app       | Steering in-progress session while away from desk |
 | **Channels**           | Push events from external systems into running session | Chat bridges, CI webhooks, monitoring alerts      |
 
-## References
+## Sources
 
 - [Channels Documentation](https://code.claude.com/docs/en/channels)
 - [Channels Reference (Building Custom)](https://code.claude.com/docs/en/channels-reference)

@@ -540,7 +540,7 @@ claude-review:
     ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
 ```
 
-## References
+## Sources
 
 - [Official Docs: GitHub Actions](https://code.claude.com/docs/en/github-actions)
 - [Official Docs: Headless Mode](https://code.claude.com/docs/en/headless)

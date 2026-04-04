@@ -415,7 +415,7 @@ claude -p "Analyze project" --max-budget-usd 5.00
 - Can resume after Claude Code restart
 - Cleaned up after 30 days (default)
 
-## References
+## Sources
 
 - [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Common Workflows](https://code.claude.com/docs/en/common-workflows)

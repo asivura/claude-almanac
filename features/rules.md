@@ -453,7 +453,7 @@ ______________________________________________________________________
    /memory
    ```
 
-## References
+## Sources
 
 - [Claude Code Memory Documentation](https://code.claude.com/docs/en/memory)
 - [Memory & Context Guide](./memory-context.md)
