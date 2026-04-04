@@ -12,3 +12,11 @@ site/next-env.d.ts
 # Images copied from ../resources/images/ at prebuild time (not checked in;
 # source of truth lives at repo-root resources/images/).
 site/public/images/
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+id_rsa*
+*.key
+credentials.json
