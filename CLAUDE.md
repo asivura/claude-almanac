@@ -30,6 +30,7 @@ claude-almanac/
 │   ├── headless-sdk.md
 │   ├── github-actions.md
 │   ├── pricing.md
+│   ├── scheduled-tasks.md
 │   └── additional-features.md
 ```
 
