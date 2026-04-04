@@ -14,9 +14,11 @@ Agent teams differ fundamentally from subagents. Subagents run within a single s
 
 - True parallel execution across independent context windows
 - Direct inter-agent communication (not just report-back)
-- Shared task list with self-coordination
+- Shared task list with self-coordination and task dependencies
 - Cross-layer work ownership (frontend, backend, tests)
 - Competing hypothesis testing in parallel
+
+Agent teams add coordination overhead and use significantly more tokens than a single session. They work best when teammates can operate independently. For sequential tasks, same-file edits, or work with many dependencies, a single session or subagents are more effective.
 
 ## Agent Teams vs. Subagents
 
@@ -72,6 +74,8 @@ An agent team consists of four components:
 | `~/.claude/tasks/{team-name}/`                     | Shared task list   |
 | `~/.claude/teams/{team-name}/inboxes/{agent}.json` | Agent mailboxes    |
 
+> The team config holds runtime state (session IDs, tmux pane IDs). Don't edit it by hand or pre-author it: your changes are overwritten on the next state update. There is no project-level equivalent; a file like `.claude/teams/teams.json` in your project directory is not recognized as configuration.
+
 ## Core Tools
 
 ### TeammateTool Operations
@@ -105,6 +109,8 @@ Task tools work with the shared task list:
 | `TaskList`    | Return all tasks and ownership status                          |
 | `SendMessage` | Direct communication between teammates                         |
 
+Tasks support dependencies: a pending task with unresolved dependencies cannot be claimed until those dependencies are completed. The system manages task dependencies automatically. Task claiming uses file locking to prevent race conditions when multiple teammates try to claim the same task simultaneously.
+
 ## In Practice
 
 An agent team running in tmux mode, with the team lead coordinating a frontend security audit across multiple teammates:
@@ -122,6 +128,8 @@ Configure how teammates render in the terminal via `teammateMode` in `~/.claude.
 | `"auto"` (default) | Split panes inside tmux, in-process otherwise             |
 | `"in-process"`     | All teammates in main terminal, use `Shift+Down` to cycle |
 | `"tmux"`           | Each teammate gets its own pane (requires tmux or iTerm2) |
+
+Split-pane mode requires either tmux or iTerm2 with the `it2` CLI. For iTerm2, enable the Python API in **iTerm2 > Settings > General > Magic > Enable Python API**. Note that `tmux` traditionally works best on macOS; using `tmux -CC` in iTerm2 is the suggested entry point.
 
 **Override per session:**
 
@@ -227,6 +235,56 @@ These environment variables are automatically provided to teammates:
 | `CLAUDE_CODE_PLAN_MODE_REQUIRED` | Whether plan approval is required |
 | `CLAUDE_CODE_PARENT_SESSION_ID`  | Session ID of the team lead       |
 
+## Starting a Team
+
+There are two ways agent teams get started:
+
+- **You request a team**: describe the task and team structure. Claude creates the team based on your instructions.
+- **Claude proposes a team**: if Claude determines your task would benefit from parallel work, it may suggest creating a team. You confirm before it proceeds.
+
+In both cases, Claude won't create a team without your approval.
+
+## Subagent Definitions for Teammates
+
+When spawning a teammate, you can reference a subagent type from any subagent scope (project, user, plugin, or CLI-defined). This lets you define a role once (e.g., a security-reviewer or test-runner) and reuse it as both a delegated subagent and an agent team teammate.
+
+```text
+Spawn a teammate using the security-reviewer agent type to audit the auth module.
+```
+
+The teammate honors the definition's `tools` allowlist and `model`. The definition's body is appended to the teammate's system prompt as additional instructions (not replacing it). Team coordination tools (`SendMessage`, task management) are always available even when `tools` restricts other tools.
+
+> **Note**: The `skills` and `mcpServers` frontmatter fields in a subagent definition are not applied when that definition runs as a teammate. Teammates load skills and MCP servers from your project and user settings, same as a regular session.
+
+## Context and Communication
+
+Each teammate has its own context window. When spawned, a teammate loads the same project context as a regular session (CLAUDE.md, MCP servers, skills) plus the spawn prompt from the lead. **The lead's conversation history does not carry over.**
+
+How teammates share information:
+
+- **Automatic message delivery**: messages are delivered automatically to recipients. The lead doesn't need to poll.
+- **Idle notifications**: when a teammate finishes and stops, they automatically notify the lead.
+- **Shared task list**: all agents can see task status and claim available work.
+
+The lead assigns every teammate a name at spawn. Any teammate can message any other by name. For predictable names you can reference in later prompts, tell the lead what to call each teammate.
+
+### Interacting with Teammates
+
+- **In-process mode**: `Shift+Down` cycles through teammates. Press `Enter` to view a session, `Escape` to interrupt their current turn. `Ctrl+T` toggles the task list.
+- **Split-pane mode**: click into a teammate's pane to interact directly.
+
+## Cleanup
+
+When done, ask the lead to clean up:
+
+```text
+Clean up the team
+```
+
+This removes shared team resources. The lead checks for active teammates and **fails if any are still running**, so shut them down first.
+
+> **Warning**: Always use the lead to clean up. Teammates should not run cleanup because their team context may not resolve correctly, potentially leaving resources in an inconsistent state.
+
 ## Use Cases
 
 ### Parallel Code Review
@@ -311,6 +369,36 @@ Use `--max-budget-usd` to cap spending:
 claude -p "Review the codebase" --max-budget-usd 10.00
 ```
 
+## Troubleshooting
+
+### Teammates Not Appearing
+
+- In in-process mode, teammates may already be running but not visible. Press `Shift+Down` to cycle.
+- Check that the task was complex enough to warrant a team. Claude decides based on the task.
+- If split panes were requested, ensure tmux is installed: `which tmux`
+- For iTerm2, verify the `it2` CLI is installed and the Python API is enabled.
+
+### Too Many Permission Prompts
+
+Teammate permission requests bubble up to the lead. Pre-approve common operations in your permission settings before spawning teammates to reduce interruptions.
+
+### Teammates Stopping on Errors
+
+Check their output via `Shift+Down` (in-process) or clicking the pane (split mode), then either give additional instructions or spawn a replacement.
+
+### Lead Shuts Down Before Work Is Done
+
+Tell the lead to keep going. You can also instruct the lead to wait for teammates to finish before proceeding if it starts doing work instead of delegating.
+
+### Orphaned tmux Sessions
+
+If a tmux session persists after the team ends:
+
+```bash
+tmux ls
+tmux kill-session -t <session-name>
+```
+
 ## Known Limitations
 
 - No session resumption for in-process teammates (`/resume` and `/rewind` don't restore them)
@@ -319,11 +407,15 @@ claude -p "Review the codebase" --max-budget-usd 10.00
 - Lead is fixed (cannot transfer leadership)
 - All teammates start with the lead's permission mode
 - Split panes require tmux or iTerm2 (not supported in VS Code terminal, Windows Terminal, or Ghostty)
-- Shutdown can be slow (teammates finish current tool call first)
+- Shutdown can be slow (teammates finish current request or tool call first)
+
+> **Tip**: `CLAUDE.md` works normally with agent teams. Teammates read `CLAUDE.md` files from their working directory, so you can provide project-specific guidance to all teammates.
 
 ## References
 
 - [Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
+- [Building a C Compiler with a Team of Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler) - Real-world example: 16 parallel agents, 2B tokens, 100K-line compiler
 - [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Hooks Documentation](https://code.claude.com/docs/en/hooks)
+- [Agent Team Token Costs](https://code.claude.com/docs/en/costs#agent-team-token-costs)
 - [Agent Teams: Environment Setup](agent-teams-setup.md) - Ghostty, tmux, Starship, and VS Code integration
