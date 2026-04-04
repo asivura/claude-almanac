@@ -830,3 +830,25 @@ ______________________________________________________________________
 1. **Testing native apps?** → Use [Computer Use](./features/computer-use.md) for GUI automation
 1. **Complex planning?** → Try [Ultraplan](./features/ultraplan.md) for cloud-based plan drafting
 1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)
+
+______________________________________________________________________
+
+## Development
+
+### Pre-commit hooks
+
+Install pre-commit hooks to catch formatting issues before committing:
+
+```bash
+# Install pre-commit (one time)
+uv tool install pre-commit
+# or: pipx install pre-commit
+
+# Install the hooks for this repo
+pre-commit install
+
+# Run against all files (first time)
+pre-commit run --all-files
+```
+
+Hooks will now run automatically on `git commit`.
