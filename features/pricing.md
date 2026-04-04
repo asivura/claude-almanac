@@ -123,3 +123,4 @@ Automode requires all of the following:
 - [Team Plan overview](https://support.claude.com/en/articles/9266767-what-is-the-team-plan)
 - [Purchase and manage Team seats](https://support.claude.com/en/articles/12004354-purchase-and-manage-seats-on-team-plans)
 - [Auto mode blog post](https://claude.com/blog/auto-mode)
+- [Agent Teams setup guide](https://github.com/asivura/claude-almanac/blob/main/features/agent-teams.md)
