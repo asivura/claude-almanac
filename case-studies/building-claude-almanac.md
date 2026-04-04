@@ -2,7 +2,7 @@
 title: Building claude-almanac
 description: Stub case study. Will document the end-to-end process of building this site with Claude Code agent teams.
 project: claude-almanac
-date: "2026-04-04"
+date: '2026-04-04'
 duration: 1 week
 author: Alexander Sivura
 themes:

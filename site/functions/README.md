@@ -52,13 +52,13 @@ Should return `<!DOCTYPE html>...` as usual.
 
 ## URL mapping
 
-| Request                              | Served from                            |
-| ------------------------------------ | -------------------------------------- |
-| `/docs/hooks` + `Accept: text/html`  | `/out/docs/hooks.html` (static)        |
+| Request                                 | Served from                       |
+| --------------------------------------- | --------------------------------- |
+| `/docs/hooks` + `Accept: text/html`     | `/out/docs/hooks.html` (static)   |
 | `/docs/hooks` + `Accept: text/markdown` | `/llms.mdx/docs/hooks/content.md` |
-| `/llms.mdx/docs/hooks/content.md`    | direct static file                     |
-| `/llms.txt`                          | direct static file                     |
-| `/llms-full.txt`                     | direct static file                     |
+| `/llms.mdx/docs/hooks/content.md`       | direct static file                |
+| `/llms.txt`                             | direct static file                |
+| `/llms-full.txt`                        | direct static file                |
 
 ## Local testing with Wrangler (optional)
 
