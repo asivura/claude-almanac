@@ -865,22 +865,6 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-## Development
+## Contributing
 
-### Pre-commit hooks
-
-Install pre-commit hooks to catch formatting issues before committing:
-
-```bash
-# Install pre-commit (one time)
-uv tool install pre-commit
-# or: pipx install pre-commit
-
-# Install the hooks for this repo
-pre-commit install
-
-# Run against all files (first time)
-pre-commit run --all-files
-```
-
-Hooks will now run automatically on `git commit`.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for local development setup, pre-commit hooks, commit conventions, and the PR workflow.
