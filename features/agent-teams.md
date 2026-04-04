@@ -326,3 +326,4 @@ claude -p "Review the codebase" --max-budget-usd 10.00
 - [Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
 - [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Hooks Documentation](https://code.claude.com/docs/en/hooks)
+- [Agent Teams: Environment Setup](agent-teams-setup.md) - Ghostty, tmux, Starship, and VS Code integration
