@@ -411,7 +411,7 @@ tmux kill-session -t <session-name>
 
 > **Tip**: `CLAUDE.md` works normally with agent teams. Teammates read `CLAUDE.md` files from their working directory, so you can provide project-specific guidance to all teammates.
 
-## References
+## Sources
 
 - [Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
 - [Building a C Compiler with a Team of Parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler) - Real-world example: 16 parallel agents, 2B tokens, 100K-line compiler

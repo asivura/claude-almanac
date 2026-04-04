@@ -101,7 +101,7 @@ Supports BCP 47 codes or language names. If the language isn't supported, dictat
 | Nothing happens when holding Space        | Ensure voice is enabled (`/voice`). Check terminal sends key-repeat events   |
 | Transcription garbled or wrong language   | Set correct language in `/config`                                            |
 
-## References
+## Sources
 
 - [Voice Dictation](https://code.claude.com/docs/en/voice-dictation)
 - [Keyboard Shortcuts](https://code.claude.com/docs/en/keybindings)

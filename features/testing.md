@@ -820,7 +820,7 @@ When updating configuration formats:
 
 ______________________________________________________________________
 
-## See Also
+## Sources
 
 - [Settings](./settings.md) - Configuration options being validated
 - [Skills](./skills.md) - Skill format and frontmatter

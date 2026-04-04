@@ -147,7 +147,7 @@ If the check run reports findings but no inline comments appear:
 - **Files changed annotations**: Findings render as annotations on diff lines
 - **Review body**: Findings for lines that moved appear under "Additional findings" in the review body
 
-## References
+## Sources
 
 - [Code Review](https://code.claude.com/docs/en/code-review)
 - [GitHub Actions](https://code.claude.com/docs/en/github-actions)

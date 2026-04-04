@@ -399,7 +399,7 @@ Allow user-configured servers within policy constraints. Entries can match by `s
 
 Denylist takes absolute precedence over allowlist. Both options can be combined.
 
-## References
+## Sources
 
 - [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp)
 - [Model Context Protocol Official Site](https://modelcontextprotocol.io/)

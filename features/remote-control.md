@@ -67,6 +67,6 @@ Remote Control is **off by default** for Team and Enterprise plans. An organizat
 | Network timeout         | Sessions time out after roughly 10 minutes of network unavailability                                          |
 | One remote per process  | In interactive mode each instance supports one remote connection. Use server mode with `--spawn` for multiple |
 
-## References
+## Sources
 
 - [Remote Control Docs](https://code.claude.com/docs/en/remote-control)

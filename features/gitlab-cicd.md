@@ -170,7 +170,7 @@ Create a `CLAUDE.md` at repository root to define coding standards and conventio
 - **Bedrock**: Verify OIDC config, role impersonation, region, and model availability
 - **Vertex**: Verify WIF configuration and service account permissions
 
-## References
+## Sources
 
 - [GitLab CI/CD](https://code.claude.com/docs/en/gitlab-ci-cd)
 - [GitHub Actions](https://code.claude.com/docs/en/github-actions)

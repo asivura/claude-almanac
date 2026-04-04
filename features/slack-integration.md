@@ -145,7 +145,7 @@ Claude automatically selects a repository based on conversation context. If mult
 - **Web access required**: Users without Claude Code on the web get standard chat responses
 - **Channels only**: Does not work in direct messages (DMs)
 
-## References
+## Sources
 
 - [Claude Code in Slack Documentation](https://code.claude.com/docs/en/slack)
 - [Claude Code on the Web](https://code.claude.com/docs/en/claude-code-on-the-web)

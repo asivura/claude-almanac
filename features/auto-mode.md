@@ -272,7 +272,7 @@ The classifier is designed to be **orthogonal to chain-of-thought monitoring**. 
 - **FPR** (false positive rate): Percentage of safe actions incorrectly blocked
 - **FNR** (false negative rate): Percentage of unsafe actions incorrectly allowed
 
-## References
+## Sources
 
 - [Auto Mode Engineering Blog Post](https://www.anthropic.com/engineering/claude-code-auto-mode)
 - [Permission Modes](https://code.claude.com/docs/en/permission-modes)

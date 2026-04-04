@@ -320,7 +320,7 @@ agent: Explore
 3. Generate findings report
 ```
 
-## References
+## Sources
 
 - [Skills Documentation](https://code.claude.com/docs/en/skills)
 - [Interactive Mode Reference](https://code.claude.com/docs/en/interactive-mode)

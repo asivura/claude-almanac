@@ -241,7 +241,7 @@ Day-of-week: `0` or `7` for Sunday through `6` for Saturday. Extended syntax (`L
 - 50 task limit per session
 - 7-day automatic expiry for recurring tasks
 
-## References
+## Sources
 
 - [Cloud Scheduled Tasks](https://code.claude.com/docs/en/web-scheduled-tasks)
 - [Desktop Scheduled Tasks](https://code.claude.com/docs/en/desktop-scheduled-tasks)
