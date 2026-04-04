@@ -42,6 +42,26 @@ Pre-commit hooks will catch anything missed, but running manually avoids the pre
 
 Prefer the project-scoped specialists in `.claude/agents/` over generic subagents — they know this repo's conventions. See `.claude/agents/README.md` for the catalog (doc-updater, doc-creator, blog-researcher, pr-reviewer, cloudflare-browser-ops).
 
+## Website development
+
+Local preview of the Fumadocs site:
+
+```bash
+cd site
+npm install   # first time only
+npm run dev   # → http://localhost:3000
+```
+
+Production build (static export to `site/out/`):
+
+```bash
+cd site && npm run build
+```
+
+The build reads content from `../features/`, `../guides/`, `../case-studies/` at the repo root, and copies images from `../resources/images/` into `site/public/images/` via a prebuild script (`scripts/copy-images.mjs`). No content lives inside `site/` — the site is just the rendering layer.
+
+Deploy: Cloudflare Pages auto-builds and deploys on every push to `main`. PR branches get preview URLs. See `site-planning/cloudflare-setup.md` for the project setup and `site/DEPLOY.md` for post-deploy verification.
+
 ## Design system (website)
 
 The website uses **Fumadocs** (Next.js 15 + Tailwind CSS v4 + shadcn/ui). The visual theme is the **"claude-almanac"** preset on [tweakcn.com](https://tweakcn.com/editor/theme) — warm terracotta primary on cream background, matching Anthropic's Claude brand palette.
