@@ -122,26 +122,35 @@ When invoked:
 
 ### Frontmatter Fields
 
-| Field             | Required | Description                                 |
-| ----------------- | -------- | ------------------------------------------- |
-| `name`            | Yes      | Unique identifier (lowercase, hyphens)      |
-| `description`     | Yes      | When Claude should delegate to this agent   |
-| `tools`           | No       | Which tools agent can use (comma-separated) |
-| `disallowedTools` | No       | Tools to deny/block                         |
-| `model`           | No       | `sonnet`, `opus`, `haiku`, or `inherit`     |
-| `permissionMode`  | No       | Permission handling mode                    |
-| `skills`          | No       | Skills to preload into agent context        |
-| `hooks`           | No       | Lifecycle hooks for this agent              |
+| Field             | Required | Description                                                              |
+| ----------------- | -------- | ------------------------------------------------------------------------ |
+| `name`            | Yes      | Unique identifier (lowercase, hyphens)                                   |
+| `description`     | Yes      | When Claude should delegate to this agent                                |
+| `tools`           | No       | Which tools agent can use (comma-separated). Inherits all if omitted     |
+| `disallowedTools` | No       | Tools to deny/block (applied before `tools`)                             |
+| `model`           | No       | `sonnet`, `opus`, `haiku`, full model ID, or `inherit` (default)         |
+| `permissionMode`  | No       | Permission handling mode                                                 |
+| `mcpServers`      | No       | MCP servers: name references or inline definitions                       |
+| `maxTurns`        | No       | Maximum agentic turns before stopping                                    |
+| `skills`          | No       | Skills to preload into agent context (full content injected)             |
+| `hooks`           | No       | Lifecycle hooks scoped to this agent                                     |
+| `memory`          | No       | Persistent memory scope: `user`, `project`, or `local`                   |
+| `effort`          | No       | Effort level override: `low`, `medium`, `high`, `max` (Opus 4.6 only)    |
+| `background`      | No       | Set to `true` to always run as background task                           |
+| `isolation`       | No       | Set to `worktree` for isolated git worktree copy                         |
+| `color`           | No       | Display color: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, etc |
+| `initialPrompt`   | No       | Auto-submitted first user turn with `--agent` or `agent` setting         |
 
 ### Permission Modes
 
-| Mode                | Behavior                                     |
-| ------------------- | -------------------------------------------- |
-| `default`           | Standard permission checking                 |
-| `acceptEdits`       | Auto-accept file edits                       |
-| `dontAsk`           | Auto-deny prompts (allowed tools still work) |
-| `bypassPermissions` | Skip all permission checks                   |
-| `plan`              | Plan mode (read-only)                        |
+| Mode                | Behavior                                                              |
+| ------------------- | --------------------------------------------------------------------- |
+| `default`           | Standard permission checking                                          |
+| `acceptEdits`       | Auto-accept file edits                                                |
+| `auto`              | AI-powered safety classifier (inherited from parent, cannot override) |
+| `dontAsk`           | Auto-deny prompts (allowed tools still work)                          |
+| `bypassPermissions` | Skip all permission checks (parent takes precedence if set)           |
+| `plan`              | Plan mode (read-only exploration)                                     |
 
 ### Model Configuration
 
@@ -189,6 +198,68 @@ claude --agents '{
   }
 }'
 ```
+
+## Running a Session as an Agent
+
+Use `--agent` to start a session where the main thread uses a subagent's system prompt, tools, and model:
+
+```bash
+claude --agent code-reviewer
+```
+
+Works with built-in and custom agents. The choice persists when you resume the session.
+
+## Agent Tool Restrictions
+
+Use `Agent(agent_type)` syntax in the `tools` field to control which subagents can be spawned:
+
+```yaml
+# Only allow spawning specific agents
+tools: Agent(worker, researcher), Read, Bash
+
+# Allow spawning any agent
+tools: Agent, Read, Bash
+```
+
+If `Agent` is omitted from `tools` entirely, the agent cannot spawn subagents.
+
+## Persistent Memory
+
+The `memory` field gives subagents a persistent directory that survives across conversations:
+
+```yaml
+---
+name: code-reviewer
+description: Expert code reviewer
+memory: user
+---
+```
+
+| Scope     | Storage Location                          |
+| --------- | ----------------------------------------- |
+| `user`    | `~/.claude/agent-memory/<name>/`          |
+| `project` | Per working tree, like auto memory        |
+| `local`   | Per working tree, private to this machine |
+
+The subagent accumulates insights over time (codebase patterns, debugging tips, architecture decisions).
+
+## MCP Servers in Subagents
+
+Give a subagent access to MCP servers by name reference or inline definition:
+
+```yaml
+---
+name: data-analyst
+description: Analyze data using database tools
+mcpServers:
+  db: {}
+  custom-api:
+    command: npx
+    args: ["-y", "custom-api-server"]
+---
+```
+
+String references share the parent session's connection. Inline servers are connected when the subagent starts and disconnected when it finishes.
 
 ## Background Agents
 
