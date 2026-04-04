@@ -33,6 +33,10 @@ claude-almanac/
 │   ├── scheduled-tasks.md
 │   ├── checkpointing.md
 │   ├── code-review.md
+│   ├── channels.md
+│   ├── slack-integration.md
+│   ├── gitlab-cicd.md
+│   ├── voice-dictation.md
 │   └── additional-features.md
 ```
 
