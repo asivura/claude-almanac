@@ -83,3 +83,5 @@ export async function getLLMText(page: InferPageType<typeof source>) {
 
 ${processed}`;
 }
+
+export { buildPageTree } from './page-tree';
