@@ -104,6 +104,41 @@ Rules:
 - No period at the end
 - Subject line: max 72 characters
 
+## Design System (website)
+
+The claude-almanac website uses **Fumadocs** (Next.js 15 + Tailwind CSS v4 + shadcn/ui).
+The visual theme is based on the **"claude"** preset from tweakcn.com - warm terracotta
+primary on cream background, matching Anthropic's Claude brand palette.
+
+### Theme editor
+
+Visual theme edits happen at [tweakcn.com](https://tweakcn.com/editor/theme) in the saved
+**"claude-almanac"** theme (on the project owner's account).
+
+**tweakcn is the authoring tool; the exported CSS in this repo is the source of truth.**
+
+### Workflow for theme changes
+
+1. Open [tweakcn.com](https://tweakcn.com/editor/theme) and load the "claude-almanac" theme
+1. Make visual edits (colors, radius, typography) with live preview
+1. Save in tweakcn
+1. Click **Code** -> copy the generated CSS (Tailwind v4 + OKLCH format)
+1. Paste into `site/src/styles/theme.css`
+1. Open a PR - review via Cloudflare Pages preview deployment
+1. Merge when the preview looks right
+
+### Current theme values
+
+| Token      | Value                                |
+| ---------- | ------------------------------------ |
+| Primary    | `#c96442` (terracotta)               |
+| Background | `#faf9f5` (warm cream)               |
+| Foreground | `#3d3929` (warm olive-brown)         |
+| Radius     | `0.5rem`                             |
+| Fonts      | Inter (body) + JetBrains Mono (code) |
+
+Never edit theme variables directly in `theme.css` except to paste from tweakcn export.
+
 ## Pull Request Workflow
 
 Direct pushes to `main` are blocked. All changes require PRs.
