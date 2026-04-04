@@ -65,6 +65,8 @@ claude mcp add --transport stdio my-server -- cmd /c npx -y @some/package
 | **project**         | `.mcp.json`      | Team-shared servers | Version controlled   |
 | **user**            | `~/.claude.json` | Personal utilities  | All projects         |
 
+**Precedence**: local > project > user. When servers with the same name exist at multiple scopes, local wins. Project-scope servers require user approval before first use (`claude mcp reset-project-choices` to reset).
+
 ## Configuration Parameters
 
 ```bash
@@ -214,9 +216,9 @@ await server.connect(transport);
 
 ### MCP Server Capabilities
 
-1. **Resources**: File-like data that can be read (API responses, documentation)
+1. **Resources**: File-like data referenced with `@server:protocol://path` in prompts
 1. **Tools**: Functions callable by Claude (with user approval)
-1. **Prompts**: Pre-written templates for specific tasks
+1. **Prompts**: Pre-written templates invokable as `/mcp__servername__promptname`
 
 ## Authentication
 
@@ -232,6 +234,41 @@ claude mcp add --transport http github https://api.githubcopilot.com/mcp/
 
 # Use the authenticated server
 > "Review PR #456 and suggest improvements"
+```
+
+### Fixed OAuth Callback Port
+
+Some servers require a specific redirect URI registered in advance:
+
+```bash
+claude mcp add --transport http \
+  --callback-port 8080 \
+  my-server https://mcp.example.com/mcp
+```
+
+### Pre-Configured OAuth Credentials
+
+```bash
+claude mcp add --transport http \
+  --client-id "your-client-id" \
+  --client-secret \
+  my-server https://mcp.example.com/mcp
+```
+
+### Non-OAuth Auth with `headersHelper`
+
+For Kerberos, short-lived tokens, or internal SSO:
+
+```json
+{
+  "mcpServers": {
+    "internal": {
+      "type": "http",
+      "url": "https://mcp.internal.com/mcp",
+      "headersHelper": "python3 ~/scripts/generate-auth-header.py"
+    }
+  }
+}
 ```
 
 ### Reset Authentication
@@ -260,11 +297,31 @@ claude mcp add --transport http github https://api.githubcopilot.com/mcp/
 - **Project**: Team-shared servers (version controlled)
 - **User**: Tools across multiple projects
 
-### Tool Management
+### Tool Search
 
-- Tool Search auto-activates when tools exceed 10% of context
-- Configure: `ENABLE_TOOL_SEARCH=auto:5` (5% threshold)
-- Output limits: `MAX_MCP_OUTPUT_TOKENS=50000`
+Tool search is enabled by default. MCP tools are deferred (only names loaded at startup) and Claude discovers full schemas on demand via a search tool. This keeps context usage low as you add more servers.
+
+| `ENABLE_TOOL_SEARCH` | Behavior                                                                      |
+| -------------------- | ----------------------------------------------------------------------------- |
+| (unset)              | Deferred by default; loads upfront if `ANTHROPIC_BASE_URL` is non-first-party |
+| `true`               | Always deferred, even with non-first-party base URL                           |
+| `auto`               | Load upfront if tools fit within 10% of context, defer overflow               |
+| `auto:<N>`           | Custom threshold percentage (e.g., `auto:5` for 5%)                           |
+| `false`              | All tools loaded upfront, no deferral                                         |
+
+Requires Sonnet 4+ or Opus 4+. Haiku does not support tool search.
+
+**Description cap**: Tool descriptions and server instructions are truncated at **2KB each**. Keep them concise and put critical details near the start.
+
+### Output Limits
+
+Claude Code warns when MCP tool output exceeds 10,000 tokens. Configure with:
+
+```bash
+export MAX_MCP_OUTPUT_TOKENS=50000
+```
+
+MCP servers can also annotate individual tools with `anthropic/maxResultSizeChars` to declare their expected output size.
 
 ### Logging in STDIO Servers
 
@@ -290,21 +347,57 @@ claude mcp remove github
 claude mcp add-from-claude-desktop
 ```
 
+## Elicitation
+
+MCP servers can request structured input from the user mid-task. When a server needs information it cannot obtain on its own, Claude Code displays an interactive dialog and passes the response back.
+
+Two modes:
+
+- **Form mode**: Dialog with server-defined fields (e.g., username/password prompt)
+- **URL mode**: Opens a browser URL for authentication or approval
+
+No configuration required. To auto-respond without showing a dialog, use the [`Elicitation` hook](https://code.claude.com/docs/en/hooks#elicitation).
+
 ## Enterprise Managed MCP
 
-Organizations can control MCP servers:
+Two approaches for centralized control:
+
+### Option 1: Exclusive Control with `managed-mcp.json`
+
+Deploy a fixed set of servers that users cannot modify. Place at:
+
+- **macOS**: `/Library/Application Support/ClaudeCode/managed-mcp.json`
+- **Linux/WSL**: `/etc/claude-code/managed-mcp.json`
+- **Windows**: `C:\Program Files\ClaudeCode\managed-mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "github": { "type": "http", "url": "https://api.githubcopilot.com/mcp/" },
+    "sentry": { "type": "http", "url": "https://mcp.sentry.dev/mcp" }
+  }
+}
+```
+
+### Option 2: Allowlists and Denylists
+
+Allow user-configured servers within policy constraints. Entries can match by `serverName`, `serverCommand` (exact array match for stdio), or `serverUrl` (wildcards supported):
 
 ```json
 {
   "allowedMcpServers": [
     { "serverName": "github" },
+    { "serverCommand": ["npx", "-y", "@modelcontextprotocol/server-filesystem"] },
     { "serverUrl": "https://mcp.company.com/*" }
   ],
   "deniedMcpServers": [
-    { "serverName": "untrusted-server" }
+    { "serverName": "untrusted-server" },
+    { "serverUrl": "https://*.untrusted.com/*" }
   ]
 }
 ```
+
+Denylist takes absolute precedence over allowlist. Both options can be combined.
 
 ## References
 
