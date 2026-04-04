@@ -8,3 +8,7 @@ site/.turbo/
 site/.open-next/
 site/.source/
 site/next-env.d.ts
+
+# Images copied from ../resources/images/ at prebuild time (not checked in;
+# source of truth lives at repo-root resources/images/).
+site/public/images/

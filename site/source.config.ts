@@ -133,8 +133,44 @@ export const caseStudy = defineDocs({
   meta: { schema: metaSchema },
 });
 
+// Rewrite image src paths that point into the repo-root `resources/images/`
+// folder so the deployed site can serve them from `/images/*` (scripts/copy-images.mjs
+// copies them there at prebuild time). Matches any number of leading `../`
+// segments because markdown files live at different depths (features/,
+// guides/, etc.).
+//
+// Contributors keep writing `![alt](../resources/images/foo.png)` (which
+// renders correctly on GitHub); this plugin handles the site-side rewrite.
+//
+// MDX node types: `image` from remark-mdx for ![]() syntax, `mdxJsxFlowElement`
+// / `mdxJsxTextElement` for JSX <img src="..."> — we handle the first
+// (plain markdown images) since that's what the content uses.
+interface MdastNode {
+  type: string;
+  url?: string;
+  children?: MdastNode[];
+}
+
+function remarkRewriteImagePaths() {
+  return (tree: MdastNode) => {
+    const visit = (node: MdastNode) => {
+      if (node.type === 'image' && typeof node.url === 'string') {
+        // Match `../<...>resources/images/<rest>`
+        const match = node.url.match(/^(?:\.\.\/)+resources\/images\/(.+)$/);
+        if (match) {
+          node.url = `/images/${match[1]}`;
+        }
+      }
+      if (Array.isArray(node.children)) {
+        for (const child of node.children) visit(child);
+      }
+    };
+    visit(tree);
+  };
+}
+
 export default defineConfig({
   mdxOptions: {
-    // MDX options - configured separately per collection if needed
+    remarkPlugins: [remarkRewriteImagePaths],
   },
 });
