@@ -57,6 +57,9 @@ export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
 ## Architecture
 
+![Multi-agent orchestrator-worker pattern](../resources/images/multi-agent-orchestration.png)
+*Source: [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — a lead agent coordinates specialized subagents that work in parallel.*
+
 An agent team consists of four components:
 
 | Component     | Role                                                                               |
@@ -110,6 +113,9 @@ Task tools work with the shared task list:
 | `SendMessage` | Direct communication between teammates                         |
 
 Tasks support dependencies: a pending task with unresolved dependencies cannot be claimed until those dependencies are completed. The system manages task dependencies automatically. Task claiming uses file locking to prevent race conditions when multiple teammates try to claim the same task simultaneously.
+
+![Complete multi-agent workflow](../resources/images/multi-agent-workflow.png)
+*Source: [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — the lead spawns subagents, iterates on their findings, and routes results through specialized agents. Agent teams follow the same orchestrator-worker loop.*
 
 ## In Practice
 

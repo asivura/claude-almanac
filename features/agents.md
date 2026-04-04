@@ -4,6 +4,9 @@ Agents are specialized AI assistants that handle specific types of tasks indepen
 
 ## Overview
 
+![Agent feedback loop: gather context, take action, verify work, repeat](../resources/images/agent-loop-gather-act-verify.png)
+*Source: [Building agents with the Claude Agent SDK](https://claude.com/blog/building-agents-with-the-claude-agent-sdk) — the core loop that every Claude Code agent (main session, subagent, or teammate) runs.*
+
 When Claude encounters a task that matches an agent's description, it automatically delegates to that agent. The agent works independently and returns results to the main conversation.
 
 **Key Benefits:**

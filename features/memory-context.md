@@ -183,6 +183,9 @@ Each location gives you the right level of context for the code you're working o
 
 ## Context Window Management
 
+![Prompt engineering vs. context engineering](../resources/images/context-window-progression.png)
+*Source: [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — context engineering is iterative, shaping what the model sees as the conversation progresses.*
+
 ### What Fills Context
 
 - Conversation history

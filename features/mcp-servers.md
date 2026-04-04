@@ -4,6 +4,9 @@ MCP is an open-source standard for connecting AI applications to external system
 
 ## Overview
 
+![MCP client orchestration](../resources/images/mcp-client-orchestration.png)
+*Source: [Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) — the MCP client loads tool definitions into the model's context window and orchestrates the loop between tool calls and results.*
+
 MCP enables Claude Code to:
 
 - Access databases and query data
@@ -299,6 +302,9 @@ For Kerberos, short-lived tokens, or internal SSO:
 
 ### Tool Search
 
+![Tool Search preserves context](../resources/images/tool-search-context.png)
+*Source: [Advanced tool use on the Claude Developer Platform](https://www.anthropic.com/engineering/advanced-tool-use) — deferring tool schemas keeps significantly more tokens available for actual work.*
+
 Tool search is enabled by default. MCP tools are deferred (only names loaded at startup) and Claude discovers full schemas on demand via a search tool. This keeps context usage low as you add more servers.
 
 | `ENABLE_TOOL_SEARCH` | Behavior                                                                      |
@@ -322,6 +328,9 @@ export MAX_MCP_OUTPUT_TOKENS=50000
 ```
 
 MCP servers can also annotate individual tools with `anthropic/maxResultSizeChars` to declare their expected output size.
+
+![Programmatic tool calling with parallel execution](../resources/images/programmatic-tool-calling.png)
+*Source: [Advanced tool use on the Claude Developer Platform](https://www.anthropic.com/engineering/advanced-tool-use) — orchestrating tools through code enables parallel execution and avoids round-trip overhead for chained calls.*
 
 ### Logging in STDIO Servers
 
