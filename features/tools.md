@@ -1,3 +1,9 @@
+---
+title: Built-in Tools Reference
+description: Reference for all 18 default tools available in the Claude Code CLI, organized into six categories.
+category: core
+---
+
 # Claude Code Built-in Tools Reference
 
 Complete reference for all default tools available in Claude Code CLI.

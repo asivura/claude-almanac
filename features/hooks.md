@@ -1,3 +1,9 @@
+---
+title: Hooks
+description: Shell commands or LLM prompts that execute at specific lifecycle events during a Claude Code session.
+category: core
+---
+
 # Claude Code Hooks
 
 Hooks are a powerful automation feature that lets you execute custom bash commands or LLM-based prompts at specific points during a Claude Code session. Think of them as lifecycle events you can hook into to control, validate, or enhance Claude's behavior.

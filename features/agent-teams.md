@@ -1,3 +1,9 @@
+---
+title: Agent Teams
+description: Multiple Claude Code instances working together on shared tasks with direct messaging and a shared task list.
+category: agents
+---
+
 # Claude Code Agent Teams
 
 Agent teams coordinate multiple independent Claude Code instances working together on a shared task. One session acts as the **team lead**, orchestrating work, while **teammates** work independently in their own context windows and communicate directly with each other.

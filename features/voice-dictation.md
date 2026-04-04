@@ -1,3 +1,9 @@
+---
+title: Voice Dictation
+description: Push-to-talk voice dictation that transcribes speech live into the prompt input.
+category: surfaces
+---
+
 # Claude Code Voice Dictation
 
 Use push-to-talk voice dictation to speak prompts instead of typing them. Speech is transcribed live into the prompt input, and you can mix voice and typing in the same message.

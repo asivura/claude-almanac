@@ -1,3 +1,9 @@
+---
+title: Memory and Context
+description: Hierarchical memory system that maintains context across sessions and manages the context window.
+category: core
+---
+
 # Claude Code Memory and Context
 
 Claude Code uses a hierarchical memory system to maintain context across sessions and manage the context window effectively.

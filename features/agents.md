@@ -1,3 +1,9 @@
+---
+title: Agents and Subagents
+description: Specialized AI assistants that handle tasks independently with isolated context and custom tool access.
+category: agents
+---
+
 # Claude Code Agents and Subagents
 
 Agents are specialized AI assistants that handle specific types of tasks independently. Each agent runs in its own isolated context window with a custom system prompt, specific tool access controls, independent permissions, and full conversation history isolation.

@@ -1,3 +1,9 @@
+---
+title: GitLab CI/CD
+description: Integrate Claude Code into GitLab pipelines to automate code changes, MRs, and review comments.
+category: ci-cd
+---
+
 # Claude Code GitLab CI/CD
 
 > **Status**: Beta. Maintained by GitLab. Built on the Claude Code CLI and Agent SDK.

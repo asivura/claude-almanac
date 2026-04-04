@@ -1,3 +1,9 @@
+---
+title: Additional Features
+description: Lesser-known but powerful Claude Code features for advanced workflows.
+category: foundational
+---
+
 # Claude Code Additional Features
 
 Lesser-known but powerful features for advanced workflows.

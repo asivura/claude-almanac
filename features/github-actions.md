@@ -1,3 +1,9 @@
+---
+title: GitHub Actions and CI/CD
+description: Run Claude Code in GitHub Actions workflows for automated code review, implementation, and CI/CD tasks.
+category: ci-cd
+---
+
 # Claude Code GitHub Actions and CI/CD
 
 Run Claude Code in GitHub Actions workflows for automated code review, implementation, and CI/CD tasks.

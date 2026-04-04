@@ -1,3 +1,9 @@
+---
+title: Channels
+description: MCP servers that push events from external systems into a running Claude Code session.
+category: integrations
+---
+
 # Claude Code Channels
 
 Channels push events from external systems into a running Claude Code session so Claude can react to things happening outside the terminal. They are MCP servers that deliver messages, alerts, and webhooks while the session is open.

@@ -1,3 +1,9 @@
+---
+title: Scheduled Tasks
+description: 'Three ways to schedule recurring Claude Code work: cloud, desktop app, and the /loop CLI command.'
+category: ci-cd
+---
+
 # Claude Code Scheduled Tasks
 
 Claude Code offers three ways to schedule recurring work, each suited to different needs.

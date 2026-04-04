@@ -1,3 +1,9 @@
+---
+title: Slash Commands and Skills
+description: Custom actions invoked directly in conversations, unified under the Skills framework.
+category: core
+---
+
 # Claude Code Slash Commands and Skills
 
 Slash commands (starting with `/`) are custom actions you can invoke directly in Claude Code conversations. Since Claude Code unified the `.claude/commands/` system with the broader **Skills** framework, all slash commands are now implemented as skills.

@@ -1,3 +1,9 @@
+---
+title: Testing Claude Code Configurations
+description: Validate Claude Code workspace configurations, skills, commands, and settings with automated tests.
+category: core
+---
+
 # Testing Claude Code Configurations
 
 Validate Claude Code workspace configurations, skills, commands, and settings with automated testing.

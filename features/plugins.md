@@ -1,3 +1,9 @@
+---
+title: Plugins
+description: Reusable packages that bundle custom commands, agents, hooks, MCP servers, and LSP integrations.
+category: agents
+---
+
 # Claude Code Plugins
 
 Plugins are packages of reusable functionality that extend Claude Code with custom commands, agents, hooks, MCP servers, and language server integrations.

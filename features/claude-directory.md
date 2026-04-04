@@ -1,3 +1,9 @@
+---
+title: The .claude Directory
+description: Where Claude Code reads instructions, settings, skills, subagents, and memory.
+category: foundational
+---
+
 # The `.claude` Directory
 
 Claude Code reads instructions, settings, skills, subagents, and memory from two locations:

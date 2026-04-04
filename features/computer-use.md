@@ -1,3 +1,9 @@
+---
+title: Computer Use
+description: Let Claude open apps, control the screen, click, type, and take screenshots on macOS.
+category: surfaces
+---
+
 # Claude Code Computer Use
 
 > **Status**: Research preview. Requires Pro or Max plan. macOS only (CLI). Claude Code v2.1.85 or later. Not available on Team or Enterprise plans, non-interactive mode (`-p`), or third-party providers (Bedrock, Vertex, Foundry).

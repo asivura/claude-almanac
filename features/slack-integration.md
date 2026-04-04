@@ -1,3 +1,9 @@
+---
+title: Claude Code in Slack
+description: Delegate coding tasks from Slack by mentioning @Claude, which creates a Claude Code session on the web.
+category: integrations
+---
+
 # Claude Code in Slack
 
 Delegate coding tasks directly from your Slack workspace. When you mention `@Claude` with a coding task, Claude detects the intent and creates a Claude Code session on the web.
