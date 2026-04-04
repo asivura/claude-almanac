@@ -360,6 +360,6 @@ claude --model opus
 
 ## References
 
-- [Settings Documentation](https://code.claude.com/docs/en/settings.md)
-- [IAM & Permissions](https://code.claude.com/docs/en/iam.md)
-- [Model Configuration](https://code.claude.com/docs/en/model-config.md)
+- [Settings Documentation](https://code.claude.com/docs/en/settings)
+- [IAM & Permissions](https://code.claude.com/docs/en/iam)
+- [Model Configuration](https://code.claude.com/docs/en/model-config)
