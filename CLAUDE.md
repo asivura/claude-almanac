@@ -31,6 +31,8 @@ claude-almanac/
 │   ├── github-actions.md
 │   ├── pricing.md
 │   ├── scheduled-tasks.md
+│   ├── checkpointing.md
+│   ├── code-review.md
 │   └── additional-features.md
 ```
 
