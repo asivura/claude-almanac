@@ -2,6 +2,8 @@
 
 Headless mode (now called SDK mode) allows you to run Claude Code non-interactively from the command line or within application code.
 
+> **Note**: The Claude Code SDK has been renamed to the **Claude Agent SDK**. The Python package changed from `claude-code-sdk` to `claude-agent-sdk`, and imports changed from `claude_code_sdk` to `claude_agent_sdk`. See the [Migration Guide](https://platform.claude.com/docs/en/agent-sdk/migration-guide) for details.
+
 ## Overview
 
 Two approaches available:
@@ -26,21 +28,25 @@ claude -p "Summarize this project" --output-format json
 
 ### Key CLI Flags
 
-| Flag                     | Purpose                    | Example                                   |
-| ------------------------ | -------------------------- | ----------------------------------------- |
-| `-p, --print`            | Non-interactive mode       | `claude -p "your prompt"`                 |
-| `--allowedTools`         | Auto-approve tools         | `--allowedTools "Read,Edit,Bash"`         |
-| `--output-format`        | Output format              | `--output-format json`                    |
-| `--json-schema`          | Validate output            | `--json-schema '{...}'`                   |
-| `--continue, -c`         | Resume most recent session | `claude -c -p "continue"`                 |
-| `--resume, -r`           | Resume specific session    | `claude -r "session-name"`                |
-| `--max-turns`            | Limit agentic turns        | `--max-turns 5`                           |
-| `--max-budget-usd`       | Spend limit                | `--max-budget-usd 5.00`                   |
-| `--model`                | Specify model              | `--model opus`                            |
-| `--append-system-prompt` | Add instructions           | `--append-system-prompt "Use TypeScript"` |
-| `--system-prompt`        | Replace system prompt      | `--system-prompt "Custom prompt"`         |
-| `--permission-mode`      | Permission level           | `--permission-mode acceptEdits`           |
-| `--tools`                | Restrict available tools   | `--tools "Read,Bash"`                     |
+| Flag                       | Purpose                    | Example                                   |
+| -------------------------- | -------------------------- | ----------------------------------------- |
+| `-p, --print`              | Non-interactive mode       | `claude -p "your prompt"`                 |
+| `--bare`                   | Skip auto-discovery        | `claude --bare -p "query"`                |
+| `--allowedTools`           | Auto-approve tools         | `--allowedTools "Read,Edit,Bash"`         |
+| `--output-format`          | Output format              | `--output-format json`                    |
+| `--input-format`           | Input format               | `--input-format stream-json`              |
+| `--json-schema`            | Validate output            | `--json-schema '{...}'`                   |
+| `--continue, -c`           | Resume most recent session | `claude -c -p "continue"`                 |
+| `--resume, -r`             | Resume specific session    | `claude -r "session-name"`                |
+| `--max-turns`              | Limit agentic turns        | `--max-turns 5`                           |
+| `--max-budget-usd`         | Spend limit                | `--max-budget-usd 5.00`                   |
+| `--model`                  | Specify model              | `--model opus`                            |
+| `--fallback-model`         | Fallback on overload       | `--fallback-model sonnet`                 |
+| `--append-system-prompt`   | Add instructions           | `--append-system-prompt "Use TypeScript"` |
+| `--system-prompt`          | Replace system prompt      | `--system-prompt "Custom prompt"`         |
+| `--permission-mode`        | Permission level           | `--permission-mode acceptEdits`           |
+| `--tools`                  | Restrict available tools   | `--tools "Read,Bash"`                     |
+| `--no-session-persistence` | Don't save session to disk | `--no-session-persistence`                |
 
 ### Output Formats
 
@@ -106,7 +112,7 @@ The Agent SDK gives you the same tools, agent loop, and context management that 
 
 ### Python Example: Simple Agent
 
-> **Note**: Verify current package name at [pypi.org](https://pypi.org/search/?q=claude+agent+sdk) or the [official SDK docs](https://platform.claude.com/docs/en/agent-sdk).
+> **Package**: `pip install claude-agent-sdk` ([PyPI](https://pypi.org/project/claude-agent-sdk/), [SDK docs](https://platform.claude.com/docs/en/agent-sdk))
 
 ```python
 import asyncio
@@ -130,7 +136,7 @@ asyncio.run(main())
 
 ### TypeScript Example: Simple Agent
 
-> **Note**: Verify current package name at [npmjs.com](https://www.npmjs.com/search?q=claude%20agent%20sdk) or the [official SDK docs](https://platform.claude.com/docs/en/agent-sdk).
+> **Package**: `npm install @anthropic-ai/claude-agent-sdk` ([npm](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk), [SDK docs](https://platform.claude.com/docs/en/agent-sdk))
 
 ```typescript
 import { query } from "@anthropic-ai/claude-agent-sdk";
@@ -159,7 +165,7 @@ async def main():
     async for message in query(
         prompt="Use the code-reviewer agent to review this codebase",
         options=ClaudeAgentOptions(
-            allowed_tools=["Read", "Glob", "Grep", "Task"],
+            allowed_tools=["Read", "Glob", "Grep", "Agent"],
             agents={
                 "code-reviewer": AgentDefinition(
                     description="Expert code reviewer.",
@@ -202,23 +208,25 @@ async def main():
 ### Python: Sessions and Context Persistence
 
 ```python
+from claude_agent_sdk import query, ClaudeAgentOptions, SystemMessage, ResultMessage
+
 async def main():
     session_id = None
 
-    # First query
+    # First query: capture the session ID
     async for message in query(
         prompt="Read the authentication module",
         options=ClaudeAgentOptions(allowed_tools=["Read", "Glob"])
     ):
-        if hasattr(message, 'subtype') and message.subtype == 'init':
-            session_id = message.session_id
+        if isinstance(message, SystemMessage) and message.subtype == "init":
+            session_id = message.data["session_id"]
 
     # Resume with full context
     async for message in query(
         prompt="Now find all places that call it",
         options=ClaudeAgentOptions(resume=session_id)
     ):
-        if hasattr(message, "result"):
+        if isinstance(message, ResultMessage):
             print(message.result)
 ```
 
