@@ -60,6 +60,24 @@ Rules:
 - No period at the end
 - Subject line: max 72 characters
 
+### Local site preview
+
+The Fumadocs site that renders at [claude-almanac.sivura.com](https://claude-almanac.sivura.com) lives in `site/`. To preview changes locally before opening a PR:
+
+```bash
+cd site
+npm install   # first time only
+npm run dev   # → http://localhost:3000
+```
+
+The site reads markdown from `features/`, `guides/`, and `case-studies/` at the repo root — no need to move or copy content into `site/`. Edits to any content file hot-reload in the dev server.
+
+For a production build (what Cloudflare Pages runs):
+
+```bash
+cd site && npm run build
+```
+
 ### Pull request workflow
 
 Direct pushes to `main` are blocked. All changes require PRs.
