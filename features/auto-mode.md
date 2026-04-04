@@ -6,6 +6,8 @@ Auto mode lets Claude execute actions without permission prompts, using a separa
 
 Users approve 93% of permission prompts in normal usage. Auto mode addresses this approval fatigue by replacing manual prompts with an AI-powered safety classifier that reviews each action before it runs.
 
+Auto mode is a **research preview**. It reduces prompts but does not guarantee safety. Use it for tasks where you trust the general direction, not as a replacement for review on sensitive operations.
+
 Auto mode sits between manual permission prompts and `--dangerously-skip-permissions` (bypassPermissions mode). It provides high autonomy while maintaining safety through two defensive layers: a prompt-injection probe on inputs and a transcript classifier on outputs.
 
 ![Security vs Autonomy tradeoff chart](https://www-cdn.anthropic.com/images/4zrzovbb/website/d6b34bdb92808fd5739e4d14340a1752d5607dda-1920x1920.png)
@@ -21,6 +23,8 @@ Auto mode sits between manual permission prompts and `--dangerously-skip-permiss
 | **Provider** | Anthropic API only. Not Bedrock, Vertex, or Foundry                       |
 | **Version**  | Claude Code v2.1.83 or later                                              |
 
+If Claude Code reports auto mode as unavailable, one of these requirements is unmet; this is not a transient outage.
+
 Admins can lock auto mode off with `permissions.disableAutoMode` set to `"disable"` in managed settings.
 
 ## Enabling Auto Mode
@@ -34,7 +38,7 @@ claude --permission-mode auto      # start directly in auto mode
 
 ### VS Code
 
-Enable "Allow dangerously skip permissions" in extension settings, then use the mode indicator to select auto mode.
+Enable "Allow dangerously skip permissions" in extension settings, then use the mode indicator to select auto mode. Note: `claudeCode.initialPermissionMode` does not accept `auto`; to start in auto mode by default, set `defaultMode` in your Claude Code `settings.json` instead.
 
 ### Settings
 
@@ -96,7 +100,16 @@ Actions are evaluated in three tiers with a fixed decision order.
 
 ### Tier 1: Safe-Tool Allowlist
 
-File reads, searches, and code navigation are allowed without classifier involvement. Blanket shell access (`Bash(*)`) and interpreter wildcards are disabled when entering auto mode.
+File reads, searches, and code navigation are allowed without classifier involvement.
+
+On entering auto mode, broad allow rules that grant arbitrary code execution are dropped:
+
+- Blanket `Bash(*)`
+- Wildcarded interpreters like `Bash(python*)`
+- Package-manager run commands
+- `Agent` allow rules
+
+Narrow rules like `Bash(npm test)` carry over. Dropped rules are restored when you leave auto mode.
 
 ### Tier 2: In-Project Operations
 
@@ -160,16 +173,16 @@ When the classifier denies an action:
 
 - A notification appears and the denial is logged under `/permissions` in "Recently denied"
 - Press `r` to retry with manual approval
-- **3 consecutive blocks** OR **20 total blocks** cause auto mode to pause and resume normal prompting
-- Any allowed action resets the consecutive counter
-- In non-interactive mode (`-p` flag), repeated blocks abort the session
+- **3 consecutive blocks** OR **20 total blocks** cause auto mode to pause and resume normal prompting. Approving the prompted action resumes auto mode. These thresholds are not configurable
+- Any allowed action resets the consecutive counter. The total counter persists for the session and resets only when its own limit triggers a fallback
+- In non-interactive mode (`-p` flag), repeated blocks abort the session since there is no user to prompt
 
 ## Subagent Handling
 
 The classifier checks subagent activity at three points:
 
-1. **Before spawn**: The delegated task description is evaluated
-1. **During run**: Each action goes through the classifier with the same rules
+1. **Before spawn**: The delegated task description is evaluated, so a dangerous-looking task is blocked at spawn time
+1. **During run**: Each action goes through the classifier with the same rules as the parent session. Any `permissionMode` in the subagent's frontmatter is ignored
 1. **After finish**: Full action history is reviewed; if flagged, a security warning is prepended to the result
 
 ## Configuration
@@ -221,6 +234,34 @@ claude auto-mode critique   # AI feedback on custom rules
 - Reads and working-directory edits skip the classifier (no overhead)
 - Overhead applies mainly to shell commands and network operations
 
+## Protected Paths
+
+Writes to a small set of paths are never auto-approved in any mode. In auto mode, these writes route to the classifier instead of being auto-approved.
+
+**Protected directories:**
+
+- `.git`
+- `.vscode`
+- `.idea`
+- `.husky`
+- `.claude` (except `.claude/commands`, `.claude/agents`, `.claude/skills`, and `.claude/worktrees`)
+
+**Protected files:**
+
+- `.gitconfig`, `.gitmodules`
+- `.bashrc`, `.bash_profile`, `.zshrc`, `.zprofile`, `.profile`
+- `.ripgreprc`
+- `.mcp.json`, `.claude.json`
+
+## Design Rationale: Reasoning-Blind Classifier
+
+The classifier is designed to be **orthogonal to chain-of-thought monitoring**. By stripping assistant text and tool results, the classifier evaluates actions based on their real-world impact, not the agent's stated reasoning. This means:
+
+- The agent cannot generate persuasive rationalizations to manipulate the classifier
+- Tool results (the primary injection vector) cannot influence classifier decisions
+- The classifier catches concealed misaligned reasoning through resulting action evaluation
+- The trade-off: the classifier cannot verify provenance (whether the agent queried or fabricated specific targets)
+
 ## Performance Metrics
 
 | Stage                 | Real Traffic (n=10k) | Real Overeager (n=52) | Synthetic Exfil (n=1k) |
@@ -234,5 +275,7 @@ claude auto-mode critique   # AI feedback on custom rules
 ## References
 
 - [Auto Mode Engineering Blog Post](https://www.anthropic.com/engineering/claude-code-auto-mode)
-- [Security Guide](https://code.claude.com/docs/en/security.md)
-- [Permission Modes](https://code.claude.com/docs/en/permissions.md)
+- [Permission Modes](https://code.claude.com/docs/en/permission-modes)
+- [Permissions](https://code.claude.com/docs/en/permissions)
+- [Security Guide](https://code.claude.com/docs/en/security)
+- [Sandboxing](https://code.claude.com/docs/en/sandboxing)
