@@ -123,7 +123,10 @@ Cannot modify by default:
 | `acceptEdits`       | Auto-accepts file edits         |
 | `plan`              | Read-only analysis only         |
 | `dontAsk`           | Auto-denies unless pre-approved |
+| `auto`              | AI-classified safety checks     |
 | `bypassPermissions` | Skips all prompts               |
+
+> For comprehensive documentation on auto mode, including classifier architecture, configuration, and threat model, see [Auto Mode](./auto-mode.md).
 
 ### Permission Rules
 
