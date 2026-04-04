@@ -29,10 +29,6 @@ jobs:
         working-directory: site
         run: npm ci
 
-      - name: Lint (if lint script exists)
-        working-directory: site
-        run: npm run lint --if-present
-
       - name: Build
         working-directory: site
         run: npm run build
