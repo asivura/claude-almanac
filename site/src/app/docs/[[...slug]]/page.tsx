@@ -51,6 +51,16 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   };
   const type = data.type;
 
+  // Map the collection type to the source directory at the repo root.
+  // Content lives at repo root in three directories (not in site/content/docs/)
+  // so the GitHub URL must reflect the actual source path.
+  const contentDirByType: Record<string, string> = {
+    reference: 'features',
+    guide: 'guides',
+    caseStudy: 'case-studies',
+  };
+  const contentDir = contentDirByType[type ?? 'reference'] ?? 'features';
+
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
@@ -59,7 +69,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
+          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/${contentDir}/${page.path}`}
         />
       </div>
 
