@@ -4,6 +4,10 @@
 // the Fumadocs-generated markdown sibling instead of HTML. Browsers (Accept:
 // text/html, */*) fall through to the static HTML export.
 //
+// Error handling: markdown-accepting clients also get a markdown 404 body
+// when the page doesn't exist (instead of falling through to the HTML 404
+// page) — keeps content negotiation consistent end-to-end.
+//
 // See site-planning/content-negotiation-decision.md for full rationale.
 //
 // URL mapping:
@@ -19,6 +23,34 @@ type PagesFunction = (context: {
   request: Request;
   next: () => Promise<Response>;
 }) => Promise<Response>;
+
+function markdownNotFound(pathname: string): Response {
+  // Sanitize pathname for safe embedding in the markdown body: strip
+  // backticks and backslashes so a crafted URL can't break out of the
+  // code span, and cap the length.
+  const displayPath = pathname.replace(/[`\\]/g, '').slice(0, 200);
+  const body = `# 404 Not Found
+
+The page \`${displayPath}\` does not exist on claude-almanac.sivura.com.
+
+## Find what you're looking for
+
+- **Full index**: [/llms.txt](/llms.txt)
+- **All content**: [/llms-full.txt](/llms-full.txt)
+- **Documentation**: [/docs](/docs)
+
+If you expected this page to exist, open an issue at
+https://github.com/asivura/claude-almanac/issues.
+`;
+  return new Response(body, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'X-Markdown-Tokens': Math.ceil(body.length / 4).toString(),
+      Vary: 'Accept',
+    },
+  });
+}
 
 export const onRequest: PagesFunction = async ({ request, next }) => {
   const accept = request.headers.get('Accept') ?? '';
@@ -40,10 +72,10 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
 
   // Guard: slugs must match our known content pattern (lowercase, digits,
   // hyphens only). Anything else is either a typo or an attempt at path
-  // traversal / URL injection — fall through to the static HTML so the
-  // platform's own 404 handles it.
+  // traversal / URL injection — return a markdown 404 so markdown-accepting
+  // clients get a consistent response type.
   if (slug && !/^[a-z0-9-]+$/.test(slug)) {
-    return next();
+    return markdownNotFound(url.pathname);
   }
 
   const mdPath = slug
@@ -57,8 +89,10 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
   });
 
   if (!mdResponse.ok) {
-    // Sibling markdown missing — fall through to the HTML page.
-    return next();
+    // Sibling markdown missing (or other non-2xx) — return a markdown 404
+    // so content negotiation stays consistent for markdown-accepting
+    // clients. Browsers still hit next() via the early return above.
+    return markdownNotFound(url.pathname);
   }
 
   const text = await mdResponse.text();
