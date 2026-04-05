@@ -91,7 +91,7 @@ export default function HomePage() {
         {/* Hero */}
         <section className="flex flex-col gap-6">
           <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-            Claude Code Almanac
+            Claude Almanac
           </h1>
           <p className="max-w-2xl text-lg italic leading-relaxed text-foreground/80 md:text-xl">
             A knowledge base for humans and AI agents —
@@ -225,23 +225,23 @@ export default function HomePage() {
           </p>
           <ul className="flex flex-col gap-2 text-sm">
             <li>
-              <Link
+              <a
                 href="/llms.txt"
                 className="font-mono text-primary underline-offset-4 hover:underline"
               >
                 /llms.txt
-              </Link>
+              </a>
               <span className="ml-2 text-muted-foreground">
                 — index of all pages
               </span>
             </li>
             <li>
-              <Link
+              <a
                 href="/llms-full.txt"
                 className="font-mono text-primary underline-offset-4 hover:underline"
               >
                 /llms-full.txt
-              </Link>
+              </a>
               <span className="ml-2 text-muted-foreground">
                 — full content, concatenated
               </span>

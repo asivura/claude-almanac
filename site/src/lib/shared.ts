@@ -1,4 +1,4 @@
-export const appName = 'claude-almanac';
+export const appName = 'Claude Almanac';
 export const docsRoute = '/docs';
 export const docsImageRoute = '/og/docs';
 export const docsContentRoute = '/llms.mdx/docs';
