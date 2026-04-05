@@ -10,7 +10,7 @@ Agent teams coordinate multiple independent Claude Code instances working togeth
 
 > **Status**: Experimental. Requires Claude Code v2.1.32+.
 
-For environment setup (Ghostty, tmux, Starship, VS Code integration), see [Agent Teams: Environment Setup](/docs/agent-teams-setup).
+For environment setup (Ghostty, tmux, Starship, VS Code integration), see [Agent Teams: Environment Setup](../guides/agent-teams-setup.md).
 
 ## Overview
 
@@ -430,4 +430,4 @@ tmux kill-session -t <session-name>
 - [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Hooks Documentation](https://code.claude.com/docs/en/hooks)
 - [Agent Team Token Costs](https://code.claude.com/docs/en/costs#agent-team-token-costs)
-- [Agent Teams: Environment Setup](/docs/agent-teams-setup) - Ghostty, tmux, Starship, and VS Code integration
+- [Agent Teams: Environment Setup](../guides/agent-teams-setup.md) - Ghostty, tmux, Starship, and VS Code integration
