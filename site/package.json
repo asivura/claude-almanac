@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "postbuild": "node scripts/patch-llms-txt.mjs",
     "dev": "next dev",
     "prebuild": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/generate-home-markdown.mjs",
     "predev": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/generate-home-markdown.mjs",
