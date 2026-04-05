@@ -23,3 +23,14 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+/* Dark mode: invert images so diagrams with black text on transparent or
+ * white backgrounds render readably. Uses invert + hue-rotate to preserve
+ * hues approximately (blues stay blue-ish, reds stay red-ish).
+ *
+ * Opt-out with class="no-invert" or data-no-invert for terminal
+ * screenshots, photos, or images with dark-by-design backgrounds.
+ */
+.dark img:not(.no-invert):not([data-no-invert]) {
+  filter: invert(1) hue-rotate(180deg);
+}
