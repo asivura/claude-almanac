@@ -13,6 +13,9 @@ site/next-env.d.ts
 # source of truth lives at repo-root resources/images/).
 site/public/images/
 
+# Regenerated from git log at prebuild time.
+site/src/data/recent-updates.json
+
 # Secrets and credentials
 .env
 .env.*
