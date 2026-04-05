@@ -24,15 +24,20 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
-/* Dark mode: wrap images in a cream surface so light-authored content
- * (diagrams, colored flowcharts, photos, screenshots) renders with its
- * original colors intact. Preserves every pixel without filter hacks.
+/* Dark mode: invert images via filter so light-background diagrams
+ * (the Anthropic blog's flowcharts and architecture diagrams being
+ * the bulk of our images) integrate visually with the dark page.
  *
- * Opt-out with class="dark-optimized" or data-dark-optimized for
- * images that were designed for dark backgrounds.
+ * invert(1) flips lightness; hue-rotate(180deg) approximately
+ * preserves hues, so pink stays pink-ish (darker), blue stays
+ * blue-ish (darker), etc. Not pixel-perfect color fidelity, but
+ * colors remain recognizable and the image feels native to dark
+ * mode rather than pasted on as a light rectangle.
+ *
+ * Opt out with class="dark-optimized" or data-dark-optimized for
+ * images that were designed for dark backgrounds (terminal
+ * screenshots, dark-themed captures, photos).
  */
 .dark img:not(.dark-optimized):not([data-dark-optimized]) {
-  background-color: #faf9f5;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
+  filter: invert(1) hue-rotate(180deg);
 }
