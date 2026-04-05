@@ -155,8 +155,8 @@ sequenceDiagram
 
     U->>DNS: resolve claude-almanac.sivura.com
     DNS-->>U: IP
-    U->>Edge: GET /hooks<br/>Accept: text/html
-    Edge->>Pages: fetch /hooks (HTML)
+    U->>Edge: GET /docs/hooks<br/>Accept: text/html
+    Edge->>Pages: fetch /docs/hooks (HTML)
     Pages-->>Edge: static HTML
     Edge-->>U: HTML (CDN cached)
 ```
@@ -172,10 +172,10 @@ sequenceDiagram
     participant MW as Pages Function<br/>(_middleware.ts)
     participant Pages as CF Pages asset store
 
-    A->>Edge: GET /hooks<br/>Accept: text/markdown
+    A->>Edge: GET /docs/hooks<br/>Accept: text/markdown
     Edge->>MW: invoke middleware
     MW->>MW: check Accept header
-    MW->>Pages: fetch /hooks.md
+    MW->>Pages: fetch /docs/hooks.md
     Pages-->>MW: raw markdown
     MW->>MW: add Content-Type<br/>+ X-Markdown-Tokens<br/>+ Vary: Accept
     MW-->>A: text/markdown response
@@ -317,11 +317,11 @@ Readers and agents access the same content through two paths:
 
 ```mermaid
 flowchart TD
-    Start[GET /hooks] --> Accept{Accept header}
+    Start[GET /docs/hooks] --> Accept{Accept header}
     Accept -->|text/html<br/>or missing| HTML[Serve static HTML]
     Accept -->|text/markdown| MW[Pages Function middleware]
 
-    MW --> Fetch[Fetch /hooks.md from asset store]
+    MW --> Fetch[Fetch /docs/hooks.md from asset store]
     Fetch --> Wrap[Wrap with Content-Type,<br/>X-Markdown-Tokens, Vary]
     Wrap --> MD[Serve markdown]
 
@@ -331,8 +331,8 @@ flowchart TD
 
 This gives us:
 
-- **URL suffix access**: `/hooks.md` directly serves markdown (Fumadocs built-in)
-- **Accept header negotiation**: `/hooks` with `Accept: text/markdown` serves markdown via Pages Function
+- **URL suffix access**: `/docs/hooks.md` directly serves markdown (static file under the `/docs/` namespace)
+- **Accept header negotiation**: `/docs/hooks` with `Accept: text/markdown` serves markdown via Pages Function
 
 Both work simultaneously, no client-side configuration needed.
 
@@ -340,11 +340,11 @@ Both work simultaneously, no client-side configuration needed.
 
 Generated automatically at build time:
 
-| Endpoint         | Content                                              |
-| ---------------- | ---------------------------------------------------- |
-| `/llms.txt`      | Index of all content with links                      |
-| `/llms-full.txt` | Full text of all content concatenated                |
-| `/hooks.md`      | Per-page markdown endpoint (Fumadocs auto-generates) |
+| Endpoint         | Content                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `/llms.txt`      | Index of all content with links                           |
+| `/llms-full.txt` | Full text of all content concatenated                     |
+| `/docs/hooks.md` | Per-page markdown endpoint (under the `/docs/` namespace) |
 
 ## Performance characteristics
 
