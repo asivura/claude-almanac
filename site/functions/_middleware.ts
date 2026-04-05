@@ -1,19 +1,19 @@
 // Cloudflare Pages Function middleware — HTTP content negotiation for LLMs.
 //
-// When a client requests /docs/<slug> with `Accept: text/markdown`, we serve
-// the Fumadocs-generated markdown sibling instead of HTML. Browsers (Accept:
-// text/html, */*) fall through to the static HTML export.
+// Universal Accept: text/markdown coverage. When a markdown-accepting client
+// hits any user-facing page, they get markdown back:
 //
-// Error handling: markdown-accepting clients also get a markdown 404 body
-// when the page doesn't exist (instead of falling through to the HTML 404
-// page) — keeps content negotiation consistent end-to-end.
+//   /                 →  /home.md (generated at build time)
+//   /docs/<slug>      →  /llms.mdx/docs/<slug>/content.md
+//   /docs/            →  /llms.txt (top-level index)
+//   /llms.txt         →  same file, served with Content-Type: text/markdown
+//   /llms-full.txt    →  same file, served with Content-Type: text/markdown
+//   anything else     →  markdown 404 body
+//
+// Browsers (Accept: text/html or */*) and requests for static assets (any
+// path ending in a file extension) fall through to next() unchanged.
 //
 // See site-planning/content-negotiation-decision.md for full rationale.
-//
-// URL mapping:
-//   /docs/<slug>                 →  /llms.mdx/docs/<slug>/content.md
-//   /docs/<slug>/ (trailing /)   →  /llms.mdx/docs/<slug>/content.md
-//   /docs/                       →  /llms.txt (top-level index)
 
 // Minimal Cloudflare Pages Function signature. We avoid depending on
 // @cloudflare/workers-types to keep the site/node_modules lean — Pages
@@ -23,6 +23,24 @@ type PagesFunction = (context: {
   request: Request;
   next: () => Promise<Response>;
 }) => Promise<Response>;
+
+function markdownResponse(
+  text: string,
+  status = 200,
+  extraCache = false,
+): Response {
+  const estimatedTokens = Math.ceil(text.length / 4);
+  const headers: Record<string, string> = {
+    'Content-Type': 'text/markdown; charset=utf-8',
+    'X-Markdown-Tokens': estimatedTokens.toString(),
+    Vary: 'Accept',
+  };
+  if (extraCache) {
+    // Only cache successful content — errors should stay fresh.
+    headers['Cache-Control'] = 'public, max-age=300, s-maxage=3600';
+  }
+  return new Response(text, { status, headers });
+}
 
 function markdownNotFound(pathname: string): Response {
   // Sanitize pathname for safe embedding in the markdown body: strip
@@ -38,77 +56,75 @@ The page \`${displayPath}\` does not exist on claude-almanac.sivura.com.
 - **Full index**: [/llms.txt](/llms.txt)
 - **All content**: [/llms-full.txt](/llms-full.txt)
 - **Documentation**: [/docs](/docs)
+- **Home**: [/](/)
 
 If you expected this page to exist, open an issue at
 https://github.com/asivura/claude-almanac/issues.
 `;
-  return new Response(body, {
-    status: 404,
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'X-Markdown-Tokens': Math.ceil(body.length / 4).toString(),
-      Vary: 'Accept',
-    },
+  return markdownResponse(body, 404);
+}
+
+async function fetchAssetAsMarkdown(
+  origin: string,
+  assetPath: string,
+  fallbackPath: string,
+): Promise<Response> {
+  const assetUrl = new URL(assetPath, origin);
+  const response = await fetch(assetUrl.toString(), {
+    headers: { 'User-Agent': 'content-negotiation-middleware' },
   });
+  if (!response.ok) return markdownNotFound(fallbackPath);
+  const text = await response.text();
+  return markdownResponse(text, 200, true);
 }
 
 export const onRequest: PagesFunction = async ({ request, next }) => {
   const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
 
-  // Only intercept markdown-accepting clients hitting /docs/*. Skip paths
-  // that already end in a file extension (they already address a raw asset).
-  if (
-    !accept.includes('text/markdown') ||
-    !url.pathname.startsWith('/docs/') ||
-    /\.[a-z0-9]+$/i.test(url.pathname)
-  ) {
+  // Skip non-markdown-accepting clients (browsers, API calls, etc).
+  if (!accept.includes('text/markdown')) return next();
+
+  // Skip static asset paths (anything ending in a file extension).
+  // home.md / llms.txt etc. are explicit routes handled below.
+  if (/\.[a-z0-9]+$/i.test(url.pathname) &&
+      url.pathname !== '/llms.txt' &&
+      url.pathname !== '/llms-full.txt') {
     return next();
   }
 
-  // Map /docs/<slug> (any trailing slash) → /llms.mdx/docs/<slug>/content.md.
-  // /docs/ (bare) → /llms.txt.
-  const slug = url.pathname.replace(/^\/docs\/?/, '').replace(/\/$/, '');
+  const path = url.pathname;
 
-  // Guard: slugs must match our known content pattern (lowercase, digits,
-  // hyphens only). Anything else is either a typo or an attempt at path
-  // traversal / URL injection — return a markdown 404 so markdown-accepting
-  // clients get a consistent response type.
-  if (slug && !/^[a-z0-9-]+$/.test(slug)) {
-    return markdownNotFound(url.pathname);
+  // Root landing page → generated markdown representation.
+  if (path === '/' || path === '') {
+    return fetchAssetAsMarkdown(url.origin, '/home.md', '/');
   }
 
-  const mdPath = slug
-    ? `/llms.mdx/docs/${slug}/content.md`
-    : '/llms.txt';
-
-  const mdUrl = new URL(mdPath, url.origin);
-  const mdResponse = await fetch(mdUrl.toString(), {
-    // Preserve cache-control / conditional headers where useful.
-    headers: { 'User-Agent': 'content-negotiation-middleware' },
-  });
-
-  if (!mdResponse.ok) {
-    // Sibling markdown missing (or other non-2xx) — return a markdown 404
-    // so content negotiation stays consistent for markdown-accepting
-    // clients. Browsers still hit next() via the early return above.
-    return markdownNotFound(url.pathname);
+  // LLM index endpoints — already markdown content but served as text/plain.
+  // Re-wrap with the correct Content-Type when the client asks for markdown.
+  if (path === '/llms.txt' || path === '/llms-full.txt') {
+    return fetchAssetAsMarkdown(url.origin, path, path);
   }
 
-  const text = await mdResponse.text();
-  // Heuristic: 1 token ≈ 4 characters for English text. Matches the format
-  // Cloudflare's "Markdown for Agents" feature emits so tooling works with
-  // either source.
-  const estimatedTokens = Math.ceil(text.length / 4);
+  // /docs/<slug> → /llms.mdx/docs/<slug>/content.md (Fumadocs internal path).
+  // /docs/ (bare) → /llms.txt (top-level index).
+  if (path.startsWith('/docs/') || path === '/docs') {
+    const slug = path.replace(/^\/docs\/?/, '').replace(/\/$/, '');
 
-  return new Response(text, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'X-Markdown-Tokens': estimatedTokens.toString(),
-      Vary: 'Accept',
-      // Let the CDN and clients cache briefly.
-      'Cache-Control': 'public, max-age=300, s-maxage=3600',
-    },
-  });
+    // Guard: slugs must match our known content pattern. Anything else is a
+    // typo or path-traversal attempt — return markdown 404.
+    if (slug && !/^[a-z0-9-]+$/.test(slug)) {
+      return markdownNotFound(path);
+    }
+
+    const mdPath = slug
+      ? `/llms.mdx/docs/${slug}/content.md`
+      : '/llms.txt';
+
+    return fetchAssetAsMarkdown(url.origin, mdPath, path);
+  }
+
+  // Any other path: return a markdown 404 so content negotiation stays
+  // consistent end-to-end for markdown-accepting clients.
+  return markdownNotFound(path);
 };

@@ -111,11 +111,23 @@ the `markdownNotFound` helper, extra guards, and comments.
 
 ### URL mapping
 
-| Client request                   | Internal fetch                     |
-| -------------------------------- | ---------------------------------- |
-| `/docs/<slug>`                   | `/llms.mdx/docs/<slug>/content.md` |
-| `/docs/<slug>/` (trailing slash) | `/llms.mdx/docs/<slug>/content.md` |
-| `/docs/` (bare)                  | `/llms.txt`                        |
+The middleware gives **universal coverage**: any user-facing path on the
+site can respond to `Accept: text/markdown` with markdown. No matter what
+URL an agent hits, it gets structured content, not HTML chrome.
+
+| Client request                   | Internal fetch                            |
+| -------------------------------- | ----------------------------------------- |
+| `/`                              | `/home.md` (built at prebuild time)       |
+| `/docs/<slug>`                   | `/llms.mdx/docs/<slug>/content.md`        |
+| `/docs/<slug>/` (trailing slash) | `/llms.mdx/docs/<slug>/content.md`        |
+| `/docs/` (bare)                  | `/llms.txt`                               |
+| `/llms.txt`                      | `/llms.txt` (re-wrapped as text/markdown) |
+| `/llms-full.txt`                 | `/llms-full.txt` (re-wrapped)             |
+| anything else                    | markdown 404 body                         |
+
+`/home.md` is generated at build time by `site/scripts/generate-home-markdown.mjs`
+from the same data sources the JSX landing page uses (category list,
+guide/case-study frontmatter, recent updates).
 
 ### Error responses
 
@@ -139,9 +151,11 @@ sanitized first (stripping backticks/backslashes, capping at 200 chars).
 
 - **Maintenance burden**: ~40 lines of code to maintain
   *Mitigation*: The code is stable — only breaks if Fumadocs changes URL conventions
-- **Doesn't cover non-Fumadocs routes**: Only routes under `/docs/` get the
-  treatment. Landing page, 404, etc. don't.
-  *Mitigation*: Those pages are for humans anyway; agents want docs content.
+- **Doesn't cover static assets**: Paths ending in a file extension
+  (`.js`, `.css`, `.png`, `.woff2`) fall through to the asset server —
+  the middleware doesn't attempt to convert them.
+  *Mitigation*: Those are binary / non-content assets; agents don't
+  request them with `Accept: text/markdown`.
 - **No automatic HTML→MD conversion**: Unlike CF's feature, we can only serve
   pre-generated markdown. If someone hits `/docs/<slug>` with no corresponding
   content in Fumadocs' generated markdown tree, they get a markdown 404 body
