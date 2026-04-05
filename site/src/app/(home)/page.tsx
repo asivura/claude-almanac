@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { source } from '@/lib/source';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import recentUpdates from '@/data/recent-updates.json';
+import categoriesData from '@/data/categories.json';
 
 // Landing page for claude-almanac.sivura.com. Server component only — all
 // data (guides, case studies, recent updates) is collected at build time.
@@ -22,48 +23,9 @@ type Category = {
   href: string;
 };
 
-const categories: Category[] = [
-  {
-    title: 'Core',
-    description: 'Hooks, skills, settings, rules, tools, memory.',
-    href: '/docs/hooks',
-  },
-  {
-    title: 'Agents',
-    description: 'Sub-agents, agent teams, plugins.',
-    href: '/docs/agents',
-  },
-  {
-    title: 'Integrations',
-    description: 'MCP, Slack, channels.',
-    href: '/docs/mcp-servers',
-  },
-  {
-    title: 'Security',
-    description: 'Sandbox, auto-mode.',
-    href: '/docs/security-sandbox',
-  },
-  {
-    title: 'CI/CD',
-    description: 'Actions, GitLab, code review, scheduled tasks.',
-    href: '/docs/github-actions',
-  },
-  {
-    title: 'Surfaces',
-    description: 'IDE, SDK, remote, voice, computer use.',
-    href: '/docs/ide-integrations',
-  },
-  {
-    title: 'Workflows',
-    description: 'Checkpointing, ultraplan, pricing.',
-    href: '/docs/checkpointing',
-  },
-  {
-    title: 'Foundational',
-    description: 'Architecture, .claude directory.',
-    href: '/docs/how-claude-code-works',
-  },
-];
+// Shared with site/scripts/generate-home-markdown.mjs so home.md stays in
+// sync with the HTML landing page.
+const categories = categoriesData as Category[];
 
 type CollectionPage = {
   url: string;

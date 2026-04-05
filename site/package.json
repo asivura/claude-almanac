@@ -5,8 +5,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "prebuild": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs",
-    "predev": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs",
+    "prebuild": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/generate-home-markdown.mjs",
+    "predev": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/generate-home-markdown.mjs",
     "start": "serve out",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",

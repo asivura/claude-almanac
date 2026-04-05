@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Core",
+    "description": "Hooks, skills, settings, rules, tools, memory.",
+    "href": "/docs/hooks"
+  },
+  {
+    "title": "Agents",
+    "description": "Sub-agents, agent teams, plugins.",
+    "href": "/docs/agents"
+  },
+  {
+    "title": "Integrations",
+    "description": "MCP, Slack, channels.",
+    "href": "/docs/mcp-servers"
+  },
+  {
+    "title": "Security",
+    "description": "Sandbox, auto-mode.",
+    "href": "/docs/security-sandbox"
+  },
+  {
+    "title": "CI/CD",
+    "description": "Actions, GitLab, code review, scheduled tasks.",
+    "href": "/docs/github-actions"
+  },
+  {
+    "title": "Surfaces",
+    "description": "IDE, SDK, remote, voice, computer use.",
+    "href": "/docs/ide-integrations"
+  },
+  {
+    "title": "Workflows",
+    "description": "Checkpointing, ultraplan, pricing.",
+    "href": "/docs/checkpointing"
+  },
+  {
+    "title": "Foundational",
+    "description": "Architecture, .claude directory.",
+    "href": "/docs/how-claude-code-works"
+  }
+]
