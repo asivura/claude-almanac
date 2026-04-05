@@ -1,12 +1,8 @@
 # Claude Code Features Reference
 
-Comprehensive documentation of Claude Code's extensibility features and capabilities for optimizing workflows and enhancing user experience.
+**Read online: [claude-almanac.sivura.com](https://claude-almanac.sivura.com/)**
 
-## Website
-
-Rendered version: **[claude-almanac.sivura.com](https://claude-almanac.sivura.com)**
-
-The markdown files in this repo are the source of truth. They're rendered by a Fumadocs site in `site/` which auto-deploys to Cloudflare Pages on every push to `main`. To preview locally: `cd site && npm install && npm run dev`. See [CONTRIBUTING.md](./CONTRIBUTING.md) for more.
+Comprehensive documentation of Claude Code's extensibility features and capabilities for optimizing workflows and enhancing user experience. The markdown files in this repo are the source of truth — they're rendered by a Fumadocs site in `site/` that auto-deploys to Cloudflare Pages on every push to `main`. See [CONTRIBUTING.md](./CONTRIBUTING.md) for local preview and contribution guidelines.
 
 ## Quick Navigation
 
