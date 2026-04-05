@@ -71,35 +71,67 @@ Cloudflare Pages Function, complementing Fumadocs' built-in llms.txt and
 
 ## Implementation
 
-Minimal Pages Function at `site/functions/_middleware.ts`:
+Pages Function at `site/functions/_middleware.ts` (simplified):
 
 ```typescript
 export const onRequest: PagesFunction = async ({ request, next }) => {
-  const accept = request.headers.get('Accept') || '';
+  const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
 
-  if (accept.includes('text/markdown') && url.pathname.startsWith('/docs/')) {
-    const mdUrl = new URL(url);
-    mdUrl.pathname = url.pathname.replace(/\/$/, '') + '.md';
-
-    const mdResponse = await fetch(mdUrl.toString());
-    if (mdResponse.ok) {
-      const text = await mdResponse.text();
-      const estimatedTokens = Math.ceil(text.length / 4);
-
-      return new Response(text, {
-        headers: {
-          'Content-Type': 'text/markdown; charset=utf-8',
-          'X-Markdown-Tokens': estimatedTokens.toString(),
-          'Vary': 'Accept',
-        }
-      });
-    }
+  // Browsers + non-/docs requests fall through to static HTML.
+  if (!accept.includes('text/markdown') || !url.pathname.startsWith('/docs/')) {
+    return next();
   }
 
-  return next();
+  // Validate slug, reject anything outside [a-z0-9-].
+  const slug = url.pathname.replace(/^\/docs\/?/, '').replace(/\/$/, '');
+  if (slug && !/^[a-z0-9-]+$/.test(slug)) return markdownNotFound(url.pathname);
+
+  // Fumadocs places per-page markdown at /llms.mdx/docs/<slug>/content.md.
+  // Bare /docs/ maps to the top-level /llms.txt index.
+  const mdPath = slug ? `/llms.mdx/docs/${slug}/content.md` : '/llms.txt';
+  const mdResponse = await fetch(new URL(mdPath, url.origin).toString());
+
+  if (!mdResponse.ok) return markdownNotFound(url.pathname);
+
+  const text = await mdResponse.text();
+  return new Response(text, {
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'X-Markdown-Tokens': Math.ceil(text.length / 4).toString(),
+      'Vary': 'Accept',
+      'Cache-Control': 'public, max-age=300, s-maxage=3600',
+    },
+  });
 };
 ```
+
+See `site/functions/_middleware.ts` for the full implementation including
+the `markdownNotFound` helper, extra guards, and comments.
+
+### URL mapping
+
+| Client request                   | Internal fetch                     |
+| -------------------------------- | ---------------------------------- |
+| `/docs/<slug>`                   | `/llms.mdx/docs/<slug>/content.md` |
+| `/docs/<slug>/` (trailing slash) | `/llms.mdx/docs/<slug>/content.md` |
+| `/docs/` (bare)                  | `/llms.txt`                        |
+
+### Error responses
+
+When the internal fetch returns 404 — or the slug fails regex validation
+— the middleware returns a **markdown 404 response** instead of falling
+through to the HTML 404 page. This keeps content negotiation consistent
+end-to-end for markdown-accepting clients (agents get markdown for both
+successes AND errors).
+
+The 404 body is a markdown document with recovery links (`/llms.txt`,
+`/llms-full.txt`, `/docs`) plus a GitHub issues link, so agents can
+self-navigate. Browsers (`Accept: text/html`) are unaffected — they
+still hit `next()` via the early-return guard.
+
+The requested pathname is embedded in a code span in the response body,
+sanitized first (stripping backticks/backslashes, capping at 200 chars).
 
 ## Consequences
 
@@ -111,9 +143,12 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
   treatment. Landing page, 404, etc. don't.
   *Mitigation*: Those pages are for humans anyway; agents want docs content.
 - **No automatic HTML→MD conversion**: Unlike CF's feature, we can only serve
-  pre-generated markdown. If someone hits a route without a `.md` sibling,
-  they get HTML.
-  *Mitigation*: Fumadocs generates `.md` for every docs route by default.
+  pre-generated markdown. If someone hits `/docs/<slug>` with no corresponding
+  content in Fumadocs' generated markdown tree, they get a markdown 404 body
+  (not HTML, not a crash).
+  *Mitigation*: Fumadocs generates `/llms.mdx/docs/<slug>/content.md` for
+  every docs route by default; the middleware fetches from that path. Missing
+  slugs return markdown 404 responses (see Error responses above).
 
 ### Benefits
 
