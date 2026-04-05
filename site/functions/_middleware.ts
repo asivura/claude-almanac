@@ -37,6 +37,15 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
   // Map /docs/<slug> (any trailing slash) → /llms.mdx/docs/<slug>/content.md.
   // /docs/ (bare) → /llms.txt.
   const slug = url.pathname.replace(/^\/docs\/?/, '').replace(/\/$/, '');
+
+  // Guard: slugs must match our known content pattern (lowercase, digits,
+  // hyphens only). Anything else is either a typo or an attempt at path
+  // traversal / URL injection — fall through to the static HTML so the
+  // platform's own 404 handles it.
+  if (slug && !/^[a-z0-9-]+$/.test(slug)) {
+    return next();
+  }
+
   const mdPath = slug
     ? `/llms.mdx/docs/${slug}/content.md`
     : '/llms.txt';
