@@ -89,7 +89,6 @@ Stop and report to team-lead via SendMessage when:
 
 ## Rules
 
-- NEVER add `Co-Authored-By` or "Generated with Claude Code" footers
 - Use conventional commits if asked to commit: `docs: document <subject>`
 - Don't fabricate values you didn't see on screen — if a field is hidden or masked, say so
 - Don't issue a single "browse the dashboard and tell me everything" report — focus the inspection on what the task asked for

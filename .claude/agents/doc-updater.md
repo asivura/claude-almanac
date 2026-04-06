@@ -20,8 +20,6 @@ You update existing markdown feature docs in `features/` to match official Anthr
 
 ## Rules
 
-- NEVER add Co-Authored-By lines to commits
-- NEVER add "Generated with Claude Code" footers
 - Use conventional commits: `type: subject` (imperative, no period, max 72 chars)
 - Reference URLs to code.claude.com use NO .md suffix (HTML URLs for humans)
 - Every doc should end with `## Sources` section listing official references
