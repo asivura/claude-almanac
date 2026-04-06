@@ -46,12 +46,42 @@ Claude Code uses a multi-level configuration system for settings, permissions, a
 | `apiKeyHelper`          | string  | Script path for dynamic API key generation                      |
 | `otelHeadersHelper`     | string  | Script for OpenTelemetry headers                                |
 | `cleanupPeriodDays`     | number  | Delete inactive sessions (0=immediate)                          |
-| `attribution.commit`    | string  | Commit message attribution (empty string hides it)              |
-| `attribution.pr`        | string  | PR description attribution (empty string hides it)              |
+| `attribution`           | object  | Commit/PR attribution (see below)                               |
 | `statusLine`            | object  | Custom status line configuration                                |
 | `respectGitignore`      | boolean | Exclude `.gitignore` files                                      |
 | `plansDirectory`        | string  | Custom plan file storage location                               |
 | `skipWebFetchPreflight` | boolean | Skip WebFetch domain safety check (for enterprise environments) |
+
+### Attribution Settings
+
+Controls the Co-Authored-By line in commits and the "Generated with Claude Code" footer in PR descriptions. Uses a **nested object** (not flat dotted keys). Set properties to empty strings to hide attribution.
+
+```json
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
+```
+
+| Property | Default | Effect when empty |
+| -------- | ------- | ----------------- |
+| `commit` | Co-Authored-By footer | Hides Co-Authored-By from commit messages |
+| `pr`     | "Generated with Claude Code" | Hides attribution from PR descriptions |
+
+Custom attribution text is also supported:
+
+```json
+{
+  "attribution": {
+    "commit": "Co-Authored-By: AI Assistant <ai@example.com>",
+    "pr": ""
+  }
+}
+```
+
+Takes precedence over the deprecated `includeCoAuthoredBy` setting. Schema: [claude-code-settings.json](https://json.schemastore.org/claude-code-settings.json).
 
 ## Environment Variables
 
