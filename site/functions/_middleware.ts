@@ -22,7 +22,36 @@
 type PagesFunction = (context: {
   request: Request;
   next: () => Promise<Response>;
+  env: {
+    ANALYTICS?: {
+      writeDataPoint(event: {
+        indexes?: string[];
+        blobs?: string[];
+        doubles?: number[];
+      }): void;
+    };
+  };
 }) => Promise<Response>;
+
+function trackRequest(
+  env: {
+    ANALYTICS?: {
+      writeDataPoint(event: {
+        indexes?: string[];
+        blobs?: string[];
+        doubles?: number[];
+      }): void;
+    };
+  },
+  pathname: string,
+  format: 'markdown' | 'html',
+): void {
+  env.ANALYTICS?.writeDataPoint({
+    indexes: [format],
+    blobs: [pathname, format],
+    doubles: [1],
+  });
+}
 
 function markdownResponse(
   text: string,
@@ -78,15 +107,19 @@ async function fetchAssetAsMarkdown(
   return markdownResponse(text, 200, true);
 }
 
-export const onRequest: PagesFunction = async ({ request, next }) => {
+export const onRequest: PagesFunction = async ({ request, next, env }) => {
   const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
 
   // Skip non-markdown-accepting clients (browsers, API calls, etc).
-  if (!accept.includes('text/markdown')) return next();
+  if (!accept.includes('text/markdown')) {
+    trackRequest(env, url.pathname, 'html');
+    return next();
+  }
 
   // Skip static asset paths (anything ending in a file extension).
   // home.md / llms.txt etc. are explicit routes handled below.
+  // No tracking — these are CSS/JS/fonts, not content requests.
   if (/\.[a-z0-9]+$/i.test(url.pathname) &&
       url.pathname !== '/llms.txt' &&
       url.pathname !== '/llms-full.txt') {
@@ -97,12 +130,14 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
 
   // Root landing page → generated markdown representation.
   if (path === '/' || path === '') {
+    trackRequest(env, path, 'markdown');
     return fetchAssetAsMarkdown(url.origin, '/home.md', '/');
   }
 
   // LLM index endpoints — already markdown content but served as text/plain.
   // Re-wrap with the correct Content-Type when the client asks for markdown.
   if (path === '/llms.txt' || path === '/llms-full.txt') {
+    trackRequest(env, path, 'markdown');
     return fetchAssetAsMarkdown(url.origin, path, path);
   }
 
@@ -114,6 +149,7 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
     // Guard: slugs must match our known content pattern. Anything else is a
     // typo or path-traversal attempt — return markdown 404.
     if (slug && !/^[a-z0-9-]+$/.test(slug)) {
+      trackRequest(env, path, 'markdown');
       return markdownNotFound(path);
     }
 
@@ -121,10 +157,12 @@ export const onRequest: PagesFunction = async ({ request, next }) => {
       ? `/llms.mdx/docs/${slug}/content.md`
       : '/llms.txt';
 
+    trackRequest(env, path, 'markdown');
     return fetchAssetAsMarkdown(url.origin, mdPath, path);
   }
 
   // Any other path: return a markdown 404 so content negotiation stays
   // consistent end-to-end for markdown-accepting clients.
+  trackRequest(env, path, 'markdown');
   return markdownNotFound(path);
 };
