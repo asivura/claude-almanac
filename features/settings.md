@@ -65,10 +65,10 @@ Controls the Co-Authored-By line in commits and the "Generated with Claude Code"
 }
 ```
 
-| Property | Default | Effect when empty |
-| -------- | ------- | ----------------- |
-| `commit` | Co-Authored-By footer | Hides Co-Authored-By from commit messages |
-| `pr`     | "Generated with Claude Code" | Hides attribution from PR descriptions |
+| Property | Default                      | Effect when empty                         |
+| -------- | ---------------------------- | ----------------------------------------- |
+| `commit` | Co-Authored-By footer        | Hides Co-Authored-By from commit messages |
+| `pr`     | "Generated with Claude Code" | Hides attribution from PR descriptions    |
 
 Custom attribution text is also supported:
 
