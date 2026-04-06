@@ -4,18 +4,22 @@ How to verify a production deploy of claude-almanac on Cloudflare Pages.
 
 **Production URL**: <https://claude-almanac.sivura.com>
 
-## 1. Check CF Pages dashboard
+> **Deploy method**: Production deploys run via `wrangler pages deploy` in
+> the `site-build.yml` GitHub Actions workflow. Pushes to `main` trigger
+> the workflow automatically. Check deploy status in the **Actions** tab
+> on GitHub, not the Cloudflare Pages dashboard.
 
-After pushing to `main` (or opening a PR for a preview deploy), go to the
-Cloudflare Pages dashboard:
+## 1. Check deploy status in GitHub Actions
 
-- Project: **claude-almanac**
-- Dashboard: <https://dash.cloudflare.com/> → Workers & Pages → claude-almanac
-- Confirm the latest deployment shows **Success** (green check)
-- Note the preview URL for PR deploys (e.g.
-  `https://<hash>.claude-almanac.pages.dev`) — CF auto-comments it on the PR
+After pushing to `main`, go to the **Actions** tab in GitHub:
 
-If the build fails, open the deploy log and check:
+- Repository: **asivura/claude-almanac**
+- Workflow: **Build and Deploy Site** (`site-build.yml`)
+- Confirm the latest run shows both **Build Site** and **Deploy** jobs
+  with a green check
+- For PR branches, the workflow runs the build job only (no deploy)
+
+If the build fails, open the job log and check:
 
 - `npm install` succeeded
 - `npm run prebuild` copied images (`[copy-images] copied N entries …`)
