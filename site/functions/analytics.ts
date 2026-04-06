@@ -705,7 +705,11 @@ export const onRequest: PagesFunction = async ({ request, env }) => {
 
   if (result.errors?.length) {
     const msg = result.errors.map((e) => e.message).join('; ');
-    const html = buildPage(range, 0, 0, new Map(), `GraphQL error: ${msg}`);
+    const isDatasetEmpty = msg.includes('unknown field');
+    const displayError = isDatasetEmpty
+      ? 'Analytics Engine dataset not initialized yet. Data will appear after traffic flows through the site with the ANALYTICS binding active.'
+      : `GraphQL error: ${msg}`;
+    const html = buildPage(range, 0, 0, new Map(), displayError);
     return new Response(html, {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },

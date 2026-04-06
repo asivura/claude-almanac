@@ -1,0 +1,7 @@
+name = "claude-almanac"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "out/"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "content_negotiation"
