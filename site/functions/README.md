@@ -60,6 +60,35 @@ Should return `<!DOCTYPE html>...` as usual.
 | `/llms.txt`                             | direct static file                |
 | `/llms-full.txt`                        | direct static file                |
 
+## `analytics.ts`
+
+Server-side rendered analytics dashboard for content negotiation metrics.
+Queries the Cloudflare Analytics Engine GraphQL API and displays markdown
+vs HTML request counts per path.
+
+- **URL**: `/analytics` (protected by Cloudflare Access)
+- **Data source**: `content_negotiation` Analytics Engine dataset
+- **Required secrets**: `CF_API_TOKEN`, `CF_ACCOUNT_ID` (Pages Secrets)
+- **Time ranges**: `?range=24h` (default), `?range=7d`, `?range=30d`
+- **No client-side JS** — fully server-rendered on each request
+
+If secrets are missing, the page renders a friendly configuration error
+instead of failing.
+
+## Analytics Engine tracking in `_middleware.ts`
+
+The middleware writes a data point to Analytics Engine on every content
+request (not static assets like CSS/JS/fonts):
+
+| Field   | Value                                 |
+| ------- | ------------------------------------- |
+| indexes | `[format]` — `"markdown"` or `"html"` |
+| blobs   | `[pathname, format]`                  |
+| doubles | `[1]` — counter for aggregation       |
+
+The `ANALYTICS` binding is optional. When absent (local dev), tracking
+is a silent no-op.
+
 ## Local testing with Wrangler (optional)
 
 For full-fidelity local testing, use Wrangler:
