@@ -6,7 +6,7 @@
     "build": "next build",
     "postbuild": "node scripts/patch-llms-txt.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/last-updated.mjs && node scripts/generate-home-markdown.mjs && node scripts/generate-feed.mjs",
+    "prebuild": "node scripts/validate-frontmatter.mjs && node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/last-updated.mjs && node scripts/generate-home-markdown.mjs && node scripts/generate-feed.mjs",
     "predev": "node scripts/copy-images.mjs && node scripts/recent-updates.mjs && node scripts/last-updated.mjs && node scripts/generate-home-markdown.mjs && node scripts/generate-feed.mjs",
     "start": "serve out",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@orama/orama": "^3.1.18",
+    "d3-force": "^3.0.0",
     "fumadocs-core": "16.7.10",
     "fumadocs-mdx": "14.2.11",
     "fumadocs-ui": "16.7.10",
@@ -22,11 +23,13 @@
     "next": "16.2.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-force-graph-2d": "^1.29.1",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
+    "@types/d3-force": "^3.0.10",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",

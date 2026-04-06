@@ -67,7 +67,7 @@ export const reference = defineDocs({
         full: z.boolean().optional(),
       }),
     files: contentFiles,
-    postprocess: { includeProcessedMarkdown: true },
+    postprocess: { includeProcessedMarkdown: true, extractLinkReferences: true },
   },
   meta: { schema: metaSchema },
 });
@@ -97,7 +97,7 @@ export const guide = defineDocs({
         full: z.boolean().optional(),
       }),
     files: contentFiles,
-    postprocess: { includeProcessedMarkdown: true },
+    postprocess: { includeProcessedMarkdown: true, extractLinkReferences: true },
   },
   meta: { schema: metaSchema },
 });
@@ -128,7 +128,7 @@ export const caseStudy = defineDocs({
         full: z.boolean().optional(),
       }),
     files: contentFiles,
-    postprocess: { includeProcessedMarkdown: true },
+    postprocess: { includeProcessedMarkdown: true, extractLinkReferences: true },
   },
   meta: { schema: metaSchema },
 });
