@@ -18,6 +18,7 @@ import {
   FooterLinks,
   type FooterLink,
 } from '@/components/page-layouts/footer-links';
+import lastUpdatedData from '@/data/last-updated.json';
 
 // Three layout variants keyed off `page.data.type`:
 //   reference  → default DocsPage (title, description, body, right ToC)
@@ -61,10 +62,21 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   };
   const contentDir = contentDirByType[type ?? 'reference'] ?? 'features';
 
+  const slug = Array.isArray(params.slug) ? params.slug.join('/') : params.slug ?? '';
+  const lastUpdatedIso = (lastUpdatedData as Record<string, string>)[slug];
+  const lastUpdatedDisplay = lastUpdatedIso
+    ? lastUpdatedIso.slice(0, 10)
+    : null;
+
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
+      {lastUpdatedDisplay ? (
+        <time dateTime={lastUpdatedIso} className="text-sm text-muted-foreground block -mt-2 mb-2">
+          Updated {lastUpdatedDisplay}
+        </time>
+      ) : null}
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
