@@ -1,7 +1,16 @@
+import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Provider } from '@/components/provider';
 import './global.css';
+
+export const metadata: Metadata = {
+  alternates: {
+    types: {
+      'application/atom+xml': '/feed.xml',
+    },
+  },
+};
 
 const inter = Inter({
   subsets: ['latin'],
