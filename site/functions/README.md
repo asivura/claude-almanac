@@ -9,7 +9,7 @@ HTTP content negotiation for LLM agents. When a client sends
 `Accept: text/markdown` against `/docs/*`, the middleware returns the
 Fumadocs-generated markdown sibling instead of the HTML page.
 
-See [`site-planning/content-negotiation-decision.md`](../../site-planning/content-negotiation-decision.md)
+See [`internals/content-negotiation-decision.md`](../../internals/content-negotiation-decision.md)
 for the rationale behind this vs Cloudflare's paid "Markdown for Agents" feature.
 
 ## Verifying locally

@@ -113,7 +113,7 @@ Expect `HTTP/2 200` and `content-type: image/png`.
 
 ## 4. Lighthouse audit
 
-Targets (from `site-planning/site-architecture.md`):
+Targets (from `site/ARCHITECTURE.md`):
 
 | Metric                     | Target                 |
 | -------------------------- | ---------------------- |
@@ -166,5 +166,5 @@ Or use `next-bundle-analyzer` if a page drifts above the budget.
 ## Related
 
 - [functions/README.md](./functions/README.md) — content-negotiation middleware details
-- [site-planning/site-architecture.md](../site-planning/site-architecture.md) — full pipeline
-- [site-planning/content-negotiation-decision.md](../site-planning/content-negotiation-decision.md) — why DIY middleware
+- [site/ARCHITECTURE.md](../site/ARCHITECTURE.md) — full pipeline
+- [internals/content-negotiation-decision.md](../internals/content-negotiation-decision.md) — why DIY middleware

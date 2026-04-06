@@ -1,8 +1,7 @@
 # Site Architecture
 
 - **Date**: 2026-04-04
-- **Status**: Design spec (pre-scaffolding)
-- **Future location**: moves to `site/ARCHITECTURE.md` after the Fumadocs site is scaffolded
+- **Status**: Canonical architecture (site is live at claude-almanac.sivura.com)
 
 This document explains how the claude-almanac website is built and served — from markdown source to rendered HTML and content-negotiated markdown responses. It is the canonical reference for contributors understanding the full pipeline.
 

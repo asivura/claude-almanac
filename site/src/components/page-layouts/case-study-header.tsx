@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 // Narrative header for case-study pages. Rendered above the DocsBody.
 //
-// Layout (per site-planning/content-taxonomy.md):
+// Layout (per internals/content-taxonomy.md):
 //   📅 {date} · ⏳ {duration} · 👤 {author}
 //   Tags: {themes}
 //   Stack: {stack}

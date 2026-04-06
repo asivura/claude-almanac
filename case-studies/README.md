@@ -18,7 +18,7 @@ Content that:
 
 ## Writing a new case study
 
-See the [content taxonomy](../site-planning/content-taxonomy.md) for full guidelines on voice, structure, and frontmatter schema.
+See the [content taxonomy](../internals/content-taxonomy.md) for full guidelines on voice, structure, and frontmatter schema.
 
 All case studies require the following frontmatter fields: `title`, `description`, `type: case-study`, `project`, `date`, `duration`, `author`, `themes`, `stack`, `outcome`.
 
