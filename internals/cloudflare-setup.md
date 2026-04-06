@@ -220,6 +220,47 @@ The analytics dashboard is protected by Cloudflare Access (Zero Trust, free for 
 1. Policy: Allow, email matches `alexander@amberflows.com`
 1. Auth method: One-time PIN (email OTP) or Google SSO
 
+## D1 Database binding
+
+Per-request event logging uses a Cloudflare D1 database to store detailed request metadata (path, format, IP hash, country, device ID, etc.).
+
+| Setting       | Value                   |
+| ------------- | ----------------------- |
+| Binding type  | D1                      |
+| Variable name | `DB`                    |
+| Database name | `claude-almanac-events` |
+
+Configure in: Pages > claude-almanac > Settings > Bindings > Add.
+
+The migration file at `site/migrations/0001_create_events.sql` creates the `events` table and indexes. Apply it after creating the database:
+
+```bash
+npx wrangler d1 create claude-almanac-events
+npx wrangler d1 execute claude-almanac-events --file=site/migrations/0001_create_events.sql
+```
+
+The binding is optional. When absent, event logging is a silent no-op.
+
+## KV Namespace binding
+
+The analytics dashboard uses KV to cache aggregate stats computed from D1, avoiding repeated expensive queries.
+
+| Setting        | Value                  |
+| -------------- | ---------------------- |
+| Binding type   | KV Namespace           |
+| Variable name  | `STATS_CACHE`          |
+| Namespace name | `claude-almanac-stats` |
+
+Configure in: Pages > claude-almanac > Settings > Bindings > Add.
+
+```bash
+npx wrangler kv namespace create claude-almanac-stats
+```
+
+Cache entries use keys like `stats:24h`, `stats:7d`, `stats:30d` and expire after 1 hour (checked at read time, not via KV TTL).
+
+The binding is optional. When absent, the dashboard queries D1 directly on every request.
+
 ## What we did NOT configure
 
 - **Cloudflare Web Analytics** — leave off for now; Analytics Engine covers our needs
