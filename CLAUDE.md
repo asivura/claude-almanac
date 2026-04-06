@@ -4,7 +4,7 @@ Guidance for Claude working in the claude-almanac repository.
 
 ## Repository purpose
 
-Public documentation for Claude Code — ~31 feature reference docs plus guides and case studies. Rendered at **claude-almanac.sivura.com** (Fumadocs site in `site/`, auto-deploys from `main` via Cloudflare Pages native git integration).
+Public documentation for Claude Code — ~31 feature reference docs plus guides and case studies. Rendered at **claude-almanac.sivura.com** (Fumadocs site in `site/`, deploys from `main` via GitHub Actions + `wrangler pages deploy`).
 
 ## Directory map
 
@@ -60,7 +60,13 @@ cd site && npm run build
 
 The build reads content from `../features/`, `../guides/`, `../case-studies/` at the repo root, and copies images from `../resources/images/` into `site/public/images/` via a prebuild script (`scripts/copy-images.mjs`). No content lives inside `site/` — the site is just the rendering layer.
 
-Deploy: Cloudflare Pages auto-builds and deploys on every push to `main`. PR branches get preview URLs. See `internals/cloudflare-setup.md` for the project setup and `site/DEPLOY.md` for post-deploy verification.
+Deploy: GitHub Actions builds and deploys via `wrangler pages deploy` on every push to `main` (see `.github/workflows/site-build.yml`). No preview deployments — test locally. See `internals/cloudflare-setup.md` for the project setup and `site/DEPLOY.md` for post-deploy verification.
+
+## Deployment rules
+
+- **NEVER** deploy directly via `wrangler pages deploy` or `wrangler pages deployment create` from a local machine. All deployments MUST go through the CI/CD pipeline (GitHub Actions).
+- Direct deploys bypass CI checks and risk deploying stale or incorrect builds.
+- If a redeploy is needed without code changes (e.g., to pick up new CF Pages bindings/secrets), use `gh run rerun <run-id>` to re-trigger the last successful workflow.
 
 ## Design system (website)
 
