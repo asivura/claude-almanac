@@ -1,4 +1,5 @@
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import Script from 'next/script';
 import { Provider } from '@/components/provider';
 import './global.css';
 
@@ -23,6 +24,12 @@ export default function Layout({ children }: LayoutProps<'/'>) {
     >
       <body className="flex flex-col min-h-screen font-sans">
         <Provider>{children}</Provider>
+        {/* Replace PLACEHOLDER_TOKEN after enabling CF Web Analytics in the dashboard */}
+        <Script
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token":"PLACEHOLDER_TOKEN"}'
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
