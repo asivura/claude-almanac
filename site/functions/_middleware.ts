@@ -63,11 +63,77 @@ function trackRequest(
   });
 }
 
+// --- User-Agent classification ---
+
+function classifyUserAgent(
+  ua: string | null,
+): { category: string; name: string } {
+  if (!ua) return { category: 'unknown', name: 'unknown' };
+  const lower = ua.toLowerCase();
+  // AI agents
+  if (lower.includes('claude-code') || lower.includes('claudecode'))
+    return { category: 'ai_agent', name: 'Claude Code' };
+  if (lower.includes('cursor'))
+    return { category: 'ai_agent', name: 'Cursor' };
+  if (lower.includes('copilot'))
+    return { category: 'ai_agent', name: 'Copilot' };
+  if (lower.includes('openai'))
+    return { category: 'ai_agent', name: 'OpenAI' };
+  if (lower.includes('gemini'))
+    return { category: 'ai_agent', name: 'Gemini' };
+  if (lower.includes('windsurf'))
+    return { category: 'ai_agent', name: 'Windsurf' };
+  if (lower.includes('codeium'))
+    return { category: 'ai_agent', name: 'Codeium' };
+  // CLI tools
+  if (lower.includes('curl'))
+    return { category: 'cli', name: 'curl' };
+  if (lower.includes('wget'))
+    return { category: 'cli', name: 'wget' };
+  if (lower.includes('httpie'))
+    return { category: 'cli', name: 'HTTPie' };
+  if (lower.includes('python-requests') || lower.includes('python-urllib'))
+    return { category: 'cli', name: 'Python' };
+  if (lower.includes('node-fetch') || lower.includes('undici'))
+    return { category: 'cli', name: 'Node.js' };
+  // Bots
+  if (lower.includes('googlebot'))
+    return { category: 'bot', name: 'Googlebot' };
+  if (
+    lower.includes('bot') ||
+    lower.includes('crawler') ||
+    lower.includes('spider')
+  )
+    return {
+      category: 'bot',
+      name: lower.match(/([\w-]*bot[\w-]*)/i)?.[1] || 'bot',
+    };
+  // Browsers
+  if (lower.includes('chrome') && !lower.includes('chromium'))
+    return { category: 'browser', name: 'Chrome' };
+  if (lower.includes('firefox'))
+    return { category: 'browser', name: 'Firefox' };
+  if (lower.includes('safari') && !lower.includes('chrome'))
+    return { category: 'browser', name: 'Safari' };
+  if (lower.includes('edge'))
+    return { category: 'browser', name: 'Edge' };
+  return { category: 'unknown', name: 'unknown' };
+}
+
+// --- D1 event logging ---
+
+interface LogEventOptions {
+  responseStatus: number;
+  responseTimeMs: number;
+  tokenCount: number | null;
+}
+
 async function logEvent(
   env: PagesEnv,
   request: Request,
   pathname: string,
   format: 'markdown' | 'html',
+  opts: LogEventOptions,
 ): Promise<void> {
   if (!env.DB) return;
   try {
@@ -78,41 +144,85 @@ async function logEvent(
       encoder.encode(ip),
     );
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const ipHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const ipHash = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
 
     const userAgent = request.headers.get('User-Agent') ?? null;
+    const { category: uaCategory, name: uaAgentName } =
+      classifyUserAgent(userAgent);
+    const acceptHeader = request.headers.get('Accept') ?? null;
     const referer = request.headers.get('Referer') ?? null;
+    const acceptLanguage =
+      request.headers.get('Accept-Language') ?? null;
+    const acceptEncoding =
+      request.headers.get('Accept-Encoding') ?? null;
 
     // Extract Cloudflare-specific properties from request.cf
-    const cf = (request as unknown as { cf?: Record<string, unknown> }).cf;
+    const cf = (request as unknown as { cf?: Record<string, unknown> })
+      .cf;
     const country = (cf?.country as string) ?? null;
+    const region = (cf?.region as string) ?? null;
     const city = (cf?.city as string) ?? null;
+    const continent = (cf?.continent as string) ?? null;
+    const timezone = (cf?.timezone as string) ?? null;
+    const latitude = (cf?.latitude as number) ?? null;
+    const longitude = (cf?.longitude as number) ?? null;
+    const postalCode = (cf?.postalCode as string) ?? null;
     const asn = (cf?.asn as number) ?? null;
+    const colo = (cf?.colo as string) ?? null;
+    const clientTcpRtt = (cf?.clientTcpRtt as number) ?? null;
     const tlsVersion = (cf?.tlsVersion as string) ?? null;
+    const tlsCipher = (cf?.tlsCipher as string) ?? null;
     const httpProtocol = (cf?.httpProtocol as string) ?? null;
 
     // Read device_id from cookie
     const cookieHeader = request.headers.get('Cookie') ?? '';
-    const deviceMatch = cookieHeader.match(/(?:^|;\s*)device_id=([^;]+)/);
+    const deviceMatch = cookieHeader.match(
+      /(?:^|;\s*)device_id=([^;]+)/,
+    );
     const deviceId = deviceMatch ? deviceMatch[1] : null;
 
     await env.DB.prepare(
-      `INSERT INTO events (pathname, format, user_agent, referer, ip, ip_hash, country, city, asn, tls_version, http_protocol, device_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO events (
+        pathname, format, response_status, response_time_ms, token_count,
+        user_agent, ua_category, ua_agent_name, accept_header, referer,
+        ip, ip_hash, device_id,
+        country, region, city, continent, timezone, latitude, longitude, postal_code,
+        asn, colo, client_tcp_rtt, tls_version, tls_cipher, http_protocol,
+        accept_language, accept_encoding
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
       .bind(
         pathname,
         format,
+        opts.responseStatus,
+        opts.responseTimeMs,
+        opts.tokenCount,
         userAgent,
+        uaCategory,
+        uaAgentName,
+        acceptHeader,
         referer,
         ip,
         ipHash,
-        country,
-        city,
-        asn,
-        tlsVersion,
-        httpProtocol,
         deviceId,
+        country,
+        region,
+        city,
+        continent,
+        timezone,
+        latitude,
+        longitude,
+        postalCode,
+        asn,
+        colo,
+        clientTcpRtt,
+        tlsVersion,
+        tlsCipher,
+        httpProtocol,
+        acceptLanguage,
+        acceptEncoding,
       )
       .run();
   } catch {
@@ -180,21 +290,37 @@ async function fetchAssetAsMarkdown(
   return markdownResponse(text, 200, true);
 }
 
+function getTokenCount(response: Response): number | null {
+  const header = response.headers.get('X-Markdown-Tokens');
+  if (!header) return null;
+  const n = parseInt(header, 10);
+  return isNaN(n) ? null : n;
+}
+
 export const onRequest: PagesFunction = async ({
   request,
   next,
   env,
   waitUntil,
 }) => {
+  const startTime = Date.now();
   const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
 
   // Skip non-markdown-accepting clients (browsers, API calls, etc).
   if (!accept.includes('text/markdown')) {
     trackRequest(env, url.pathname, 'html');
-    waitUntil(logEvent(env, request, url.pathname, 'html'));
 
     const response = await next();
+    const elapsed = Date.now() - startTime;
+
+    waitUntil(
+      logEvent(env, request, url.pathname, 'html', {
+        responseStatus: response.status,
+        responseTimeMs: elapsed,
+        tokenCount: null,
+      }),
+    );
 
     // Set device_id cookie on HTML responses if not already present.
     if (!getDeviceIdCookie(request)) {
@@ -213,9 +339,11 @@ export const onRequest: PagesFunction = async ({
   // Skip static asset paths (anything ending in a file extension).
   // home.md / llms.txt etc. are explicit routes handled below.
   // No tracking — these are CSS/JS/fonts, not content requests.
-  if (/\.[a-z0-9]+$/i.test(url.pathname) &&
-      url.pathname !== '/llms.txt' &&
-      url.pathname !== '/llms-full.txt') {
+  if (
+    /\.[a-z0-9]+$/i.test(url.pathname) &&
+    url.pathname !== '/llms.txt' &&
+    url.pathname !== '/llms-full.txt'
+  ) {
     return next();
   }
 
@@ -224,16 +352,40 @@ export const onRequest: PagesFunction = async ({
   // Root landing page → generated markdown representation.
   if (path === '/' || path === '') {
     trackRequest(env, path, 'markdown');
-    waitUntil(logEvent(env, request, path, 'markdown'));
-    return fetchAssetAsMarkdown(url.origin, '/home.md', '/');
+    const response = await fetchAssetAsMarkdown(
+      url.origin,
+      '/home.md',
+      '/',
+    );
+    const elapsed = Date.now() - startTime;
+    waitUntil(
+      logEvent(env, request, path, 'markdown', {
+        responseStatus: response.status,
+        responseTimeMs: elapsed,
+        tokenCount: getTokenCount(response),
+      }),
+    );
+    return response;
   }
 
   // LLM index endpoints — already markdown content but served as text/plain.
   // Re-wrap with the correct Content-Type when the client asks for markdown.
   if (path === '/llms.txt' || path === '/llms-full.txt') {
     trackRequest(env, path, 'markdown');
-    waitUntil(logEvent(env, request, path, 'markdown'));
-    return fetchAssetAsMarkdown(url.origin, path, path);
+    const response = await fetchAssetAsMarkdown(
+      url.origin,
+      path,
+      path,
+    );
+    const elapsed = Date.now() - startTime;
+    waitUntil(
+      logEvent(env, request, path, 'markdown', {
+        responseStatus: response.status,
+        responseTimeMs: elapsed,
+        tokenCount: getTokenCount(response),
+      }),
+    );
+    return response;
   }
 
   // /docs/<slug> → /llms.mdx/docs/<slug>/content.md (Fumadocs internal path).
@@ -245,8 +397,16 @@ export const onRequest: PagesFunction = async ({
     // typo or path-traversal attempt — return markdown 404.
     if (slug && !/^[a-z0-9-]+$/.test(slug)) {
       trackRequest(env, path, 'markdown');
-      waitUntil(logEvent(env, request, path, 'markdown'));
-      return markdownNotFound(path);
+      const response = markdownNotFound(path);
+      const elapsed = Date.now() - startTime;
+      waitUntil(
+        logEvent(env, request, path, 'markdown', {
+          responseStatus: response.status,
+          responseTimeMs: elapsed,
+          tokenCount: getTokenCount(response),
+        }),
+      );
+      return response;
     }
 
     const mdPath = slug
@@ -254,13 +414,33 @@ export const onRequest: PagesFunction = async ({
       : '/llms.txt';
 
     trackRequest(env, path, 'markdown');
-    waitUntil(logEvent(env, request, path, 'markdown'));
-    return fetchAssetAsMarkdown(url.origin, mdPath, path);
+    const response = await fetchAssetAsMarkdown(
+      url.origin,
+      mdPath,
+      path,
+    );
+    const elapsed = Date.now() - startTime;
+    waitUntil(
+      logEvent(env, request, path, 'markdown', {
+        responseStatus: response.status,
+        responseTimeMs: elapsed,
+        tokenCount: getTokenCount(response),
+      }),
+    );
+    return response;
   }
 
   // Any other path: return a markdown 404 so content negotiation stays
   // consistent end-to-end for markdown-accepting clients.
   trackRequest(env, path, 'markdown');
-  waitUntil(logEvent(env, request, path, 'markdown'));
-  return markdownNotFound(path);
+  const response = markdownNotFound(path);
+  const elapsed = Date.now() - startTime;
+  waitUntil(
+    logEvent(env, request, path, 'markdown', {
+      responseStatus: response.status,
+      responseTimeMs: elapsed,
+      tokenCount: getTokenCount(response),
+    }),
+  );
+  return response;
 };
