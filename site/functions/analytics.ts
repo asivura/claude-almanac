@@ -124,8 +124,14 @@ interface EventRow {
   pathname: string;
   format: string;
   country: string | null;
+  ua_agent_name: string | null;
   user_agent: string | null;
   device_id: string | null;
+}
+
+interface UACategoryRow {
+  ua_category: string;
+  cnt: number;
 }
 
 interface AggregateStats {
@@ -133,15 +139,17 @@ interface AggregateStats {
   unique_ips: number;
   unique_devices: number;
   markdown_pct: string;
+  avg_response_time_ms: number;
   top_paths: Array<{ pathname: string; count: number }>;
   top_countries: Array<{ country: string; count: number }>;
+  ua_categories: Array<{ category: string; count: number }>;
   last_updated: string;
 }
 
 async function fetchRecentEvents(db: D1Database): Promise<EventRow[]> {
   const result = await db
     .prepare(
-      `SELECT timestamp, pathname, format, country, user_agent, device_id
+      `SELECT timestamp, pathname, format, country, ua_agent_name, user_agent, device_id
        FROM events ORDER BY timestamp DESC LIMIT 100`,
     )
     .all<EventRow>();
@@ -192,6 +200,14 @@ async function computeAggregates(
       ? ((mdCount / totalEvents) * 100).toFixed(1)
       : '0.0';
 
+  const avgRtRow = await db
+    .prepare(
+      `SELECT AVG(response_time_ms) as avg_rt FROM events WHERE timestamp >= ? AND response_time_ms IS NOT NULL`,
+    )
+    .bind(since)
+    .first<{ avg_rt: number | null }>();
+  const avgResponseTimeMs = Math.round(avgRtRow?.avg_rt ?? 0);
+
   const topPathRows = await db
     .prepare(
       `SELECT pathname, COUNT(*) as cnt FROM events WHERE timestamp >= ? GROUP BY pathname ORDER BY cnt DESC LIMIT 10`,
@@ -214,13 +230,26 @@ async function computeAggregates(
     count: r.cnt,
   }));
 
+  const uaCategoryRows = await db
+    .prepare(
+      `SELECT ua_category, COUNT(*) as cnt FROM events WHERE timestamp >= ? AND ua_category IS NOT NULL GROUP BY ua_category ORDER BY cnt DESC`,
+    )
+    .bind(since)
+    .all<UACategoryRow>();
+  const uaCategories = uaCategoryRows.results.map((r) => ({
+    category: r.ua_category,
+    count: r.cnt,
+  }));
+
   return {
     total_events: totalEvents,
     unique_ips: uniqueIps,
     unique_devices: uniqueDevices,
     markdown_pct: mdPct,
+    avg_response_time_ms: avgResponseTimeMs,
     top_paths: topPaths,
     top_countries: topCountries,
+    ua_categories: uaCategories,
     last_updated: new Date().toISOString(),
   };
 }
@@ -310,6 +339,45 @@ function buildPage(
 
   const errorBanner = error
     ? `<div class="error">${escapeHtml(error)}</div>`
+    : '';
+
+  // Build UA category bar chart (CSS-only)
+  const uaCategorySection = aggregates?.ua_categories?.length
+    ? (() => {
+        const maxCount = Math.max(
+          ...aggregates.ua_categories.map((c) => c.count),
+        );
+        const categoryColors: Record<string, string> = {
+          ai_agent: '#c96442',
+          browser: '#4a90d9',
+          bot: '#7a7462',
+          cli: '#5b8a72',
+          unknown: '#b0a99f',
+        };
+        const bars = aggregates.ua_categories
+          .map((c) => {
+            const pct =
+              maxCount > 0
+                ? ((c.count / maxCount) * 100).toFixed(1)
+                : '0';
+            const color =
+              categoryColors[c.category] ?? categoryColors.unknown;
+            return `
+          <div class="bar-row">
+            <span class="bar-label">${escapeHtml(c.category)}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%;background:${color};"></div>
+            </div>
+            <span class="bar-count">${c.count.toLocaleString()}</span>
+          </div>`;
+          })
+          .join('');
+        return `
+    <div class="list-section">
+      <h3>User Agent Categories</h3>
+      <div class="bar-chart">${bars}</div>
+    </div>`;
+      })()
     : '';
 
   return `<!DOCTYPE html>
@@ -456,6 +524,34 @@ function buildPage(
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
+    .bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 60px;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .bar-label {
+      font-size: 0.8125rem;
+      text-align: right;
+      color: #7a7462;
+    }
+    .bar-track {
+      height: 1.25rem;
+      background: #f0ede6;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 0.25rem;
+      transition: width 0.3s;
+    }
+    .bar-count {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #3d3929;
+    }
   </style>
 </head>
 <body>
@@ -521,18 +617,14 @@ function buildPage(
       <div class="label">Markdown share</div>
       <div class="value">${aggregates.markdown_pct}%</div>
     </div>
+    <div class="card">
+      <div class="label">Avg response time</div>
+      <div class="value">${aggregates.avg_response_time_ms}ms</div>
+    </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-    <div class="list-section">
-      <h3>Top Paths</h3>
-      <table>
-        <thead><tr><th>Path</th><th class="num">Count</th></tr></thead>
-        <tbody>${aggregates.top_paths.map((p) => `
-          <tr><td><code>${escapeHtml(p.pathname)}</code></td><td class="num">${p.count.toLocaleString()}</td></tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
+    ${uaCategorySection}
     <div class="list-section">
       <h3>Top Countries</h3>
       <table>
@@ -542,6 +634,16 @@ function buildPage(
         </tbody>
       </table>
     </div>
+  </div>
+
+  <div class="list-section">
+    <h3>Top Paths</h3>
+    <table>
+      <thead><tr><th>Path</th><th class="num">Count</th></tr></thead>
+      <tbody>${aggregates.top_paths.map((p) => `
+        <tr><td><code>${escapeHtml(p.pathname)}</code></td><td class="num">${p.count.toLocaleString()}</td></tr>`).join('')}
+      </tbody>
+    </table>
   </div>
   ` : ''}
 
@@ -554,6 +656,7 @@ function buildPage(
         <th>Path</th>
         <th>Format</th>
         <th>Country</th>
+        <th>Agent</th>
         <th>User Agent</th>
         <th>Device ID</th>
       </tr>
@@ -564,6 +667,7 @@ function buildPage(
         <td><code>${escapeHtml(e.pathname)}</code></td>
         <td>${escapeHtml(e.format)}</td>
         <td>${e.country ? escapeHtml(e.country) : ''}</td>
+        <td>${e.ua_agent_name ? escapeHtml(e.ua_agent_name) : ''}</td>
         <td class="ua" title="${e.user_agent ? escapeHtml(e.user_agent) : ''}">${e.user_agent ? escapeHtml(e.user_agent.slice(0, 60)) : ''}</td>
         <td><code>${e.device_id ? escapeHtml(e.device_id.slice(0, 8)) : ''}</code></td>
       </tr>`).join('')}
