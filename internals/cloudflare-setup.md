@@ -184,10 +184,43 @@ To revert a bad production deployment:
 
 No git revert needed — CF serves whichever deployment you designate as production.
 
+## Analytics Engine binding
+
+Content negotiation tracking uses Cloudflare Analytics Engine to count markdown vs HTML requests per path.
+
+| Setting       | Value                 |
+| ------------- | --------------------- |
+| Binding type  | Analytics Engine      |
+| Variable name | `ANALYTICS`           |
+| Dataset       | `content_negotiation` |
+
+Configure in: Pages > claude-almanac > Settings > Bindings > Add.
+
+The binding is optional. When absent (local dev, misconfigured), tracking calls are a silent no-op.
+
+### Pages Secrets for the analytics dashboard
+
+The `/analytics` dashboard page queries the Analytics Engine GraphQL API server-side. It needs two Pages Secrets:
+
+| Secret          | Value                                                      |
+| --------------- | ---------------------------------------------------------- |
+| `CF_API_TOKEN`  | API token with **Account Analytics:Read** permission       |
+| `CF_ACCOUNT_ID` | Cloudflare account ID (`be59d35938cfd487927ececf20967971`) |
+
+Configure in: Pages > claude-almanac > Settings > Variables and Secrets.
+
+### Cloudflare Access policy for /analytics
+
+The analytics dashboard is protected by Cloudflare Access (Zero Trust, free for up to 50 users):
+
+1. CF Dashboard > Zero Trust > Access > Applications > Add
+1. Application type: Self-hosted
+1. App domain: `claude-almanac.sivura.com`
+1. Path: `/analytics`
+1. Policy: Allow, email matches `alexander@amberflows.com`
+1. Auth method: One-time PIN (email OTP) or Google SSO
+
 ## What we did NOT configure
 
-- **CF Access** (Zero Trust preview protection) — left off; docs are public
-- **Analytics** — leave Cloudflare Web Analytics off for now; free tier is fine
-- **Workers bindings** — none needed for the static site
-- **Pages Functions** — will be added later for `Accept: text/markdown` content negotiation (see [site-architecture.md](../site/ARCHITECTURE.md))
+- **Cloudflare Web Analytics** — leave off for now; Analytics Engine covers our needs
 - **Custom build image / Docker** — defaults are fine
