@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 // Prelude banner for guide pages. Rendered above the DocsBody.
 //
-// Layout (per site-planning/content-taxonomy.md):
+// Layout (per internals/content-taxonomy.md):
 //   ⏱ {time} · 📊 {difficulty} · 👤 {author}
 //   Prerequisites: {prerequisites}
 //   Outcome: {outcome}

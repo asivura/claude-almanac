@@ -2,7 +2,7 @@
 
 - **Date**: 2026-04-04
 - **Status**: Manual setup guide (pre-scaffolding deployment prep)
-- **Prerequisite reading**: [cloudflare-state.md](./cloudflare-state.md), [site-architecture.md](./site-architecture.md)
+- **Prerequisite reading**: \[cloudflare-state.md\](_(deleted: historical snapshot)_), [site-architecture.md](../site/ARCHITECTURE.md)
 
 Step-by-step walkthrough for creating the Cloudflare Pages project that serves `claude-almanac.sivura.com`. Do these steps **after** the site scaffolder has landed `site/package.json` and a successful `npm run build` has been verified locally.
 
@@ -189,5 +189,5 @@ No git revert needed — CF serves whichever deployment you designate as product
 - **CF Access** (Zero Trust preview protection) — left off; docs are public
 - **Analytics** — leave Cloudflare Web Analytics off for now; free tier is fine
 - **Workers bindings** — none needed for the static site
-- **Pages Functions** — will be added later for `Accept: text/markdown` content negotiation (see [site-architecture.md](./site-architecture.md))
+- **Pages Functions** — will be added later for `Accept: text/markdown` content negotiation (see [site-architecture.md](../site/ARCHITECTURE.md))
 - **Custom build image / Docker** — defaults are fine

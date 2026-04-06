@@ -24,6 +24,6 @@ Content that:
 
 ## Writing a new guide
 
-See the [content taxonomy](../site-planning/content-taxonomy.md) for full guidelines on voice, structure, and frontmatter schema.
+See the [content taxonomy](../internals/content-taxonomy.md) for full guidelines on voice, structure, and frontmatter schema.
 
 All guides require the following frontmatter fields: `title`, `description`, `type: guide`, `category`, `time`, `difficulty`, `prerequisites`, `outcome`.

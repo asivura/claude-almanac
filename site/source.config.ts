@@ -5,13 +5,13 @@ import { z } from 'zod';
 
 /**
  * Three content collections feeding a single /docs/ URL namespace.
- * See site-planning/content-taxonomy.md for the source-of-truth schema.
+ * See internals/content-taxonomy.md for the source-of-truth schema.
  *
  * Schemas are currently LENIENT: only `title` is derived automatically
  * (from the first H1 or the file basename). Type-specific fields
  * (category, time, difficulty, prerequisites, etc.) are optional because
  * most existing files (as of 2026-04-04) lack frontmatter.
- * See site-planning/frontmatter-gaps.md for the migration checklist.
+ * See _(deleted: all gaps closed via PR #90)_ for the migration checklist.
  */
 
 const referenceCategory = z.enum([

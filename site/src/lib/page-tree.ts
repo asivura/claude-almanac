@@ -4,7 +4,7 @@ import type { source } from './source';
 /**
  * Build the claude-almanac sidebar: three top-level sections
  * (REFERENCE, GUIDES, CASE STUDIES) with category sub-groups per
- * site-planning/content-taxonomy.md.
+ * internals/content-taxonomy.md.
  *
  * This replaces the auto-generated page tree with a curated structure:
  *   - REFERENCE grouped by `category` frontmatter (Core, Agents, ...)
@@ -13,7 +13,7 @@ import type { source } from './source';
  *
  * Pages without a `category` field fall into an "Uncategorized" group, so
  * the site still renders cleanly while frontmatter is backfilled
- * (see site-planning/frontmatter-gaps.md).
+ * (see _(deleted: all gaps closed via PR #90)_).
  */
 
 type AnyPage = ReturnType<typeof source.getPages>[number];

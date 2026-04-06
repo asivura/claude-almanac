@@ -13,7 +13,7 @@
 // Browsers (Accept: text/html or */*) and requests for static assets (any
 // path ending in a file extension) fall through to next() unchanged.
 //
-// See site-planning/content-negotiation-decision.md for full rationale.
+// See internals/content-negotiation-decision.md for full rationale.
 
 // Minimal Cloudflare Pages Function signature. We avoid depending on
 // @cloudflare/workers-types to keep the site/node_modules lean — Pages

@@ -13,7 +13,7 @@ Public documentation for Claude Code — ~31 feature reference docs plus guides 
 | `features/`         | Reference docs (objective, third-person). Each ends with a `## Sources` section. |
 | `guides/`           | How-tos (imperative, second-person)                                              |
 | `case-studies/`     | Narratives (first-person)                                                        |
-| `site-planning/`    | Architecture decisions (ADRs, taxonomy, CF Pages setup)                          |
+| `internals/`        | Architecture decisions (ADRs, taxonomy, CF Pages setup)                          |
 | `site/`             | Fumadocs Next.js app — auto-deploys to Cloudflare Pages on push to `main`        |
 | `resources/images/` | Images referenced by markdown (paths rewritten to `/images/*` at build time)     |
 | `.claude/agents/`   | Project-scoped specialist agent templates                                        |
@@ -22,7 +22,7 @@ All content in `features/`, `guides/`, and `case-studies/` feeds the single `/do
 
 ## Content taxonomy
 
-Per-type frontmatter schemas (reference / guide / case-study) live in `site-planning/content-taxonomy.md`. It is the canonical source for voice, structure, and required fields — treat it as binding when creating or editing content.
+Per-type frontmatter schemas (reference / guide / case-study) live in `internals/content-taxonomy.md`. It is the canonical source for voice, structure, and required fields — treat it as binding when creating or editing content.
 
 ## Source attribution convention
 
@@ -60,7 +60,7 @@ cd site && npm run build
 
 The build reads content from `../features/`, `../guides/`, `../case-studies/` at the repo root, and copies images from `../resources/images/` into `site/public/images/` via a prebuild script (`scripts/copy-images.mjs`). No content lives inside `site/` — the site is just the rendering layer.
 
-Deploy: Cloudflare Pages auto-builds and deploys on every push to `main`. PR branches get preview URLs. See `site-planning/cloudflare-setup.md` for the project setup and `site/DEPLOY.md` for post-deploy verification.
+Deploy: Cloudflare Pages auto-builds and deploys on every push to `main`. PR branches get preview URLs. See `internals/cloudflare-setup.md` for the project setup and `site/DEPLOY.md` for post-deploy verification.
 
 ## Design system (website)
 
@@ -94,7 +94,7 @@ Never edit theme variables directly in `theme.css` except to paste from tweakcn 
 
 ## Branch protection
 
-`main` requires these CI checks to pass before merge: `Validate PR Title`, `Validate Commits`, `Check Markdown Format`. The one-time setup command (`gh api .../protection`) lives in `site-planning/branch-protection.md`.
+`main` requires these CI checks to pass before merge: `Validate PR Title`, `Validate Commits`, `Check Markdown Format`. The one-time setup command (`gh api .../protection`) lives in `internals/branch-protection.md`.
 
 ## Contributor docs
 
