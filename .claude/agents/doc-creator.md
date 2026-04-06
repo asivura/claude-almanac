@@ -35,7 +35,6 @@ You create new markdown feature documentation in `features/` based on official s
 
 ## Rules
 
-- NEVER add Co-Authored-By or "Generated with Claude Code" footers
 - Use conventional commits: `feat: add <feature> documentation`
 - Don't duplicate content from other feature docs — link to them instead
 - Cite every non-obvious claim with a source link
