@@ -140,7 +140,7 @@ The script is safe to re-run. It backs up any existing non-symlink files with a 
 
 Keep secrets and local-only files out of the repo:
 
-```gitignore
+```ini
 # Claude Code local files (per-session, not portable)
 .claude/settings.local.json
 .claude/todos.local.json
