@@ -81,6 +81,53 @@ Without `mouse on`, you can't scroll with the trackpad -- you'd have to enter co
 
 **Important:** tmux only reads its config when the server first starts. If you add these settings to an already-running tmux, reload with `tmux source-file ~/.tmux.conf`.
 
+### Agent Teams Focus Protection
+
+When Claude Code spawns a teammate in a new tmux pane, keystrokes you're typing can leak into the new pane during the split, corrupting the startup command. Add these hooks to prevent that:
+
+```bash
+# --- Agent Teams focus protection ---
+# Problem: when Claude Code spawns a teammate pane, leaked keystrokes
+# corrupt the startup command. Four-layer fix:
+#   1. C-u clears any keystrokes that leaked during split-window
+#   2. select-pane -l returns focus to the lead pane immediately
+#   3. Guard catches Claude Code's subsequent select-pane commands
+#   4. Retry script (after 3s) detects and re-executes failed spawns
+set-hook -g after-split-window "send-keys C-u; select-pane -l; set-option -g @split_guard 1; run-shell -b 'sleep 3 && $HOME/path/to/tmux-retry-teammate.sh; /opt/homebrew/bin/tmux set-option -g -u @split_guard 2>/dev/null'"
+set-hook -g after-select-pane "if-shell -F '#{==:#{@split_guard},1}' 'set-option -g -u @split_guard; select-pane -l'"
+```
+
+The retry script (`tmux-retry-teammate.sh`) detects panes where the startup command was corrupted and re-executes it:
+
+```bash
+#!/bin/bash
+# Detects and retries failed Claude Code teammate spawns.
+TMUX_BIN=/opt/homebrew/bin/tmux
+
+for pane in $($TMUX_BIN list-panes -F '#{pane_id}' 2>/dev/null); do
+    content=$($TMUX_BIN capture-pane -t "$pane" -p -J 2>/dev/null) || continue
+
+    # Match panes with both a shell error AND a Claude agent startup pattern
+    if echo "$content" | grep -q "command not found" \
+        && echo "$content" | grep -q "CLAUDE_CODE_EXPERIMENTAL"; then
+
+        # Extract the intended command
+        cmd=$(echo "$content" \
+            | grep "CLAUDE_CODE_EXPERIMENTAL" \
+            | grep -o 'cd /[^ ]* && env CLAUDECODE.*' \
+            | head -1)
+
+        if [ -n "$cmd" ]; then
+            $TMUX_BIN send-keys -t "$pane" C-c C-u
+            sleep 0.2
+            $TMUX_BIN send-keys -t "$pane" "$cmd" Enter
+        fi
+    fi
+done
+```
+
+Without these hooks, teammate spawns fail intermittently (especially when you're actively typing in the lead pane). The four layers work together: `C-u` clears leaked input, `select-pane -l` returns focus to the lead, the guard flag prevents Claude's own `select-pane` from stealing focus back, and the retry script catches any spawns that still failed.
+
 ### Pasting images into Claude Code
 
 In VS Code's integrated terminal, use **Cmd+V** to paste images. In Ghostty (or any external terminal), use **Ctrl+V** instead -- Cmd+V won't work for image paste in terminal Claude Code sessions.
@@ -142,11 +189,11 @@ Launch Ghostty with tmux and Claude Code directly from VS Code, scoped to whatev
 
 ### Launch Script
 
-Create a script that opens Ghostty with a tmux session running Claude Code:
+Create a script that opens Ghostty with a tmux session running Claude Code. Each invocation creates a unique, timestamped session with remote control and worktree isolation:
 
 ```bash
 #!/usr/bin/env bash
-# ghostty-claude.sh -- launch Ghostty+tmux+Claude Code for a project
+# ghostty-claude.sh -- launch Ghostty+tmux+Claude Code with remote control
 # Usage: ghostty-claude.sh [project-path]
 
 set -euo pipefail
@@ -161,11 +208,33 @@ SESSION_NAME="$(basename "$PROJECT_DIR")"
 SESSION_NAME="${SESSION_NAME//./-}"
 SESSION_NAME="${SESSION_NAME//:/-}"
 
+# Build display name with timestamp
+DISPLAY_NAME="${SESSION_NAME}-$(date +%Y%m%d-%H%M)"
+
+# Find a unique tmux session name
+TMUX_SESSION="$DISPLAY_NAME"
+i=0
+while tmux has-session -t "$TMUX_SESSION" 2>/dev/null; do
+  i=$((i + 1))
+  TMUX_SESSION="${DISPLAY_NAME}-${i}"
+done
+
 open -na Ghostty.app --args \
   --working-directory="$PROJECT_DIR" \
-  --title="$SESSION_NAME" \
-  -e tmux new-session -A -s "$SESSION_NAME" claude
+  --title="$TMUX_SESSION" \
+  -e tmux new-session -s "$TMUX_SESSION" \
+    "claude --remote-control --worktree '$TMUX_SESSION' --name '$TMUX_SESSION'"
 ```
+
+**What the flags do:**
+
+| Flag               | Purpose                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| `--remote-control` | Enables control from phone, tablet, or browser via [claude.ai/code](https://claude.ai/code)   |
+| `--worktree`       | Creates an isolated git worktree named after the session, so parallel sessions don't conflict |
+| `--name`           | Sets the session name (visible in `/resume` and remote control)                               |
+
+Each launch gets a unique timestamped name like `grace-20260408-2315`, so you can run multiple sessions for the same project without collision. The Ghostty window title, tmux session name, and Claude worktree all share the same identifier.
 
 **Important macOS note:** you must use `open -na Ghostty.app --args ...` to launch Ghostty from the CLI. The `ghostty` binary does not support launching the terminal emulator directly on macOS.
 
