@@ -114,7 +114,7 @@ for pane in $($TMUX_BIN list-panes -F '#{pane_id}' 2>/dev/null); do
         # Extract the intended command
         cmd=$(echo "$content" \
             | grep "CLAUDE_CODE_EXPERIMENTAL" \
-            | grep -o 'cd /[^ ]* && env CLAUDECODE.*' \
+            | grep -o 'cd /[^ ]* && env CLAUDE_CODE.*' \
             | head -1)
 
         if [ -n "$cmd" ]; then
