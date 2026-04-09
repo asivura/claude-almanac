@@ -1,6 +1,6 @@
 ---
 title: Version-Controlled Claude Code Configuration
-description: Keep Claude Code and VS Code configuration in a git repo with symlinks for backup and portability
+description: Keep Claude Code, VS Code, tmux, Ghostty, and Starship configuration in a git repo with symlinks
 type: guide
 category: setup
 time: 10 min
@@ -8,7 +8,7 @@ difficulty: beginner
 prerequisites:
   - git
   - Claude Code installed
-outcome: A git repository managing your Claude Code and VS Code config files via symlinks
+outcome: A git repository managing your full Claude Code environment (settings, tmux, Ghostty, VS Code) via symlinks
 author: Alexander Sivura
 ---
 
@@ -20,7 +20,7 @@ Keep your Claude Code configuration under version control so it's backed up, por
 
 Claude Code stores configuration in `~/.claude/` -- settings, global instructions, rules, skills, and hooks. These files accumulate over time and represent significant investment. But they're scattered across your home directory with no backup, no history, and no way to sync across machines.
 
-The same applies to VS Code settings and keybindings that support your Claude Code workflow.
+The same applies to the rest of your Claude Code environment: VS Code settings, tmux configuration (including agent teams focus protection hooks), Ghostty terminal config, and Starship prompt. These tools work together, and losing any piece means re-discovering settings you already dialed in.
 
 ## The Pattern
 
@@ -37,34 +37,50 @@ Store everything in a git repo. Symlink from the expected locations back to the 
   vscode/
     settings.json     ← ~/Library/Application Support/Code/User/settings.json
     keybindings.json  ← ~/Library/Application Support/Code/User/keybindings.json
-  setup.sh            (creates the symlinks)
+  tmux/
+    .tmux.conf        ← ~/.tmux.conf
+  ghostty/
+    config            ← ~/.config/ghostty/config
+  starship/
+    starship.toml     ← ~/.config/starship.toml
+  scripts/
+    ghostty-claude.sh   (launcher, referenced by VS Code task)
+    tmux-retry-teammate.sh (teammate spawn retry, referenced by tmux hooks)
+  setup.sh            (creates all symlinks)
 ```
 
-Arrows show symlink direction: the files in `~/.claude/` are symlinks pointing to the repo.
+Arrows show symlink direction: the files in `~/.claude/`, `~/.config/`, etc. are symlinks pointing to the repo.
+
+The `scripts/` directory isn't symlinked anywhere -- scripts are referenced by absolute path from VS Code tasks and tmux hooks.
 
 ## Step 1: Create the Repo
 
 ```bash
-mkdir -p ~/Developer/repos/dotfiles-claude/{claude-home,vscode}
+mkdir -p ~/Developer/repos/dotfiles-claude/{claude-home,vscode,tmux,ghostty,starship,scripts}
 cd ~/Developer/repos/dotfiles-claude
 git init
 ```
 
 ## Step 2: Move Existing Config into the Repo
 
-Copy your current Claude Code config files into the repo:
+Copy your current config files into the repo:
 
 ```bash
-# Claude Code files
+# Claude Code
 cp ~/.claude/settings.json claude-home/
 cp ~/.claude/CLAUDE.md claude-home/ 2>/dev/null
 cp -r ~/.claude/rules claude-home/ 2>/dev/null
 cp -r ~/.claude/skills claude-home/ 2>/dev/null
 cp -r ~/.claude/hooks claude-home/ 2>/dev/null
 
-# VS Code files (macOS path)
+# VS Code (macOS path)
 cp ~/Library/Application\ Support/Code/User/settings.json vscode/
 cp ~/Library/Application\ Support/Code/User/keybindings.json vscode/
+
+# Terminal tools
+cp ~/.tmux.conf tmux/.tmux.conf 2>/dev/null
+cp ~/.config/ghostty/config ghostty/config 2>/dev/null
+cp ~/.config/starship.toml starship/starship.toml 2>/dev/null
 ```
 
 ## Step 3: Create a Setup Script
@@ -122,9 +138,21 @@ for item in settings.json keybindings.json; do
   link_item "$VSCODE_SOURCE/$item" "$VSCODE_TARGET/$item"
 done
 
+# --- tmux ---
+link_item "$REPO_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
+
+# --- Ghostty ---
+mkdir -p "$HOME/.config/ghostty"
+link_item "$REPO_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+
+# --- Starship ---
+mkdir -p "$HOME/.config"
+link_item "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+
 echo ""
 echo "Done. Verify with:"
 echo "  ls -la ~/.claude/settings.json ~/.claude/CLAUDE.md ~/.claude/rules"
+echo "  ls -la ~/.tmux.conf ~/.config/ghostty/config ~/.config/starship.toml"
 ```
 
 Make it executable and run it:
@@ -159,6 +187,8 @@ Note that `.claude/settings.local.json` is where Claude Code stores per-session 
 
 ## What to Version Control
 
+**Claude Code:**
+
 | File                  | Purpose                                   | Version control?      |
 | --------------------- | ----------------------------------------- | --------------------- |
 | `settings.json`       | Permissions, MCP servers, hooks, env vars | Yes                   |
@@ -169,6 +199,24 @@ Note that `.claude/settings.local.json` is where Claude Code stores per-session 
 | `settings.local.json` | Per-session permission grants             | No                    |
 | `todos.local.json`    | Session-local task state                  | No                    |
 | `projects/`           | Auto-memory per project                   | No (machine-specific) |
+
+**Terminal tools:**
+
+| File             | Purpose                                | Version control? |
+| ---------------- | -------------------------------------- | ---------------- |
+| `.tmux.conf`     | tmux settings, agent teams focus hooks | Yes              |
+| `ghostty/config` | Ghostty theme and font                 | Yes              |
+| `starship.toml`  | Minimal prompt for agent team panes    | Yes              |
+| `scripts/`       | Launcher and retry scripts             | Yes              |
+
+**VS Code:**
+
+| File               | Purpose                        | Version control? |
+| ------------------ | ------------------------------ | ---------------- |
+| `settings.json`    | Editor, extension, theme prefs | Yes              |
+| `keybindings.json` | Custom keyboard shortcuts      | Yes              |
+
+The terminal tools matter for Claude Code because tmux focus protection prevents corrupted teammate spawns, Ghostty is the host terminal, and Starship keeps prompts minimal in agent team panes. See [Agent Teams Setup](agent-teams-setup.md) for details on each.
 
 ## Verification
 
