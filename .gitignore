@@ -20,6 +20,9 @@ site/src/data/recent-updates.json
 # (served by the middleware when / is requested with Accept: text/markdown).
 site/public/home.md
 
+# Wrangler local cache
+.wrangler/
+
 # Secrets and credentials
 .env
 .env.*
