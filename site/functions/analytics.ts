@@ -33,80 +33,60 @@ type PagesFunction = (context: {
   env: Env;
 }) => Promise<Response>;
 
-interface AEGroup {
-  sum: { double1: number };
-  dimensions: { blob1: string; blob2: string };
+interface AESqlRow {
+  path: string;
+  format: string;
+  cnt: number;
 }
 
-interface AEResponse {
-  data?: {
-    viewer?: {
-      accounts?: Array<{
-        content_negotiationAdaptiveGroups?: AEGroup[];
-      }>;
-    };
-  };
-  errors?: Array<{ message: string }>;
+interface AESqlResponse {
+  data?: AESqlRow[];
+  rows?: number;
+  meta?: Array<{ name: string; type: string }>;
 }
 
-function rangeToDate(range: string): { start: string; end: string } {
-  const now = new Date();
-  const end = now.toISOString();
-  let ms: number;
-  switch (range) {
-    case '30d':
-      ms = 30 * 24 * 60 * 60 * 1000;
-      break;
-    case '7d':
-      ms = 7 * 24 * 60 * 60 * 1000;
-      break;
-    default:
-      ms = 24 * 60 * 60 * 1000;
-  }
-  const start = new Date(now.getTime() - ms).toISOString();
-  return { start, end };
-}
+type AEQueryResult =
+  | { kind: 'ok'; rows: AESqlRow[] }
+  | { kind: 'error'; message: string };
 
 async function queryAnalyticsEngine(
   apiToken: string,
   accountId: string,
   range: string,
-): Promise<AEResponse> {
-  const { start, end } = rangeToDate(range);
-  const query = `query {
-  viewer {
-    accounts(filter: { accountTag: "${accountId}" }) {
-      content_negotiationAdaptiveGroups(
-        limit: 100
-        filter: {
-          datetime_geq: "${start}"
-          datetime_leq: "${end}"
-        }
-        orderBy: [sum_double1_DESC]
-      ) {
-        sum { double1 }
-        dimensions {
-          blob1
-          blob2
-        }
-      }
-    }
-  }
-}`;
+): Promise<AEQueryResult> {
+  const intervalDays = range === '30d' ? 30 : range === '7d' ? 7 : 1;
+
+  // Analytics Engine SQL API. sum(_sample_interval) accounts for AE's
+  // automatic sampling — it gives a corrected event count estimate.
+  // See: https://developers.cloudflare.com/analytics/analytics-engine/sql-api/
+  const sql = `SELECT blob1 AS path, blob2 AS format, sum(_sample_interval) AS cnt
+FROM content_negotiation
+WHERE timestamp > NOW() - INTERVAL '${intervalDays}' DAY
+GROUP BY path, format
+ORDER BY cnt DESC
+FORMAT JSON`;
 
   const response = await fetch(
-    'https://api.cloudflare.com/client/v4/graphql',
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/analytics_engine/sql`,
     {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ query }),
+      body: sql,
     },
   );
 
-  return response.json() as Promise<AEResponse>;
+  if (!response.ok) {
+    const text = await response.text();
+    return {
+      kind: 'error',
+      message: `HTTP ${response.status}: ${text.slice(0, 500)}`,
+    };
+  }
+
+  const body = (await response.json()) as AESqlResponse;
+  return { kind: 'ok', rows: body.data ?? [] };
 }
 
 function escapeHtml(str: string): string {
@@ -691,7 +671,7 @@ export const onRequest: PagesFunction = async ({ request, env }) => {
   const rangeParam = url.searchParams.get('range') ?? '24h';
   const range = ['24h', '7d', '30d'].includes(rangeParam) ? rangeParam : '24h';
 
-  let result: AEResponse;
+  let result: AEQueryResult;
   try {
     result = await queryAnalyticsEngine(env.CF_API_TOKEN, env.CF_ACCOUNT_ID, range);
   } catch (err) {
@@ -703,30 +683,28 @@ export const onRequest: PagesFunction = async ({ request, env }) => {
     });
   }
 
-  if (result.errors?.length) {
-    const msg = result.errors.map((e) => e.message).join('; ');
-    const isDatasetEmpty = msg.includes('unknown field');
-    const displayError = isDatasetEmpty
-      ? 'Analytics Engine dataset not initialized yet. Data will appear after traffic flows through the site with the ANALYTICS binding active.'
-      : `GraphQL error: ${msg}`;
-    const html = buildPage(range, 0, 0, new Map(), displayError);
+  if (result.kind === 'error') {
+    const html = buildPage(
+      range,
+      0,
+      0,
+      new Map(),
+      `Analytics Engine query failed: ${result.message}`,
+    );
     return new Response(html, {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
   }
 
-  const groups =
-    result.data?.viewer?.accounts?.[0]?.content_negotiationAdaptiveGroups ?? [];
-
   let totalMarkdown = 0;
   let totalHtml = 0;
   const pathData = new Map<string, PathStats>();
 
-  for (const group of groups) {
-    const path = group.dimensions.blob1;
-    const format = group.dimensions.blob2;
-    const count = group.sum.double1;
+  for (const row of result.rows) {
+    const path = row.path;
+    const format = row.format;
+    const count = Math.round(Number(row.cnt) || 0);
 
     if (format === 'markdown') totalMarkdown += count;
     else totalHtml += count;
