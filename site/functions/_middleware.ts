@@ -209,6 +209,22 @@ export const onRequest: PagesFunction = async ({
   const startTime = Date.now();
   const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
+  const path = url.pathname;
+
+  // Fast path: static sub-resources (JS, CSS, fonts, images, Next.js RSC
+  // .txt segments) bypass every middleware branch. Re-wrapping these
+  // responses to append Set-Cookie or logging them as "html" events broke
+  // client-side navigation in Safari — a critical sub-resource would fail
+  // to load after the first tile click and Safari aborted the top-level
+  // navigation with "This page couldn't load". It also polluted Analytics
+  // Engine with JS/CSS/font hits mislabeled as html page views.
+  // /llms.txt and /llms-full.txt are the exception: they look like files
+  // but are top-level content endpoints handled below.
+  const hasExtension = /\.[a-z0-9]+$/i.test(path);
+  const isLlmsTxt = path === '/llms.txt' || path === '/llms-full.txt';
+  if (hasExtension && !isLlmsTxt) {
+    return next();
+  }
 
   // Skip non-markdown-accepting clients (browsers, API calls, etc).
   if (!accept.includes('text/markdown')) {
@@ -216,35 +232,30 @@ export const onRequest: PagesFunction = async ({
     const elapsed = Date.now() - startTime;
 
     waitUntil(
-      trackRequest(env, request, url.pathname, 'html', elapsed, response.status, null),
+      trackRequest(env, request, path, 'html', elapsed, response.status, null),
     );
 
     // Set device_id cookie on HTML responses if not already present.
+    // Build a fresh Headers object from response.headers instead of passing
+    // the upstream Response as the init — the init-object form aliases the
+    // headers, and mutating shared headers on a streaming response is what
+    // triggered the Safari sub-resource failure above.
     if (!getDeviceIdCookie(request)) {
       const id = crypto.randomUUID();
-      const cloned = new Response(response.body, response);
-      cloned.headers.append(
+      const headers = new Headers(response.headers);
+      headers.append(
         'Set-Cookie',
         `device_id=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000`,
       );
-      return cloned;
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
     }
 
     return response;
   }
-
-  // Skip static asset paths (anything ending in a file extension).
-  // home.md / llms.txt etc. are explicit routes handled below.
-  // No tracking — these are CSS/JS/fonts, not content requests.
-  if (
-    /\.[a-z0-9]+$/i.test(url.pathname) &&
-    url.pathname !== '/llms.txt' &&
-    url.pathname !== '/llms-full.txt'
-  ) {
-    return next();
-  }
-
-  const path = url.pathname;
 
   // Root landing page → generated markdown representation.
   if (path === '/' || path === '') {
