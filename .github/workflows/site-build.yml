@@ -62,4 +62,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: site
-          command: pages deploy out/ --project-name=claude-almanac
+          command: pages deploy --project-name=claude-almanac
