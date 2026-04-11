@@ -20,18 +20,6 @@
 // Functions run in a Workers runtime that has `fetch`, `Request`, `Response`,
 // `URL`, `Headers` natively (all covered by lib.dom).
 
-interface D1Database {
-  prepare(query: string): D1PreparedStatement;
-}
-interface D1PreparedStatement {
-  bind(...values: unknown[]): D1PreparedStatement;
-  run(): Promise<unknown>;
-}
-interface KVNamespace {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string): Promise<void>;
-}
-
 interface PagesEnv {
   ANALYTICS?: {
     writeDataPoint(event: {
@@ -40,8 +28,6 @@ interface PagesEnv {
       doubles?: number[];
     }): void;
   };
-  DB?: D1Database;
-  STATS_CACHE?: KVNamespace;
 }
 
 type PagesFunction = (context: {
@@ -50,18 +36,6 @@ type PagesFunction = (context: {
   env: PagesEnv;
   waitUntil: (promise: Promise<unknown>) => void;
 }) => Promise<Response>;
-
-function trackRequest(
-  env: PagesEnv,
-  pathname: string,
-  format: 'markdown' | 'html',
-): void {
-  env.ANALYTICS?.writeDataPoint({
-    indexes: [format],
-    blobs: [pathname, format],
-    doubles: [1],
-  });
-}
 
 // --- User-Agent classification ---
 
@@ -120,23 +94,29 @@ function classifyUserAgent(
   return { category: 'unknown', name: 'unknown' };
 }
 
-// --- D1 event logging ---
-
-interface LogEventOptions {
-  responseStatus: number;
-  responseTimeMs: number;
-  tokenCount: number | null;
+function getDeviceIdCookie(request: Request): string | null {
+  const cookieHeader = request.headers.get('Cookie') ?? '';
+  const match = cookieHeader.match(/(?:^|;\s*)device_id=([^;]+)/);
+  return match ? match[1] : null;
 }
 
-async function logEvent(
+async function trackRequest(
   env: PagesEnv,
   request: Request,
   pathname: string,
   format: 'markdown' | 'html',
-  opts: LogEventOptions,
+  responseTimeMs: number,
+  responseStatus: number,
+  tokenCount: number | null,
 ): Promise<void> {
-  if (!env.DB) return;
+  if (!env.ANALYTICS) return;
   try {
+    const ua = request.headers.get('User-Agent');
+    const { category: uaCategory, name: uaAgentName } =
+      classifyUserAgent(ua);
+    const cf = (request as unknown as { cf?: Record<string, unknown> })
+      .cf;
+    const country = (cf?.country as string) ?? '';
     const ip = request.headers.get('CF-Connecting-IP') ?? '';
     const encoder = new TextEncoder();
     const hashBuffer = await crypto.subtle.digest(
@@ -146,94 +126,17 @@ async function logEvent(
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const ipHash = hashArray
       .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-
-    const userAgent = request.headers.get('User-Agent') ?? null;
-    const { category: uaCategory, name: uaAgentName } =
-      classifyUserAgent(userAgent);
-    const acceptHeader = request.headers.get('Accept') ?? null;
-    const referer = request.headers.get('Referer') ?? null;
-    const acceptLanguage =
-      request.headers.get('Accept-Language') ?? null;
-    const acceptEncoding =
-      request.headers.get('Accept-Encoding') ?? null;
-
-    // Extract Cloudflare-specific properties from request.cf
-    const cf = (request as unknown as { cf?: Record<string, unknown> })
-      .cf;
-    const country = (cf?.country as string) ?? null;
-    const region = (cf?.region as string) ?? null;
-    const city = (cf?.city as string) ?? null;
-    const continent = (cf?.continent as string) ?? null;
-    const timezone = (cf?.timezone as string) ?? null;
-    const latitude = (cf?.latitude as number) ?? null;
-    const longitude = (cf?.longitude as number) ?? null;
-    const postalCode = (cf?.postalCode as string) ?? null;
-    const asn = (cf?.asn as number) ?? null;
-    const colo = (cf?.colo as string) ?? null;
-    const clientTcpRtt = (cf?.clientTcpRtt as number) ?? null;
-    const tlsVersion = (cf?.tlsVersion as string) ?? null;
-    const tlsCipher = (cf?.tlsCipher as string) ?? null;
-    const httpProtocol = (cf?.httpProtocol as string) ?? null;
-
-    // Read device_id from cookie
-    const cookieHeader = request.headers.get('Cookie') ?? '';
-    const deviceMatch = cookieHeader.match(
-      /(?:^|;\s*)device_id=([^;]+)/,
-    );
-    const deviceId = deviceMatch ? deviceMatch[1] : null;
-
-    await env.DB.prepare(
-      `INSERT INTO events (
-        pathname, format, response_status, response_time_ms, token_count,
-        user_agent, ua_category, ua_agent_name, accept_header, referer,
-        ip, ip_hash, device_id,
-        country, region, city, continent, timezone, latitude, longitude, postal_code,
-        asn, colo, client_tcp_rtt, tls_version, tls_cipher, http_protocol,
-        accept_language, accept_encoding
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-      .bind(
-        pathname,
-        format,
-        opts.responseStatus,
-        opts.responseTimeMs,
-        opts.tokenCount,
-        userAgent,
-        uaCategory,
-        uaAgentName,
-        acceptHeader,
-        referer,
-        ip,
-        ipHash,
-        deviceId,
-        country,
-        region,
-        city,
-        continent,
-        timezone,
-        latitude,
-        longitude,
-        postalCode,
-        asn,
-        colo,
-        clientTcpRtt,
-        tlsVersion,
-        tlsCipher,
-        httpProtocol,
-        acceptLanguage,
-        acceptEncoding,
-      )
-      .run();
+      .join('')
+      .slice(0, 16);
+    const deviceId = getDeviceIdCookie(request)?.slice(0, 12) ?? '';
+    env.ANALYTICS.writeDataPoint({
+      indexes: [format],
+      blobs: [pathname, format, country, uaCategory, uaAgentName, ipHash, deviceId, 'v2'],
+      doubles: [responseTimeMs, responseStatus, tokenCount ?? 0],
+    });
   } catch {
-    // Never crash the middleware — D1 logging is best-effort.
+    // Never crash the middleware on analytics failure.
   }
-}
-
-function getDeviceIdCookie(request: Request): string | null {
-  const cookieHeader = request.headers.get('Cookie') ?? '';
-  const match = cookieHeader.match(/(?:^|;\s*)device_id=([^;]+)/);
-  return match ? match[1] : null;
 }
 
 function markdownResponse(
@@ -309,17 +212,11 @@ export const onRequest: PagesFunction = async ({
 
   // Skip non-markdown-accepting clients (browsers, API calls, etc).
   if (!accept.includes('text/markdown')) {
-    trackRequest(env, url.pathname, 'html');
-
     const response = await next();
     const elapsed = Date.now() - startTime;
 
     waitUntil(
-      logEvent(env, request, url.pathname, 'html', {
-        responseStatus: response.status,
-        responseTimeMs: elapsed,
-        tokenCount: null,
-      }),
+      trackRequest(env, request, url.pathname, 'html', elapsed, response.status, null),
     );
 
     // Set device_id cookie on HTML responses if not already present.
@@ -351,7 +248,6 @@ export const onRequest: PagesFunction = async ({
 
   // Root landing page → generated markdown representation.
   if (path === '/' || path === '') {
-    trackRequest(env, path, 'markdown');
     const response = await fetchAssetAsMarkdown(
       url.origin,
       '/home.md',
@@ -359,11 +255,7 @@ export const onRequest: PagesFunction = async ({
     );
     const elapsed = Date.now() - startTime;
     waitUntil(
-      logEvent(env, request, path, 'markdown', {
-        responseStatus: response.status,
-        responseTimeMs: elapsed,
-        tokenCount: getTokenCount(response),
-      }),
+      trackRequest(env, request, path, 'markdown', elapsed, response.status, getTokenCount(response)),
     );
     return response;
   }
@@ -371,7 +263,6 @@ export const onRequest: PagesFunction = async ({
   // LLM index endpoints — already markdown content but served as text/plain.
   // Re-wrap with the correct Content-Type when the client asks for markdown.
   if (path === '/llms.txt' || path === '/llms-full.txt') {
-    trackRequest(env, path, 'markdown');
     const response = await fetchAssetAsMarkdown(
       url.origin,
       path,
@@ -379,11 +270,7 @@ export const onRequest: PagesFunction = async ({
     );
     const elapsed = Date.now() - startTime;
     waitUntil(
-      logEvent(env, request, path, 'markdown', {
-        responseStatus: response.status,
-        responseTimeMs: elapsed,
-        tokenCount: getTokenCount(response),
-      }),
+      trackRequest(env, request, path, 'markdown', elapsed, response.status, getTokenCount(response)),
     );
     return response;
   }
@@ -396,15 +283,10 @@ export const onRequest: PagesFunction = async ({
     // Guard: slugs must match our known content pattern. Anything else is a
     // typo or path-traversal attempt — return markdown 404.
     if (slug && !/^[a-z0-9-]+$/.test(slug)) {
-      trackRequest(env, path, 'markdown');
       const response = markdownNotFound(path);
       const elapsed = Date.now() - startTime;
       waitUntil(
-        logEvent(env, request, path, 'markdown', {
-          responseStatus: response.status,
-          responseTimeMs: elapsed,
-          tokenCount: getTokenCount(response),
-        }),
+        trackRequest(env, request, path, 'markdown', elapsed, response.status, getTokenCount(response)),
       );
       return response;
     }
@@ -413,7 +295,6 @@ export const onRequest: PagesFunction = async ({
       ? `/llms.mdx/docs/${slug}/content.md`
       : '/llms.txt';
 
-    trackRequest(env, path, 'markdown');
     const response = await fetchAssetAsMarkdown(
       url.origin,
       mdPath,
@@ -421,26 +302,17 @@ export const onRequest: PagesFunction = async ({
     );
     const elapsed = Date.now() - startTime;
     waitUntil(
-      logEvent(env, request, path, 'markdown', {
-        responseStatus: response.status,
-        responseTimeMs: elapsed,
-        tokenCount: getTokenCount(response),
-      }),
+      trackRequest(env, request, path, 'markdown', elapsed, response.status, getTokenCount(response)),
     );
     return response;
   }
 
   // Any other path: return a markdown 404 so content negotiation stays
   // consistent end-to-end for markdown-accepting clients.
-  trackRequest(env, path, 'markdown');
   const response = markdownNotFound(path);
   const elapsed = Date.now() - startTime;
   waitUntil(
-    logEvent(env, request, path, 'markdown', {
-      responseStatus: response.status,
-      responseTimeMs: elapsed,
-      tokenCount: getTokenCount(response),
-    }),
+    trackRequest(env, request, path, 'markdown', elapsed, response.status, getTokenCount(response)),
   );
   return response;
 };
