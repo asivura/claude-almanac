@@ -155,6 +155,6 @@ From the [Claude Code v2.1.59 changelog](https://github.com/anthropics/claude-co
 
 ## Sources
 
-- [Memory Management (Official Docs)](https://docs.anthropic.com/docs/en/memory)
-- [Claude Code Settings](https://docs.anthropic.com/docs/en/settings)
+- [Memory Management (Official Docs)](https://code.claude.com/docs/en/memory)
+- [Claude Code Settings](https://code.claude.com/docs/en/settings)
 - [Claude Code v2.1.59 Release](https://github.com/anthropics/claude-code/releases/tag/v2.1.59)
