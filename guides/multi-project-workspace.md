@@ -169,9 +169,9 @@ Ghostty launcher (ghostty-claude.sh)
 ## Next Steps
 
 - [Agent Teams Setup](agent-teams-setup.md) -- configure Ghostty + tmux for the launcher task
-- [Settings](settings.md) -- full reference for `additionalDirectories` and other Claude Code settings
-- [Memory & Context](memory-context.md) -- how CLAUDE.md files work across projects
-- [Rules](rules.md) -- modular rules for project-specific and global conventions
+- [Settings](../features/settings.md) -- full reference for `additionalDirectories` and other Claude Code settings
+- [Memory & Context](../features/memory-context.md) -- how CLAUDE.md files work across projects
+- [Rules](../features/rules.md) -- modular rules for project-specific and global conventions
 
 ## Sources
 
