@@ -5,5 +5,6 @@
 exclude = [
   "^https://dash\\.cloudflare\\.com",       # Requires Cloudflare login
   "^https://www\\.npmjs\\.com",              # Returns 403 to CI bots
+  "^https://claude\\.ai/",                  # Auth-walled app routes (403 headless)
   "^http://localhost",                       # Dev server, not running in CI
 ]
