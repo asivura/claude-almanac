@@ -244,12 +244,12 @@ The setup script handles everything: backs up existing config, creates symlinks,
 
 ## Next Steps
 
-- [Settings](settings.md) -- full reference for `settings.json` options
-- [Memory & Context](memory-context.md) -- how CLAUDE.md and rules work
+- [Settings](../features/settings.md) -- full reference for `settings.json` options
+- [Memory & Context](../features/memory-context.md) -- how CLAUDE.md and rules work
 - [Multi-Project Workspace](multi-project-workspace.md) -- add a VS Code workspace and `additionalDirectories` to the repo
 - [Agent Teams Setup](agent-teams-setup.md) -- add Ghostty/tmux scripts to the repo
 
 ## Sources
 
 - [Claude Code Settings](https://code.claude.com/docs/en/settings.md)
-- [Claude Code Configuration](https://code.claude.com/docs/en/configuration.md)
+- [Claude Code Directory](https://code.claude.com/docs/en/claude-directory.md)

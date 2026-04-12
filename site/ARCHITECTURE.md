@@ -68,7 +68,7 @@ Content lives in three directories, each with a distinct content type:
 
 All three feed the **same `/docs/` URL namespace** (slugs must be unique across directories). Source directory is a contributor concept; URL is a reader concept.
 
-See [content-taxonomy.md](./content-taxonomy.md) for the full spec on content types, voices, and schemas.
+See [content-taxonomy.md](../internals/content-taxonomy.md) for the full spec on content types, voices, and schemas.
 
 ### Source-to-URL mapping
 
@@ -180,7 +180,7 @@ sequenceDiagram
     MW-->>A: text/markdown response
 ```
 
-This gives us parity with Cloudflare's paid "Markdown for Agents" feature on the free tier. See [content-negotiation-decision.md](./content-negotiation-decision.md).
+This gives us parity with Cloudflare's paid "Markdown for Agents" feature on the free tier. See [content-negotiation-decision.md](../internals/content-negotiation-decision.md).
 
 ## Per-type page rendering
 
@@ -357,10 +357,10 @@ Generated automatically at build time:
 
 ## Related docs
 
-- [framework-decision.md](./framework-decision.md) — why we chose Fumadocs
-- [content-negotiation-decision.md](./content-negotiation-decision.md) — why we built our own Accept header middleware
-- [content-taxonomy.md](./content-taxonomy.md) — reference vs guide vs case study
-- [theme-claude-almanac.css](./theme-claude-almanac.css) — the exported theme
+- [framework-decision.md](../internals/framework-decision.md) — why we chose Fumadocs
+- [content-negotiation-decision.md](../internals/content-negotiation-decision.md) — why we built our own Accept header middleware
+- [content-taxonomy.md](../internals/content-taxonomy.md) — reference vs guide vs case study
+- [theme-claude-almanac.css](src/styles/theme.css) — the exported theme
 
 ## Open questions
 

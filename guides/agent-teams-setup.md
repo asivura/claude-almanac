@@ -15,7 +15,7 @@ author: Alexander Sivura
 
 # Agent Teams: Environment Setup
 
-Tools, configuration, and IDE integration for running multiple Claude Code sessions in parallel. Install these once and you're ready to use the [coordination patterns](agent-teams.md).
+Tools, configuration, and IDE integration for running multiple Claude Code sessions in parallel. Install these once and you're ready to use the [coordination patterns](../features/agent-teams.md).
 
 ## Tools Overview
 
@@ -685,7 +685,7 @@ The fix is always the same: explicitly mention `TeamCreate` and `team_name` in y
 
 ## Next Steps
 
-Your environment is ready. Head to [Agent Teams](agent-teams.md) for architecture details, display modes, hooks, and the full tool reference.
+Your environment is ready. Head to [Agent Teams](../features/agent-teams.md) for architecture details, display modes, hooks, and the full tool reference.
 
 ## Sources
 
@@ -693,4 +693,4 @@ Your environment is ready. Head to [Agent Teams](agent-teams.md) for architectur
 - [Ghostty Terminal](https://ghostty.org/)
 - [tmux](https://github.com/tmux/tmux/wiki)
 - [Starship Prompt](https://starship.rs/)
-- [Agent Teams](agent-teams.md) - Architecture, display modes, hooks, and tool reference
+- [Agent Teams](../features/agent-teams.md) - Architecture, display modes, hooks, and tool reference

@@ -1,0 +1,9 @@
+# Lychee link checker configuration
+# https://lychee.cli.rs/usage/config/
+
+# Exclude URLs that require authentication or block bots
+exclude = [
+  "^https://dash\\.cloudflare\\.com",       # Requires Cloudflare login
+  "^https://www\\.npmjs\\.com",              # Returns 403 to CI bots
+  "^http://localhost",                       # Dev server, not running in CI
+]
