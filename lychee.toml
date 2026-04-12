@@ -1,0 +1,12 @@
+# Lychee link checker config. Consumed automatically by lycheeverse/lychee-action.
+# See https://github.com/lycheeverse/lychee#configuration
+
+# Exclude URLs that are not real failures:
+#   - npmjs.com returns 403 to headless bots
+#   - dash.cloudflare.com is auth-walled (always 403 without a session)
+#   - localhost references are dev-server instructions
+exclude = [
+    "^https://www\\.npmjs\\.com/",
+    "^https://dash\\.cloudflare\\.com/",
+    "^https?://localhost(:\\d+)?(/|$)",
+]
