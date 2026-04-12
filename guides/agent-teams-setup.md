@@ -75,9 +75,14 @@ set -g mouse on
 # Fix terminal colors and mouse inside tmux (for Ghostty)
 set -g default-terminal "tmux-256color"
 set -ag terminal-features ",xterm-ghostty:RGB:mouse:usstyle:clipboard:title"
+
+# Keep sessions alive when terminal is closed
+set -g destroy-unattached off
 ```
 
 Without `mouse on`, you can't scroll with the trackpad -- you'd have to enter copy mode manually every time. The `terminal-features` line tells tmux that Ghostty supports RGB colors, mouse reporting, styled underlines, clipboard, and title -- ensuring colors render correctly and mouse events are properly forwarded to TUI apps like Claude Code.
+
+The `destroy-unattached off` setting is critical for worktree sessions -- without it, tmux kills the session when you close the Ghostty window, losing your Claude Code session. With it enabled, sessions survive terminal closure and can be resumed later (see [Session Resume](#session-resume)).
 
 **Important:** tmux only reads its config when the server first starts. If you add these settings to an already-running tmux, reload with `tmux source-file ~/.tmux.conf`.
 
@@ -277,6 +282,244 @@ Add to VS Code `keybindings.json`:
 ```
 
 Now press **Ctrl+Shift+T** with any file open to launch a Claude Code agent for that project.
+
+## Session Resume
+
+When you run multiple worktree sessions, you need a way to get back to them -- whether you closed the Ghostty window, your terminal crashed, or you just switched away. This resume script handles all three cases: live sessions, detached sessions, and orphaned worktrees (where the tmux session was killed but the worktree is still on disk).
+
+### Resume Script
+
+Create a companion script to the launcher:
+
+```bash
+#!/usr/bin/env bash
+# ghostty-claude-resume.sh -- resume a worktree Claude Code session
+# Usage: ghostty-claude-resume.sh [--in-place | --switch] [path]
+#
+# Modes:
+#   (default)    Open a new Ghostty window attached to the session
+#   --in-place   Attach in the current terminal
+#   --switch     Switch current tmux client to the session (for tmux keybind)
+#
+# If a path inside a worktree is given, the session is detected automatically.
+# Otherwise, an interactive picker is shown.
+
+set -euo pipefail
+
+MODE="ghostty"
+PATH_ARG=""
+for arg in "$@"; do
+  case "$arg" in
+    --in-place) MODE="in-place" ;;
+    --switch)   MODE="switch" ;;
+    *)          PATH_ARG="$arg" ;;
+  esac
+done
+
+SELECTED=""
+WORKTREE_DIR=""
+CREATE_SESSION=false
+
+# If a path is given, try to detect the session from the worktree root
+if [[ -n "$PATH_ARG" ]]; then
+  WORKTREE_ROOT=$(git -C "$PATH_ARG" rev-parse --show-toplevel 2>/dev/null || true)
+  if [[ -n "$WORKTREE_ROOT" ]]; then
+    CANDIDATE=$(basename "$WORKTREE_ROOT")
+    if [[ "$CANDIDATE" =~ ^.+-[0-9]{8}-[0-9]{4} ]]; then
+      SELECTED="$CANDIDATE"
+      WORKTREE_DIR="$WORKTREE_ROOT"
+      if ! tmux has-session -t "$CANDIDATE" 2>/dev/null; then
+        CREATE_SESSION=true
+      fi
+    fi
+  fi
+fi
+
+# If not resolved from path, show interactive picker
+if [[ -z "$SELECTED" ]]; then
+  # Collect live tmux sessions matching worktree naming pattern
+  LIVE_SESSIONS=$(tmux list-sessions -F '#{session_name}' 2>/dev/null \
+    | grep -E '^.+-[0-9]{8}-[0-9]{4}' || true)
+
+  # Collect orphaned worktrees (on disk but no tmux session)
+  ORPHANED=""
+  for repo_dir in ~/Developer/repos/*/; do
+    wt_base="${repo_dir}.claude/worktrees"
+    [[ -d "$wt_base" ]] || continue
+    for wt_dir in "$wt_base"/*/; do
+      [[ -d "$wt_dir" ]] || continue
+      wt_name=$(basename "$wt_dir")
+      [[ "$wt_name" =~ ^.+-[0-9]{8}-[0-9]{4} ]] || continue
+      if ! tmux has-session -t "$wt_name" 2>/dev/null; then
+        ORPHANED="${ORPHANED}${wt_name} (no session - ${wt_dir})\n"
+      fi
+    done
+  done
+
+  # Build combined list with status indicators
+  ENTRIES=""
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    attached=$(tmux list-sessions -F '#{session_name} #{session_attached}' 2>/dev/null \
+      | grep "^${name} " | awk '{print $2}')
+    if [[ "$attached" -gt 0 ]]; then
+      ENTRIES="${ENTRIES}${name} (attached)\n"
+    else
+      ENTRIES="${ENTRIES}${name} (detached)\n"
+    fi
+  done <<< "$LIVE_SESSIONS"
+
+  if [[ -n "$ORPHANED" ]]; then
+    ENTRIES="${ENTRIES}${ORPHANED}"
+  fi
+
+  # In --switch mode, exclude the current session
+  if [[ "$MODE" == "switch" ]]; then
+    CURRENT=$(tmux display-message -p '#{session_name}' 2>/dev/null || true)
+    if [[ -n "$CURRENT" ]]; then
+      ENTRIES=$(echo -e "$ENTRIES" | grep -v "^${CURRENT} " || true)
+    fi
+  fi
+
+  ENTRIES=$(echo -e "$ENTRIES" | sed '/^$/d')
+
+  if [[ -z "$ENTRIES" ]]; then
+    echo "No worktree sessions found."
+    exit 0
+  fi
+
+  # Use fzf if available, otherwise numbered menu
+  ENTRY_COUNT=$(echo "$ENTRIES" | wc -l | tr -d ' ')
+  if [[ "$ENTRY_COUNT" -eq 1 ]]; then
+    CHOSEN="$ENTRIES"
+  elif command -v fzf &>/dev/null; then
+    CHOSEN=$(echo "$ENTRIES" | fzf --prompt="Resume session: " --height=~20 --reverse) || true
+  else
+    echo "Worktree sessions:"
+    i=1
+    while IFS= read -r line; do
+      echo "  $i) $line"
+      i=$((i + 1))
+    done <<< "$ENTRIES"
+    read -rp "Select [1-${ENTRY_COUNT}]: " choice
+    CHOSEN=$(echo "$ENTRIES" | sed -n "${choice}p")
+  fi
+
+  SELECTED=$(echo "$CHOSEN" | awk '{print $1}')
+
+  if echo "$CHOSEN" | grep -q "(no session"; then
+    CREATE_SESSION=true
+    WORKTREE_DIR=$(echo "$CHOSEN" | grep -o '/[^ )]*')
+  fi
+fi
+
+# Attach to existing session or recreate for orphaned worktree
+if $CREATE_SESSION; then
+  # Recreate tmux session in the orphaned worktree with claude
+  case "$MODE" in
+    ghostty)
+      open -na Ghostty.app --args \
+        --working-directory="$WORKTREE_DIR" \
+        --title="$SELECTED" \
+        -e tmux new-session -s "$SELECTED" "claude"
+      ;;
+    in-place)
+      cd "$WORKTREE_DIR"
+      exec tmux new-session -s "$SELECTED" "claude"
+      ;;
+    switch)
+      tmux new-session -d -s "$SELECTED" -c "$WORKTREE_DIR" "claude"
+      tmux switch-client -t "$SELECTED"
+      ;;
+  esac
+else
+  case "$MODE" in
+    ghostty)
+      open -na Ghostty.app --args \
+        --title="$SELECTED" \
+        -e tmux attach-session -t "$SELECTED"
+      ;;
+    in-place)
+      exec tmux attach-session -t "$SELECTED"
+      ;;
+    switch)
+      tmux switch-client -t "$SELECTED"
+      ;;
+  esac
+fi
+```
+
+### How the Picker Works
+
+The picker shows all worktree sessions across your projects with status indicators:
+
+```
+Resume session:
+  webclass-service-20260408-1430 (attached)
+  pandb-aurora-20260408-1512 (detached)
+  workspace-20260407-0930 (no session - /path/to/worktree)
+```
+
+| Status         | Meaning                                 | Action                          |
+| -------------- | --------------------------------------- | ------------------------------- |
+| `(attached)`   | tmux session exists, has active clients | Attaches a second client        |
+| `(detached)`   | tmux session exists, no clients         | Reattaches                      |
+| `(no session)` | Worktree on disk, tmux session gone     | Recreates session with `claude` |
+
+The third case -- **orphaned worktree recovery** -- is especially useful when tmux crashes or you reboot. Your work is preserved in the worktree; the script recreates the tmux session and launches Claude Code in it.
+
+### tmux Keybinding
+
+Add to `~/.tmux.conf` for quick session switching:
+
+```bash
+# Keep sessions alive when terminal is closed (worktree sessions survive)
+set -g destroy-unattached off
+
+# Resume worktree session picker (prefix + R)
+bind R display-popup -E -w 70 -h 15 \
+  "~/path/to/ghostty-claude-resume.sh --switch"
+```
+
+Press **prefix + R** (default: `Ctrl+B R`) to open a popup picker. Select a session to switch to it immediately. The `--switch` mode excludes the current session from the list.
+
+### VS Code Resume Integration
+
+Add a second task and keybinding for resuming sessions -- complementing the launch shortcut:
+
+**Task** (`.code-workspace` or `.vscode/tasks.json`):
+
+```json
+{
+  "label": "Resume Claude Worktree Session",
+  "type": "shell",
+  "command": "/path/to/ghostty-claude-resume.sh",
+  "args": ["${fileDirname}"],
+  "presentation": {
+    "reveal": "never"
+  },
+  "problemMatcher": []
+}
+```
+
+**Keybinding** (`keybindings.json`):
+
+```json
+{
+  "key": "ctrl+shift+r",
+  "command": "workbench.action.tasks.runTask",
+  "args": "Resume Claude Worktree Session"
+}
+```
+
+This gives you two VS Code shortcuts:
+
+| Shortcut         | Action                      |
+| ---------------- | --------------------------- |
+| **Ctrl+Shift+T** | Launch new worktree session |
+| **Ctrl+Shift+R** | Resume existing session     |
+
+The resume shortcut uses `${fileDirname}` to detect which worktree you're editing in. If you're viewing a file inside a worktree, it auto-selects that session. If you're in the main project, it shows the picker.
 
 ## Claude Code Settings
 
