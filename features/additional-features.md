@@ -55,6 +55,20 @@ cd ../project-feature-a
 claude
 ```
 
+### With `--worktree` Flag
+
+Claude Code can create and manage the worktree automatically:
+
+```bash
+claude --worktree my-feature --name my-feature
+```
+
+Combine with `--remote-control` and `--name` for full session management. See [Agent Teams Setup](../guides/agent-teams-setup.md#launch-script) for a launcher script that automates this.
+
+### Session Resume
+
+When running multiple worktree sessions, use a resume script to reconnect to detached or orphaned sessions. See [Session Resume](../guides/agent-teams-setup.md#session-resume) for the full setup, including an interactive picker, path-based detection for VS Code, and tmux keybinding (`prefix + R`).
+
 ### Benefits
 
 - Each worktree has isolated file state
