@@ -4,9 +4,12 @@
 # Exclude URLs that are not real failures:
 #   - npmjs.com returns 403 to headless bots
 #   - dash.cloudflare.com is auth-walled (always 403 without a session)
+#   - claude.ai app routes (/code, /admin-settings, /analytics) are all
+#     auth-walled — checking them headless always returns 403
 #   - localhost references are dev-server instructions
 exclude = [
     "^https://www\\.npmjs\\.com/",
     "^https://dash\\.cloudflare\\.com/",
+    "^https://claude\\.ai/(code|admin-settings|analytics)(/|$)",
     "^https?://localhost(:\\d+)?(/|$)",
 ]
