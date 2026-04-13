@@ -334,12 +334,46 @@ Create a team to debug the memory leak. Spawn three investigators:
 - One analyzing recent deployments for regressions
 ```
 
-### Specifying Teammate Models
+### Controlling Teammate Models
+
+By default, teammates inherit the lead session's model. There are four ways to override this:
+
+**1. Custom agent definitions** — set the `model` field in `.claude/agents/<name>.md` frontmatter:
+
+```yaml
+model: sonnet        # Short alias (recommended)
+model: claude-opus-4-6  # Full model ID
+model: inherit       # Same as lead session (default)
+```
+
+**2. Natural language** — specify the model when spawning:
 
 ```
 Create a team with 4 teammates to refactor these modules in parallel.
 Use Sonnet for each teammate.
 ```
+
+**3. CLAUDE.md guidance** — add model instructions so the lead applies them consistently:
+
+```markdown
+When spawning Agent Teams teammates, always pass `model: "sonnet"`
+on the Agent tool call unless a specific model is requested.
+```
+
+**4. Environment variable** — `CLAUDE_CODE_SUBAGENT_MODEL` overrides all other settings:
+
+```bash
+export CLAUDE_CODE_SUBAGENT_MODEL=sonnet
+```
+
+**Model resolution order** (highest priority first):
+
+1. `CLAUDE_CODE_SUBAGENT_MODEL` environment variable
+1. Per-invocation `model` parameter on the Agent tool call
+1. Agent definition's `model` frontmatter
+1. Lead session's model (inheritance)
+
+Short aliases (`sonnet`, `opus`, `haiku`) resolve to the latest version automatically and work in all contexts. Full model IDs (e.g., `claude-opus-4-6`) are supported in agent definition frontmatter but may cause errors when passed as per-invocation parameters.
 
 ## Best Practices
 
