@@ -526,7 +526,7 @@ ______________________________________________________________________
 
 **Key Capabilities**:
 
-- JSON schema validation for settings.json, cd-context.json
+- JSON schema validation for settings.json
 - Skill frontmatter validation (name, description, format)
 - CI/CD integration with GitLab/GitHub Actions
 - Pre-commit hooks for local validation

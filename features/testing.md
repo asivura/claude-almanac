@@ -132,33 +132,6 @@ SETTINGS_SCHEMA: dict[str, object] = {
 }
 ```
 
-### cd-context.json Schema (Multi-Repo Workspaces)
-
-```python
-CD_CONTEXT_SCHEMA: dict[str, object] = {
-    "type": "object",
-    "required": ["default_files"],
-    "properties": {
-        "default_files": {
-            "type": "array",
-            "items": {"type": "string"},
-            "minItems": 1,
-        },
-        "repos": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "required": ["files", "summary"],
-                "properties": {
-                    "files": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-                    "summary": {"type": "string", "minLength": 5},
-                },
-            },
-        },
-    },
-}
-```
-
 ### Skill Frontmatter Schema
 
 ```python
@@ -193,7 +166,7 @@ from typing import Any
 
 from jsonschema import Draft7Validator, ValidationError
 
-from ..schemas import CD_CONTEXT_SCHEMA, SETTINGS_SCHEMA
+from ..schemas import SETTINGS_SCHEMA
 
 
 @dataclass
@@ -215,11 +188,6 @@ class ConfigValidator:
         """Validate settings.json against schema."""
         settings_path = self.claude_dir / "settings.json"
         return self._validate_json_file(settings_path, SETTINGS_SCHEMA)
-
-    def validate_cd_context(self) -> ValidationResult:
-        """Validate cd-context.json against schema."""
-        cd_context_path = self.claude_dir / "cd-context.json"
-        return self._validate_json_file(cd_context_path, CD_CONTEXT_SCHEMA)
 
     def _validate_json_file(
         self, file_path: Path, schema: Mapping[str, Any]
@@ -723,7 +691,7 @@ jobs:
           uv run python -c "
           import json
           from pathlib import Path
-          for f in ['settings.json', 'cd-context.json']:
+          for f in ['settings.json']:
               p = Path('../' + f)
               if p.exists():
                   json.load(open(p))
