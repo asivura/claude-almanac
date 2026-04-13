@@ -167,8 +167,16 @@ When invoked:
 model: sonnet        # High capability
 model: opus          # Maximum capability
 model: haiku         # Fast and cheap
-model: inherit       # Same as parent
+model: claude-opus-4-6  # Full model ID
+model: inherit       # Same as parent (default)
 ```
+
+When a subagent is invoked, the model is resolved in this order (highest priority first):
+
+1. `CLAUDE_CODE_SUBAGENT_MODEL` environment variable
+1. Per-invocation `model` parameter on the Agent tool call
+1. Agent definition's `model` frontmatter
+1. Parent session's model (inheritance)
 
 ### Using Hooks with Agents
 
