@@ -262,7 +262,7 @@ Each task has an 8-character ID. A session can hold up to 50 scheduled tasks.
 
 ### Seven-Day Expiry
 
-Recurring tasks automatically expire 7 days after creation. The task fires one final time, then deletes itself. This bounds how long a forgotten loop can run. Cancel and recreate before expiry if needed, or use Cloud/Desktop tasks for durable scheduling.
+Recurring tasks automatically expire 7 days after creation. The task fires one final time, then deletes itself. This bounds how long a forgotten loop can run. Cancel and recreate before expiry if needed, or use Routines or Desktop tasks for durable scheduling.
 
 ### Disabling Session Scheduling
 
@@ -270,7 +270,7 @@ Set `CLAUDE_CODE_DISABLE_CRON=1` to disable the scheduler entirely. The cron too
 
 ## Cron Expression Reference
 
-`CronCreate` and cloud tasks accept standard 5-field cron expressions: `minute hour day-of-month month day-of-week`.
+`CronCreate` and Routines accept standard 5-field cron expressions: `minute hour day-of-month month day-of-week`.
 
 | Example        | Meaning                      |
 | -------------- | ---------------------------- |
