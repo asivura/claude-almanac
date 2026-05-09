@@ -209,6 +209,8 @@ The agentic loop, tools, and capabilities are the same everywhere. What changes 
 | **Remote**         | Anthropic-managed VMs                   | Offload tasks, work on repos you don't have locally |
 | **Remote Control** | Your machine, controlled from a browser | Use the web UI while keeping everything local       |
 
+**Remote** and **Remote Control** are distinct: the first describes *where* Claude runs (on Anthropic-managed VMs), the second is a *surface* for driving a local session from another device. See [Remote Control](./remote-control.md).
+
 And the interfaces:
 
 - Terminal (CLI)
