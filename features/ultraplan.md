@@ -1,6 +1,6 @@
 ---
 title: Ultraplan
-description: Draft a plan on the web in plan mode, then execute it in the cloud or send it back to the terminal.
+description: Draft a plan on the web in plan mode, then execute it on Remote or send it back to the terminal.
 category: workflows
 ---
 
@@ -8,7 +8,7 @@ category: workflows
 
 > **Status**: Research preview. Requires a Claude Code on the web account and a GitHub repository.
 
-Start a plan from your local CLI, draft and review it on Claude Code on the web in plan mode, then execute it in the cloud or send it back to your terminal.
+Start a plan from your local CLI, draft and review it on Claude Code on the web in plan mode, then execute it on Remote or send it back to your terminal.
 
 ## Why Ultraplan
 
@@ -22,7 +22,7 @@ Ultraplan is useful when the terminal isn't enough for plan review:
 
 - Claude Code on the web account
 - GitHub repository
-- The cloud session runs in your account's default cloud environment
+- The Remote session runs in your account's default Remote environment
 
 ## Launch Ultraplan
 
@@ -54,7 +54,7 @@ After launch, your CLI prompt shows a status indicator while the remote session 
 | `ultraplan needs your input` | Claude has a clarifying question; open the session link to respond |
 | `ultraplan ready`            | The plan is ready to review in your browser                        |
 
-Run `/tasks` and select the ultraplan entry to open a detail view with the session link, agent activity, and a **Stop ultraplan** action. Stopping archives the cloud session and clears the indicator.
+Run `/tasks` and select the ultraplan entry to open a detail view with the session link, agent activity, and a **Stop ultraplan** action. Stopping archives the Remote session and clears the indicator.
 
 ## Review and Revise
 
@@ -72,7 +72,7 @@ When the plan looks right, choose from the browser:
 
 ### Execute on the Web
 
-Select **Approve Claude's plan and start coding** in your browser. Claude implements the plan in the same cloud session. Your terminal shows a confirmation, the status indicator clears, and work continues in the cloud. When finished, review the diff and create a PR from the web interface.
+Select **Approve Claude's plan and start coding** in your browser. Claude implements the plan in the same Remote session. Your terminal shows a confirmation, the status indicator clears, and work continues on Remote. When finished, review the diff and create a PR from the web interface.
 
 ### Send Back to Terminal
 

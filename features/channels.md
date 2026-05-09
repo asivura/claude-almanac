@@ -302,7 +302,7 @@ When set, this replaces the Anthropic allowlist entirely. An empty array blocks 
 
 | Feature                | What It Does                                           | Good For                                          |
 | ---------------------- | ------------------------------------------------------ | ------------------------------------------------- |
-| **Claude Code on web** | Fresh cloud sandbox cloned from GitHub                 | Delegating self-contained async work              |
+| **Claude Code on web** | Fresh Remote sandbox cloned from GitHub                | Delegating self-contained async work              |
 | **Claude in Slack**    | Spawns web session from `@Claude` mention              | Starting tasks from team conversation context     |
 | **Standard MCP**       | Claude queries on demand; nothing pushed               | Giving Claude read/query access to a system       |
 | **Remote Control**     | Drive local session from claude.ai or mobile app       | Steering in-progress session while away from desk |
