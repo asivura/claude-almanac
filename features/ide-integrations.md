@@ -13,7 +13,7 @@ Claude Code integrates with multiple IDEs, editors, and surfaces to provide AI-a
 | [VS Code Extension](#vscode-extension)            | IDE extension     | Stable           |
 | [JetBrains Plugin](#jetbrains-ide-integration)    | IDE plugin        | Beta             |
 | [Desktop App](#desktop-app)                       | Native app        | Stable           |
-| [Claude Code on the Web](#claude-code-on-the-web) | Cloud             | Research preview |
+| [Claude Code on the Web](#claude-code-on-the-web) | Remote            | Research preview |
 | [Chrome Integration](#chromebrowser-integration)  | Browser extension | Beta             |
 | [CLI](#terminal-keyboard-shortcuts)               | Terminal          | Stable           |
 
@@ -217,7 +217,7 @@ Download from [claude.com/download](https://claude.com/download). Available on m
 - **Dispatch integration**: Send tasks from your phone, get a session on Desktop
 - **Scheduled tasks**: Run Claude on a recurring schedule
 - **Connectors**: GitHub, Slack, Linear, and more
-- **Multiple environments**: Local, SSH, and cloud (remote)
+- **Multiple environments**: Local, SSH, and Remote
 
 ### Permission Modes
 
@@ -260,7 +260,7 @@ Computer use lets Claude open apps, control your screen, and interact with GUIs.
 
 > **Status**: Research preview.
 
-Claude Code on the web lets developers run Claude Code tasks asynchronously on secure Anthropic-managed cloud infrastructure, accessible from [claude.ai/code](https://claude.ai/code) and the Claude mobile app (iOS/Android).
+Claude Code on the Web is the browser-and-mobile client for the Remote environment (Anthropic-managed VMs). It lets developers run Claude Code tasks asynchronously, accessible from [claude.ai/code](https://claude.ai/code) and the Claude mobile app (iOS/Android).
 
 ### Availability
 
@@ -269,17 +269,17 @@ Claude Code on the web lets developers run Claude Code tasks asynchronously on s
 
 ### Key Features
 
-- **Asynchronous execution**: Start tasks and close your laptop; work continues in the cloud
+- **Asynchronous execution**: Start tasks and close your laptop; work continues on the Remote VM
 - **Diff view**: Review changes file by file with inline commenting before creating PRs
 - **Auto-fix PRs**: Claude watches PRs, automatically fixes CI failures and review comments
-- **Terminal-to-web**: Start cloud sessions from CLI with `claude --remote "task description"`
+- **Terminal-to-web**: Start Remote sessions from CLI with `claude --remote "task description"`
 - **Web-to-terminal**: Pull web sessions to local with `/teleport` or `claude --teleport`
 - **Parallel tasks**: Run multiple `--remote` sessions simultaneously
 - **Scheduled tasks**: Recurring automation (daily PR reviews, dependency audits, CI failure analysis)
 - **Session sharing**: Share sessions with team members (Team/Enterprise) or publicly (Pro/Max)
 - **Mobile access**: Kick off tasks and monitor progress from iOS/Android
 
-### Cloud Environment
+### Remote Environment
 
 Sessions run in isolated Anthropic-managed VMs with:
 
@@ -306,7 +306,7 @@ Three levels:
 # Plan in local terminal
 claude --permission-mode plan
 
-# Execute in cloud
+# Execute on Remote
 claude --remote "Execute the migration plan in docs/migration-plan.md"
 ```
 

@@ -206,7 +206,7 @@ The agentic loop, tools, and capabilities are the same everywhere. What changes 
 | Environment        | Where Code Runs                         | Use Case                                            |
 | ------------------ | --------------------------------------- | --------------------------------------------------- |
 | **Local**          | Your machine                            | Default. Full access to your files and environment  |
-| **Cloud**          | Anthropic-managed VMs                   | Offload tasks, work on repos you don't have locally |
+| **Remote**         | Anthropic-managed VMs                   | Offload tasks, work on repos you don't have locally |
 | **Remote Control** | Your machine, controlled from a browser | Use the web UI while keeping everything local       |
 
 And the interfaces:
