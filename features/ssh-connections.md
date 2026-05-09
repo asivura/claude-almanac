@@ -13,11 +13,11 @@ SSH connections let you run Claude Code on a remote Linux or macOS machine while
 
 SSH is one of three environments you can pick when starting a session in the desktop app's **Code** tab, alongside **Local** and **Remote**:
 
-| Environment | Where Claude runs               | Where files live         |
-| ----------- | ------------------------------- | ------------------------ |
-| Local       | Your machine                    | Your machine             |
-| Remote      | Anthropic-managed cloud VM      | Cloned into the cloud VM |
-| SSH         | A remote machine you connect to | The remote machine       |
+| Environment | Where Claude runs               | Where files live   |
+| ----------- | ------------------------------- | ------------------ |
+| Local       | Your machine                    | Your machine       |
+| Remote      | Anthropic-managed VM            | Cloned into the VM |
+| SSH         | A remote machine you connect to | The remote machine |
 
 When you select an SSH connection, the desktop app opens an SSH session to the host, installs Claude Code on the remote machine the first time you connect, and starts a session that runs entirely on that host. Your prompts, diffs, and approvals flow through the SSH connection back to the desktop UI.
 
