@@ -347,7 +347,7 @@ The sandbox isolates Bash subprocesses. Other tools have different boundaries:
 
 ### Security Benefits
 
-- Isolated virtual machines per session
+- Isolated Docker container per project, providing a consistent environment across the team
 - Custom firewall restricting network
 - Enhanced isolation for `--dangerously-skip-permissions`
 - Default-deny network policy
