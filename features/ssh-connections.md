@@ -25,15 +25,17 @@ Sessions in the SSH environment behave like local sessions in most ways. They su
 
 ## Requirements
 
-| Side          | Requirement                                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Client OS     | Claude Desktop on macOS or Windows. The desktop app is not available on Linux.                                      |
-| Plan          | Pro, Max, Team, or Enterprise subscription. The Code tab is gated by a paid plan.                                   |
-| Remote OS     | Linux or macOS. Windows hosts are not supported as SSH targets.                                                     |
-| Remote access | A working SSH login: a host you can reach with `ssh user@host`, optionally pre-configured in `~/.ssh/config`.       |
-| Remote tools  | None up front. The desktop app installs Claude Code on the remote machine automatically the first time you connect. |
+| Side                | Requirement                                                                                                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client OS           | Claude Desktop on macOS or Windows. The desktop app is not available on Linux.                                                                                                                                                              |
+| Plan                | Pro, Max, Team, or Enterprise subscription. The Code tab is gated by a paid plan.                                                                                                                                                           |
+| Remote OS           | Linux or macOS. Windows hosts are not supported as SSH targets.                                                                                                                                                                             |
+| Remote access       | A working SSH login: a host you can reach with `ssh user@host`, optionally pre-configured in `~/.ssh/config`.                                                                                                                               |
+| Remote tools        | None up front. The desktop app installs Claude Code on the remote machine automatically the first time you connect.                                                                                                                         |
+| Client network      | Outbound SSH (port 22 or your configured port) to the remote host. The desktop app's claude.ai sign-in needs reachability to Anthropic's API endpoints.                                                                                     |
+| Remote host network | Outbound HTTPS to Anthropic's API endpoints from the remote machine, since the remote `claude` process makes the model API calls. Whether the desktop app honors `HTTPS_PROXY` and `NO_PROXY` on either leg is not documented by Anthropic. |
 
-The remote machine does not need a pre-installed Claude Code, a claude.ai login, or its own subscription. The session inherits authentication from the desktop app.
+The remote machine does not need a pre-installed Claude Code, a claude.ai login, or its own subscription. Claude authenticates to Anthropic's API through the desktop app's existing claude.ai sign-in; no separate authentication is required on the remote host.
 
 ## Adding a connection
 
@@ -54,13 +56,15 @@ SSH Host: dev-vm
 
 Once added, the connection appears in the environment dropdown alongside **Local** and **Remote**. Select it to start a session on that machine.
 
-User-added connections are saved to `~/.claude/settings.json` under the `sshConfigs` key (see [Pre-configuring connections](#pre-configuring-connections-for-a-team) for the schema).
+User-added connections are saved to `~/.claude/settings.json` under the `sshConfigs` key (see [Pre-configuring connections](#pre-configuring-connections-for-a-team) for the schema). To rename or remove a saved connection, edit that file directly; the desktop app does not currently expose UI affordances for editing existing entries.
 
 ## Connecting and running a session
 
 After picking an SSH connection from the environment dropdown, choose a project folder on the remote machine, pick a model, choose a permission mode, and send your first prompt. The session shows up in the sidebar like any other session. The desktop app handles SSH transport in the background.
 
-On the first connection to a new host, the desktop app installs Claude Code on the remote machine. Subsequent sessions to the same host reuse that installation.
+You can have multiple SSH sessions to the same or different hosts open concurrently; each appears as its own entry in the sidebar. Whether the desktop app honors `ControlMaster` / `ControlPath` for SSH connection multiplexing is not documented.
+
+On the first connection to a new host, the desktop app installs Claude Code on the remote machine. Subsequent sessions to the same host reuse that installation. Anthropic does not currently document the install path, disk footprint, runtime dependencies, or update behavior of the auto-installed remote binary, nor an uninstall command. Until this is published, treat first-connect to a host as installing an unspecified Anthropic-distributed binary under the SSH user's account.
 
 Within an SSH session you can:
 
@@ -71,13 +75,17 @@ Within an SSH session you can:
 - Install and manage plugins
 - Open a side chat with `Cmd+;` (macOS) or `Ctrl+;` (Windows)
 
+Behavior when the SSH transport drops mid-session, when the laptop sleeps, when networks switch, or when the desktop app's claude.ai sign-in expires is not currently documented by Anthropic. In-flight tool calls, partially-applied diffs, and remote `claude` process lifecycle on reconnect are similarly unspecified.
+
 The integrated terminal pane is available in local sessions only; for shell access on the remote host, use a separate terminal with `ssh`. The **Continue in → Claude Code on the Web** option is also unavailable for SSH sessions.
 
 ## Authentication and security
 
-The desktop app uses your operating system's SSH client semantics. Hostnames, port mappings, identity files, `ProxyCommand`, and `ProxyJump` entries from `~/.ssh/config` all apply, and `Host` aliases work as the **SSH Host** value. Internally, host resolution uses `ssh -G` so the same configuration your terminal sees is what the desktop app sees.
+The desktop app uses your operating system's SSH client semantics. Hostnames, port mappings, identity files, `ProxyCommand`, and `ProxyJump` entries from `~/.ssh/config` all apply, and `Host` aliases work as the **SSH Host** value. Allowlist matching uses `ssh -G` to resolve the configured host through `~/.ssh/config` before pattern checks. Anthropic does not document whether the underlying SSH transport is the system `ssh` binary or a bundled implementation, so behavior of less-common SSH config directives may differ from your terminal.
 
 User-added SSH connection metadata (name, host, port, identity file path) is persisted in `~/.claude/settings.json`. Claude itself authenticates to Anthropic's API through the desktop app's existing claude.ai sign-in; no separate authentication is required on the remote host.
+
+Anthropic does not currently document where the session credential lives on the remote host during an SSH session, its lifetime, or its cleanup behavior on disconnect. Treat the remote host as having full ability to use your Claude session for the duration of the session, and avoid SSH connections to multi-tenant or untrusted hosts until this behavior is documented.
 
 For organizations with stricter requirements, see the managed settings options below.
 
@@ -136,18 +144,22 @@ Important constraints:
 - Only the Claude Desktop app honors this setting. The Claude Code CLI, IDE extensions, and any `ssh` invocations from the Bash tool are not restricted by it.
 - It governs which hosts the desktop app initiates SSH sessions to, not network egress. Pair it with your organization's network or zero-trust controls if you need a hard boundary.
 
+`sshHostAllowlist` does not restrict `ProxyCommand` execution. A user who controls their own `~/.ssh/config` can route a connection to an allowlisted `HostName` through an arbitrary `ProxyCommand`. Treat `sshHostAllowlist` as a UI guardrail for the desktop app, not a network containment boundary. Enforcement also assumes the managed settings file is owned by an administrator and not writable by the user; distribute it via MDM (or equivalent) and verify file permissions on each managed machine.
+
 ## Comparison with Remote Control
 
 SSH connections and [Remote Control](./remote-control.md) both involve "running Claude on one machine and using it from another", but they solve different problems and run in opposite directions.
 
-| Dimension             | SSH connections                                 | Remote Control                                                    |
-| --------------------- | ----------------------------------------------- | ----------------------------------------------------------------- |
-| Where Claude executes | Remote host (Linux or macOS)                    | Your local terminal session                                       |
-| Client surface        | Claude Desktop app on macOS or Windows          | claude.ai/code in any browser, or the Claude mobile app           |
-| Transport             | Direct SSH from your client to the host         | TLS bridge through Anthropic's servers                            |
-| Primary use           | Develop on cloud VMs, dev boxes, dev containers | Drive a local terminal session from your phone, tablet, or laptop |
-| Auth                  | OS SSH client and your keys                     | claude.ai OAuth (no API keys, Vertex, Bedrock, or Foundry)        |
-| Required admin action | None for personal use; managed settings for IT  | Off by default for Team and Enterprise; admin must enable         |
+| Dimension                      | SSH connections                                                | Remote Control                                                               |
+| ------------------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Where Claude executes          | Remote host (Linux or macOS)                                   | Your local terminal session                                                  |
+| Client surface                 | Claude Desktop app on macOS or Windows                         | claude.ai/code in any browser, or the Claude mobile app                      |
+| Client OS support              | macOS or Windows only (no Linux desktop app)                   | Any browser, including Linux; mobile app on iOS and Android                  |
+| Transport                      | Direct SSH from your client to the host                        | TLS bridge through Anthropic's servers                                       |
+| Concurrency / session lifetime | Many parallel sessions per host, each in its own sidebar entry | One remote per process; use server mode with `--spawn` for multiple sessions |
+| Primary use                    | Develop on cloud VMs, dev boxes, dev containers                | Drive a local terminal session from your phone, tablet, or any browser       |
+| Auth                           | OS SSH client and your keys                                    | claude.ai OAuth (no API keys, Vertex, Bedrock, or Foundry)                   |
+| Required admin action          | None for personal use; managed settings for IT                 | Off by default for Team and Enterprise; admin must enable                    |
 
 If you need to drive a long-running terminal session from a phone, use Remote Control. If your code, build tools, and data live on a remote host and you want to develop against them with a graphical client, use an SSH connection.
 

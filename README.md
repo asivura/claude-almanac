@@ -414,6 +414,29 @@ claude remote-control
 
 ______________________________________________________________________
 
+### SSH Connections
+
+[features/ssh-connections.md](./features/ssh-connections.md)
+
+**Purpose**: Run Claude Code on a remote Linux or macOS machine while using the Claude Desktop app on your laptop as the client interface. Distinct from Remote Control: with SSH connections Claude executes on the remote, not locally.
+
+**Key Capabilities**:
+
+- Connect to any reachable Linux or macOS host over SSH from the desktop app's Code tab
+- Honors `~/.ssh/config` (host aliases, `ProxyJump`, `ProxyCommand`, identity files)
+- Auto-installs Claude Code on the remote on first connect
+- Pre-configurable for teams via managed settings (`sshConfigs`)
+- Restrict-able via `sshHostAllowlist` (Desktop UI guardrail; not a network boundary)
+
+**Quick Start**:
+
+1. Open the **Code** tab in the Claude Desktop app
+1. Click **+ Add SSH connection** in the environment dropdown
+1. Provide a Name and SSH Host (`user@hostname` or an alias from `~/.ssh/config`)
+1. Pick the new connection from the dropdown and start a session
+
+______________________________________________________________________
+
 ### Headless Mode and Agent SDK
 
 **Purpose**: Run Claude Code programmatically for scripting, custom agents, and automation.
