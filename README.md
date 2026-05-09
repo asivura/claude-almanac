@@ -23,6 +23,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Rules](./features/rules.md)                                 | Modular memory files   | Path-conditional guidelines, organized by topic             |
 | [GitHub Actions](./features/github-actions.md)               | CI/CD integration      | PR review, issue-to-PR, automated workflows                 |
 | [Remote Control](./features/remote-control.md)               | Mobile/web access      | Control terminal sessions from phone, tablet, or browser    |
+| [SSH Connections](./features/ssh-connections.md)             | Remote machines        | Run Claude on a remote Linux or macOS host via Desktop      |
 | [Headless/SDK](./features/headless-sdk.md)                   | Programmatic usage     | CLI automation, custom agents, scripting                    |
 | [Plugins](./features/plugins.md)                             | Shareable packages     | Distribute tools, LSP servers, team standardization         |
 | [Auto Mode](./features/auto-mode.md)                         | Permission automation  | Reduce permission prompts with AI-powered safety checks     |
