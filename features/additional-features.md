@@ -320,7 +320,7 @@ Native desktop app with GUI.
 
 ______________________________________________________________________
 
-## Remote Development
+## Isolated Environments
 
 ### DevContainers
 

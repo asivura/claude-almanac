@@ -46,7 +46,7 @@ If Remote Control is active, it disconnects when ultraplan starts (both features
 
 ## Status Indicators
 
-After launch, your CLI prompt shows a status indicator while the remote session works:
+After launch, your CLI prompt shows a status indicator while the Remote session works:
 
 | Status                       | Meaning                                                            |
 | ---------------------------- | ------------------------------------------------------------------ |
