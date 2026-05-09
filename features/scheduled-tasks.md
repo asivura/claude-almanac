@@ -1,6 +1,6 @@
 ---
 title: Scheduled Tasks
-description: 'Three ways to schedule recurring Claude Code work: cloud, desktop app, and the /loop CLI command.'
+description: 'Three ways to schedule recurring Claude Code work: Routines (cloud), desktop app, and the /loop CLI command.'
 category: ci-cd
 ---
 
@@ -10,7 +10,7 @@ Claude Code offers three ways to schedule recurring work, each suited to differe
 
 ## Scheduling Options Comparison
 
-|                            | Cloud                          | Desktop                     | `/loop` (CLI)         |
+|                            | Routines (cloud)               | Desktop                     | `/loop` (CLI)         |
 | -------------------------- | ------------------------------ | --------------------------- | --------------------- |
 | Runs on                    | Anthropic cloud                | Your machine                | Your machine          |
 | Requires machine on        | No                             | Yes                         | Yes                   |
@@ -24,43 +24,55 @@ Claude Code offers three ways to schedule recurring work, each suited to differe
 
 **When to use which:**
 
-- **Cloud tasks**: Work that should run reliably without your machine (daily PR reviews, overnight CI analysis)
+- **Routines**: Work that should run reliably without your machine (daily PR reviews, overnight CI analysis), or that needs to react to API calls or GitHub events
 - **Desktop tasks**: Need access to local files and tools (code reviews against your working directory)
 - **`/loop`**: Quick polling during a session (watching a deployment, babysitting a PR)
 
-## Cloud Scheduled Tasks
+## Routines (Cloud)
 
-Cloud scheduled tasks run on Anthropic-managed infrastructure. They keep working even when your computer is off.
+Routines run on Anthropic-managed infrastructure. They keep working even when your computer is off. A routine is a saved Claude Code configuration (prompt, repositories, connectors, environment) packaged once and run automatically by one or more triggers.
+
+> Anthropic rebranded this product from "Cloud Scheduled Tasks" to **Routines** in 2026. The old `web-scheduled-tasks` doc URL now redirects to `/en/routines`. Routines are in research preview, so behavior, limits, and the API surface may change.
 
 ### Availability
 
-Pro, Max, Team, and Enterprise users.
+Pro, Max, Team, and Enterprise users with [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web) enabled. Team and Enterprise admins can disable routines org-wide via the **Routines** toggle in admin settings.
 
-### Creating Cloud Tasks
+### Trigger Types
 
-Create from three places:
+A routine can have one or more triggers attached. Multiple triggers can be combined on a single routine.
 
-- **Web**: Visit [claude.ai/code/scheduled](https://claude.ai/code/scheduled) and click **New scheduled task**
-- **Desktop**: Open the **Schedule** page, click **New task**, choose **New remote task**
-- **CLI**: Run `/schedule` in any session. Claude walks through setup conversationally. You can also pass a description: `/schedule daily PR review at 9am`
+| Trigger      | Fires when                                                                   |
+| ------------ | ---------------------------------------------------------------------------- |
+| **Schedule** | Recurring cadence (hourly, daily, weekdays, weekly) or once at a future time |
+| **API**      | An authenticated POST to a per-routine `/fire` endpoint                      |
+| **GitHub**   | A matching repository event (pull request or release actions)                |
+
+### Creating a Routine
+
+Create from three places. All three surfaces write to the same cloud account, so a routine you create in one shows up in the others immediately.
+
+- **Web**: Visit [claude.ai/code/routines](https://claude.ai/code/routines) and click **New routine**
+- **Desktop**: Click **Routines** in the sidebar, click **New routine**, choose **Remote** (choosing **Local** instead creates a Desktop scheduled task)
+- **CLI**: Run `/schedule` in any session. Claude walks through setup conversationally. You can also pass a description: `/schedule daily PR review at 9am`. The CLI creates scheduled-trigger routines only; add API or GitHub triggers from the web.
 
 ### Configuration
 
 | Field        | Description                                                              |
 | ------------ | ------------------------------------------------------------------------ |
-| Name         | Descriptive identifier for the task                                      |
+| Name         | Descriptive identifier for the routine                                   |
 | Prompt       | Instructions sent to Claude each run (must be self-contained)            |
 | Model        | Model used for each run                                                  |
 | Repositories | GitHub repositories to clone (starts from default branch each run)       |
 | Environment  | Cloud environment (network access, env vars, setup script)               |
-| Schedule     | Frequency: Hourly, Daily, Weekdays, or Weekly                            |
+| Triggers     | One or more of: Schedule, API, GitHub event                              |
 | Connectors   | MCP connectors for external services (Slack, Linear, Google Drive, etc.) |
 
 ### Branch Permissions
 
 By default, Claude can only push to branches prefixed with `claude/`. Enable **Allow unrestricted branch pushes** per repository to remove this restriction.
 
-### Frequency Options
+### Schedule Trigger Options
 
 | Frequency | Description                                      |
 | --------- | ------------------------------------------------ |
@@ -68,22 +80,56 @@ By default, Claude can only push to branches prefixed with `claude/`. Enable **A
 | Daily     | Once per day at specified time (default 9:00 AM) |
 | Weekdays  | Same as Daily but skips Saturday and Sunday      |
 | Weekly    | Once per week on specified day and time          |
+| One-off   | Single fire at a specific future timestamp       |
 
 For custom intervals (every 2 hours, first of each month), pick the closest preset and update from CLI with `/schedule update` to set a specific cron expression. Minimum interval is 1 hour.
 
-Tasks may run a few minutes after their scheduled time. The offset is consistent per task.
+Times are entered in your local zone and converted automatically. Runs may start a few minutes after the scheduled time due to stagger; the offset is consistent per routine.
 
-### Managing Cloud Tasks
+One-off runs auto-disable after firing and do not count against the daily routine run cap.
 
-From the task detail page:
+### API Trigger
 
-- **Run now**: Trigger immediately without waiting for schedule
+An API trigger gives a routine a dedicated HTTP endpoint. POSTing to the endpoint with the routine's bearer token starts a new session and returns a session URL. Useful for wiring Claude Code into alerting systems, deploy pipelines, or any tool that can make an authenticated HTTP request.
+
+API triggers are added from the web only; the CLI cannot create or revoke tokens. The endpoint requires the `experimental-cc-routine-2026-04-01` beta header during research preview.
+
+```bash
+curl -X POST https://api.anthropic.com/v1/claude_code/routines/trig_<id>/fire \
+  -H "Authorization: Bearer sk-ant-oat01-xxxxx" \
+  -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Sentry alert SEN-4521 fired in prod."}'
+```
+
+The optional `text` field is freeform per-run context passed to the routine alongside its saved prompt. Each routine has its own token, scoped to triggering that routine only.
+
+### GitHub Trigger
+
+A GitHub trigger starts a new session automatically when a matching event occurs on a connected repository. Each matching event starts its own session.
+
+- **Supported events**: Pull request (opened, closed, assigned, labeled, synchronized, etc.) and Release (created, published, edited, deleted)
+- **Filters**: Author, title, body, base branch, head branch, labels, draft state, merged state. Operators: equals, contains, starts with, is one of, is not one of, matches regex
+- **Setup**: Requires the Claude GitHub App installed on the target repository. `/web-setup` grants clone access but does NOT install the GitHub App; the trigger setup flow prompts for it.
+
+GitHub triggers are configured from the web UI only.
+
+### Managing Routines
+
+From the routine detail page:
+
+- **Run now**: Trigger immediately without waiting for the next scheduled time
 - **Toggle repeats**: Pause/resume without deleting
-- **Edit**: Change prompt, schedule, repositories, environment, or connectors
+- **Edit**: Change name, prompt, schedule, repositories, environment, connectors, or any of the routine's triggers
 - **View runs**: Each run creates a session where you can review changes and create PRs
-- **Delete**: Remove the task (past sessions remain)
+- **Delete**: Remove the routine (past sessions remain)
 
 CLI management: `/schedule list`, `/schedule update`, `/schedule run`
+
+### Usage and Limits
+
+Routines draw down subscription usage like interactive sessions, plus a per-account daily cap on how many runs can start. One-off runs are exempt from the daily cap. Organizations with extra usage enabled can keep running routines on metered overage when the cap is hit. GitHub webhook events are subject to per-routine and per-account hourly caps during research preview.
 
 ## Desktop Scheduled Tasks
 
@@ -249,8 +295,9 @@ Day-of-week: `0` or `7` for Sunday through `6` for Saturday. Extended syntax (`L
 
 ## Sources
 
-- [Cloud Scheduled Tasks](https://code.claude.com/docs/en/web-scheduled-tasks)
+- [Routines](https://code.claude.com/docs/en/routines) (formerly Cloud Scheduled Tasks; old `web-scheduled-tasks` URL redirects here)
 - [Desktop Scheduled Tasks](https://code.claude.com/docs/en/desktop-scheduled-tasks)
 - [CLI Scheduled Tasks (/loop)](https://code.claude.com/docs/en/scheduled-tasks)
+- [Trigger a routine via API](https://platform.claude.com/docs/en/api/claude-code/routines-fire)
 - [GitHub Actions](https://code.claude.com/docs/en/github-actions)
 - [Channels](https://code.claude.com/docs/en/channels)

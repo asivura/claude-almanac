@@ -30,7 +30,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [Security & Sandbox](./features/security-sandbox.md)         | Isolation and controls | Secure execution, network isolation, enterprise policies    |
 | [Testing](./features/testing.md)                             | Config validation      | Validate settings, skills, schemas in CI/CD                 |
 | [Plans & Pricing](./features/pricing.md)                     | Plan comparison        | Pricing, Claude Code access, feature matrix by plan         |
-| [Scheduled Tasks](./features/scheduled-tasks.md)             | Recurring automation   | Cloud cron jobs, desktop tasks, CLI loops                   |
+| [Scheduled Tasks](./features/scheduled-tasks.md)             | Recurring automation   | Routines (cloud), desktop tasks, CLI loops                  |
 | [Checkpointing](./features/checkpointing.md)                 | Session recovery       | Undo changes, rewind to previous states, explore safely     |
 | [Code Review](./features/code-review.md)                     | Automated PR review    | Multi-agent analysis for bugs, security, regressions        |
 | [Channels](./features/channels.md)                           | Persistent AI threads  | Long-running projects, recurring workflows, team context    |
@@ -577,7 +577,7 @@ ______________________________________________________________________
 
 **Key Capabilities**:
 
-- Cloud tasks (cron) via claude.ai for Team/Enterprise
+- Routines via claude.ai (cloud, schedule/API/GitHub triggers, Pro and above)
 - Desktop tasks via the macOS/Windows app
 - CLI `/loop` command for repeating local tasks
 - CronCreate/CronList/CronDelete tools for programmatic scheduling
