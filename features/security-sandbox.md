@@ -60,7 +60,7 @@ Network access is controlled through a proxy server running outside the sandbox.
 ![Git Integration Proxy](../resources/images/git-integration-proxy.png)
 *Source: [Beyond permission prompts: making Claude Code more secure and autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing)*
 
-### Cloud Environment
+### Network Access Levels
 
 Three access levels:
 
