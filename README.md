@@ -38,7 +38,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [GitLab CI/CD](./features/gitlab-cicd.md)                    | GitLab pipelines       | MR automation, @claude mentions, Bedrock/Vertex auth        |
 | [Voice Dictation](./features/voice-dictation.md)             | Speech input           | Speak prompts instead of typing, coding vocabulary          |
 | [Computer Use](./features/computer-use.md)                   | GUI automation         | Native app testing, visual debugging, simulator control     |
-| [Ultraplan](./features/ultraplan.md)                         | Cloud planning         | Draft plans on the web, review in browser, execute anywhere |
+| [Ultraplan](./features/ultraplan.md)                         | Remote planning        | Draft plans on the web, review in browser, execute anywhere |
 | [Additional Features](./features/additional-features.md)     | Advanced capabilities  | Git worktrees, images, sessions, plan mode                  |
 
 ______________________________________________________________________
@@ -743,7 +743,7 @@ ______________________________________________________________________
 
 ### Ultraplan
 
-**Purpose**: Draft plans in the cloud, review in your browser, execute anywhere.
+**Purpose**: Draft plans on Remote, review in your browser, execute anywhere.
 
 **Key Capabilities**:
 
@@ -886,7 +886,7 @@ ______________________________________________________________________
 1. **Using GitLab?** → Set up [GitLab CI/CD](./features/gitlab-cicd.md) for MR automation
 1. **Prefer voice?** → Enable [Voice Dictation](./features/voice-dictation.md) for speech input
 1. **Testing native apps?** → Use [Computer Use](./features/computer-use.md) for GUI automation
-1. **Complex planning?** → Try [Ultraplan](./features/ultraplan.md) for cloud-based plan drafting
+1. **Complex planning?** → Try [Ultraplan](./features/ultraplan.md) for plan drafting on Remote
 1. **Advanced features?** → Explore [Additional Features](./features/additional-features.md)
 
 ______________________________________________________________________
