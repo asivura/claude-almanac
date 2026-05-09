@@ -173,7 +173,7 @@ If you need to drive a long-running terminal session from a phone, use Remote Co
 - **Linux clients cannot use this feature**, since the desktop app is not available on Linux. CLI users on Linux can still `ssh` to a remote host and run `claude` there.
 - **No integrated terminal pane in SSH sessions.** Use a separate terminal with `ssh` for shell access on the remote host.
 - **No "Continue in → Claude Code on the Web"** for SSH sessions. That handoff is available for local sessions only and requires a clean working tree.
-- **`@mention` and the file pane** are available in local and SSH sessions, but not in cloud Remote sessions.
+- **`@mention` and the file pane** are available in local and SSH sessions, but not in Remote sessions.
 - **`sshHostAllowlist` only applies to the desktop app.** It does not restrict the CLI, IDE extensions, or `ssh` calls from Claude's Bash tool.
 
 ## Sources

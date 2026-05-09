@@ -313,7 +313,7 @@ Native desktop app with GUI.
 
 - Multiple isolated coding sessions
 - Built-in Git worktree support
-- Launch local or cloud sessions
+- Launch Local or Remote sessions
 - Browser control integration
 
 [Documentation](https://code.claude.com/docs/en/desktop)
