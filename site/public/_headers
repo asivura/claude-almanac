@@ -1,10 +1,18 @@
-/*
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' static.cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+# Long cache for hashed Next.js static assets (JS/CSS/fonts/media).
+# Filenames include content hashes, so cached entries never become stale.
+# More-specific rules go first so they win over the catch-all /* below.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Long cache for copied content images. Filenames mirror the source files
+# in resources/images; replacement happens via filename change in PRs.
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Long cache for per-page OG images. Path is keyed by doc slug; content
+# rotates only when the slug changes.
+/og/docs/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /llms.txt
   Access-Control-Allow-Origin: *
@@ -20,3 +28,15 @@
 
 /*.md
   X-Robots-Tag: noindex, nofollow
+
+# Global defaults: security headers plus short browser cache / longer edge
+# cache so the CDN absorbs traffic spikes while letting publishes propagate
+# fast. Asset-specific rules above override Cache-Control for hashed paths.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' static.cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Cache-Control: public, max-age=300, s-maxage=3600

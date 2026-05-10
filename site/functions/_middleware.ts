@@ -204,6 +204,10 @@ function getTokenCount(response: Response): number | null {
   return isNaN(n) ? null : n;
 }
 
+// Canonical host. *.pages.dev hits are redirected here so search engines,
+// bots, and humans converge on one origin.
+const CANONICAL_HOST = 'claude-almanac.sivura.com';
+
 export const onRequest: PagesFunction = async ({
   request,
   next,
@@ -214,6 +218,18 @@ export const onRequest: PagesFunction = async ({
   const accept = request.headers.get('Accept') ?? '';
   const url = new URL(request.url);
   const path = url.pathname;
+
+  // Redirect *.pages.dev hits to the canonical custom domain. Must run
+  // before the static sub-resource fast-path so even JS/CSS/image hits
+  // to pages.dev get redirected.
+  if (url.hostname.endsWith('.pages.dev')) {
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: `https://${CANONICAL_HOST}${url.pathname}${url.search}`,
+      },
+    });
+  }
 
   // Fast path: static sub-resources (JS, CSS, fonts, images, Next.js RSC
   // .txt segments) bypass every middleware branch. Re-wrapping these
