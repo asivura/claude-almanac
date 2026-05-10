@@ -29,9 +29,17 @@
 /*.md
   X-Robots-Tag: noindex, nofollow
 
-# Global defaults: security headers plus short browser cache / longer edge
-# cache so the CDN absorbs traffic spikes while letting publishes propagate
-# fast. Asset-specific rules above override Cache-Control for hashed paths.
+# HTML doc pages: short browser cache, longer edge cache so the CDN absorbs
+# traffic spikes while letting publishes propagate fast. Scoped to /docs/* so
+# it does not collide with the immutable static-asset rules above. CF Pages
+# _headers rules are layered (not first-match), and multiple matching rules
+# would otherwise get comma-joined into a single malformed header.
+/docs/*
+  Cache-Control: public, max-age=300, s-maxage=3600
+
+# Global defaults: security headers only. Cache-Control is set per-path above
+# (immutable for hashed assets, short for /docs/*) to avoid layered headers
+# producing a malformed comma-joined Cache-Control on matching paths.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -39,4 +47,3 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' static.cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
-  Cache-Control: public, max-age=300, s-maxage=3600
