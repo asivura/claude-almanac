@@ -243,8 +243,11 @@ export const onRequest: PagesFunction = async ({
     // we can advertise it via a Link header (RFC 8288). Agents that parse
     // Link headers can discover the markdown variant without prior
     // knowledge of llms.txt or content negotiation.
+    //
+    // Only emit the Link on 200 responses. Pointing agents at a markdown
+    // alternate from a 404 or 5xx upstream is misleading.
     let markdownAlternate: string | null = null;
-    if (path.startsWith('/docs/')) {
+    if (path.startsWith('/docs/') && response.status === 200) {
       const slug = path.replace(/^\/docs\/?/, '').replace(/\/$/, '');
       if (slug && /^[a-z0-9-]+$/.test(slug)) {
         markdownAlternate = `/llms.mdx/docs/${slug}/content.md`;
