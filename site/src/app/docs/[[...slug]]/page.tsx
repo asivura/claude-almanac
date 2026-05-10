@@ -144,8 +144,14 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
     // that parse HTML but don't inspect response headers can discover
     // the markdown variant. Mirrors the Link header set by the Pages
     // middleware on HTML responses.
+    //
+    // Next.js mergeMetadata replaces alternates wholesale rather than
+    // deep-merging types, so the atom feed alternate from layout.tsx
+    // (the source of truth) must be re-declared here to survive on
+    // /docs/<slug> pages.
     alternates: {
       types: {
+        'application/atom+xml': '/feed.xml',
         'text/markdown': getPageMarkdownUrl(page).url,
       },
     },

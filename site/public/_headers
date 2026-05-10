@@ -8,9 +8,15 @@
 
 /llms.txt
   Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex, nofollow
 
 /llms-full.txt
   Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex, nofollow
 
 /llms.mdx/*
   Access-Control-Allow-Origin: *
+  X-Robots-Tag: noindex, nofollow
+
+/*.md
+  X-Robots-Tag: noindex, nofollow
