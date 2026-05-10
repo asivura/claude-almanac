@@ -149,6 +149,10 @@ function markdownResponse(
     'Content-Type': 'text/markdown; charset=utf-8',
     'X-Markdown-Tokens': estimatedTokens.toString(),
     Vary: 'Accept',
+    // Prevent search engines from indexing the markdown variant. The HTML
+    // version is canonical; markdown is served only for content negotiation
+    // and would otherwise create duplicate-content noise.
+    'X-Robots-Tag': 'noindex, nofollow',
   };
   if (extraCache) {
     // Only cache successful content — errors should stay fresh.
@@ -235,18 +239,40 @@ export const onRequest: PagesFunction = async ({
       trackRequest(env, request, path, 'html', elapsed, response.status, null),
     );
 
-    // Set device_id cookie on HTML responses if not already present.
-    // Build a fresh Headers object from response.headers instead of passing
-    // the upstream Response as the init — the init-object form aliases the
-    // headers, and mutating shared headers on a streaming response is what
-    // triggered the Safari sub-resource failure above.
-    if (!getDeviceIdCookie(request)) {
-      const id = crypto.randomUUID();
+    // Compute the markdown alternate URL for /docs/<slug> HTML responses so
+    // we can advertise it via a Link header (RFC 8288). Agents that parse
+    // Link headers can discover the markdown variant without prior
+    // knowledge of llms.txt or content negotiation.
+    let markdownAlternate: string | null = null;
+    if (path.startsWith('/docs/')) {
+      const slug = path.replace(/^\/docs\/?/, '').replace(/\/$/, '');
+      if (slug && /^[a-z0-9-]+$/.test(slug)) {
+        markdownAlternate = `/llms.mdx/docs/${slug}/content.md`;
+      }
+    }
+
+    // Set device_id cookie on HTML responses if not already present, and/or
+    // attach the Link alternate. Build a fresh Headers object from
+    // response.headers instead of passing the upstream Response as the
+    // init: the init-object form aliases the headers, and mutating shared
+    // headers on a streaming response is what triggered the Safari
+    // sub-resource failure above.
+    const needsCookie = !getDeviceIdCookie(request);
+    if (needsCookie || markdownAlternate) {
       const headers = new Headers(response.headers);
-      headers.append(
-        'Set-Cookie',
-        `device_id=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000`,
-      );
+      if (needsCookie) {
+        const id = crypto.randomUUID();
+        headers.append(
+          'Set-Cookie',
+          `device_id=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000`,
+        );
+      }
+      if (markdownAlternate) {
+        headers.append(
+          'Link',
+          `<${markdownAlternate}>; rel="alternate"; type="text/markdown"`,
+        );
+      }
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
