@@ -140,5 +140,14 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
     openGraph: {
       images: getPageImage(page).url,
     },
+    // Advertise the markdown representation in the HTML head so agents
+    // that parse HTML but don't inspect response headers can discover
+    // the markdown variant. Mirrors the Link header set by the Pages
+    // middleware on HTML responses.
+    alternates: {
+      types: {
+        'text/markdown': getPageMarkdownUrl(page).url,
+      },
+    },
   };
 }
