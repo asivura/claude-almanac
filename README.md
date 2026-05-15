@@ -15,6 +15,7 @@ Comprehensive documentation of Claude Code's extensibility features and capabili
 | [MCP Servers](./features/mcp-servers.md)                     | External integrations  | Connect to databases, APIs, third-party tools               |
 | [Agents](./features/agents.md)                               | Specialized subagents  | Delegate complex tasks, isolate context                     |
 | [Agent Teams](./features/agent-teams.md)                     | Multi-agent sessions   | Coordinate parallel work across independent instances       |
+| [Agent View](./features/agent-view.md)                       | Background session TUI | Manage multiple background sessions from one dashboard      |
 | [Skills](./features/skills.md)                               | Custom slash commands  | Create reusable commands and workflows                      |
 | [Settings](./features/settings.md)                           | Configuration options  | Customize behavior, permissions, API                        |
 | [IDE Integrations](./features/ide-integrations.md)           | Editor support         | VSCode, JetBrains, Vim/Neovim, Chrome                       |
@@ -186,6 +187,37 @@ Create an agent team to review PR #142. Spawn three reviewers:
 ```
 
 [Full Documentation →](./features/agent-teams.md)
+
+______________________________________________________________________
+
+### Agent View
+
+**Purpose**: Centralized terminal dashboard for managing multiple Claude Code background sessions.
+
+**Key Capabilities**:
+
+- Unified session list grouped by state (Needs input, Working, Completed)
+- Peek and reply to answer session questions without attaching
+- PR status indicators on each session row
+- Auto-generated one-line summaries per session
+- Automatic git worktree isolation for safe parallel edits
+- Dispatch sessions with custom agents, skills, or repo targets
+
+**Quick Start**:
+
+```bash
+# Open agent view
+claude agents
+
+# Dispatch to background
+claude --bg "refactor the auth module"
+
+# Or press ← from any session to open agent view
+```
+
+**Requirements**: Claude Code v2.1.139+, Pro/Max/Team/Enterprise/API plan.
+
+[Full Documentation →](./features/agent-view.md)
 
 ______________________________________________________________________
 
@@ -795,6 +827,7 @@ ______________________________________________________________________
 | GitLab CI/CD              | https://code.claude.com/docs/en/gitlab-ci-cd                              |
 | Computer Use              | https://code.claude.com/docs/en/computer-use                              |
 | Ultraplan                 | https://code.claude.com/docs/en/ultraplan                                 |
+| Agent View                | https://code.claude.com/docs/en/agent-view                                |
 | Claude Code on the Web    | https://code.claude.com/docs/en/claude-code-on-the-web                    |
 
 ______________________________________________________________________
@@ -807,6 +840,7 @@ ______________________________________________________________________
 | MCP Servers         | High                 | Moderate    | High                | Medium         |
 | Agents              | High                 | Moderate    | High                | Low            |
 | Agent Teams         | High                 | Moderate    | High                | Medium         |
+| Agent View          | Moderate             | High        | High                | None           |
 | Skills              | Moderate             | High        | High                | Low            |
 | Settings            | Low                  | High        | Moderate            | Low            |
 | IDE Integrations    | Moderate             | High        | High                | Low            |
@@ -841,6 +875,7 @@ ______________________________________________________________________
 | MCP Servers     | `.claude/settings.json`   | `claude mcp add`                              |
 | Agents          | `.claude/agents/`         | `/agents`                                     |
 | Agent Teams     | `~/.claude/teams/`        | env: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` |
+| Agent View      | `~/.claude/jobs/`         | `claude agents`                               |
 | Skills          | `.claude/skills/`         | `/skill-name`                                 |
 | Settings        | `.claude/settings.json`   | `/config`                                     |
 | IDE             | Extension settings        | `Cmd+Esc`                                     |
@@ -879,6 +914,7 @@ ______________________________________________________________________
 1. **Running in CI/CD?** → Use [GitHub Actions](./features/github-actions.md) or [Headless Mode](./features/headless-sdk.md)
 1. **Validating configs?** → Set up [Testing](./features/testing.md) for automated validation
 1. **Parallel collaboration?** → Set up [Agent Teams](./features/agent-teams.md) for multi-instance work
+1. **Managing background sessions?** → Open [Agent View](./features/agent-view.md) to dispatch and monitor from one screen
 1. **Sharing with team?** → Create [Plugins](./features/plugins.md) for distribution
 1. **Reducing prompts?** → Enable [Auto Mode](./features/auto-mode.md) for AI-powered safety checks
 1. **Need security?** → Configure [Sandbox](./features/security-sandbox.md) for isolation
