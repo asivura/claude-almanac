@@ -162,7 +162,7 @@ Ghostty launcher (ghostty-claude.sh)
 ## Tips
 
 - **One workspace, many sessions**: you can press Ctrl+Shift+T multiple times to launch separate Claude sessions for different projects. Each gets its own Ghostty window and tmux session.
-- **Project-specific CLAUDE.md**: each project can have its own `CLAUDE.md` with specific conventions. Claude reads the one from the working directory it was launched in.
+- **Project-specific CLAUDE.md**: each project can have its own `CLAUDE.md` with specific conventions. Claude reads the one from the working directory it was launched in. By default, directories in `additionalDirectories` grant file access only — their `CLAUDE.md` files are not loaded. To opt in to loading `CLAUDE.md` and `CLAUDE.local.md` from every additional directory, set `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1` before starting a session. Note that this loads all of them at startup, so for a large `additionalDirectories` list the context cost can be significant — set it per session rather than exporting it globally. See [Memory & Context](../features/memory-context.md) for details.
 - **Global rules via `~/.claude/rules/`**: rules that apply across all projects (commit conventions, personal preferences) go in your global rules directory.
 - **Adding projects**: when you add a new project, update both the `.code-workspace` file and `additionalDirectories` in `settings.json`.
 

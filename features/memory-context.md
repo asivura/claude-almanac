@@ -61,6 +61,22 @@ Claude Code discovers CLAUDE.md files using both **upward** and **downward** tra
 - Prevents context bloat in large monorepos with many packages
 - Ensures you get relevant context without overwhelming the context window
 
+### Loading Memory from Additional Directories
+
+By default, directories added via `--add-dir`, `/add-dir`, or the `additionalDirectories` setting extend Claude Code's **file access** only. Their `CLAUDE.md` and `CLAUDE.local.md` files are not loaded — only the memory files discovered by walking up from the current working directory are included.
+
+Starting in Claude Code **2.1.20**, an opt-in environment variable enables memory loading from additional directories:
+
+```bash
+export CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1
+```
+
+When set, Claude Code loads `CLAUDE.md` and `CLAUDE.local.md` from every directory in the additional directories list at startup, in addition to the cwd upward chain. The variable is opt-in to preserve backward compatibility for users with large `additionalDirectories` lists.
+
+**Trade-off:** all matched memory files are loaded at startup, so the context cost scales with the number of added directories. This works well for a small, curated set of directories (a handful of related repos or a monorepo). Exporting it globally with a large `additionalDirectories` list may consume significant context budget before any conversation begins. Consider setting it per-session rather than in a shell profile.
+
+This environment variable is currently undocumented in the official Claude Code reference pages.
+
 ### Memory Imports
 
 CLAUDE.md files can import other files:
@@ -457,3 +473,5 @@ Official Anthropic guidance and community best practices for CLAUDE.md formattin
 - [Memory Management](https://code.claude.com/docs/en/memory)
 - [Best Practices](https://code.claude.com/docs/en/best-practices)
 - [Context Management](https://code.claude.com/docs/en/interactive-mode)
+- [CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD (GitHub issue #21138)](https://github.com/anthropics/claude-code/issues/21138)
+- [Feature request: load CLAUDE.md from additionalDirectories (GitHub issue #12259)](https://github.com/anthropics/claude-code/issues/12259)
