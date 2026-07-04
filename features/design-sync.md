@@ -1,6 +1,7 @@
 ---
 title: Claude Design Sync
 description: Push a local React design system to claude.ai/design with /design-sync, authorize it with /design-login, and manage Design project access with /design.
+type: reference
 category: integrations
 ---
 
@@ -23,13 +24,13 @@ The `/design*` commands are how Claude Code participates in that loop. `/design-
 | Login         | A `claude.ai` login on the Claude Code session. The design-system OAuth scope is granted separately (see [`/design-login`](#design-login)) |
 | Source        | A React design system on disk, ideally with Storybook or a component package the converter can bundle                                      |
 
-Claude Design's design-system import and two-way `/design-sync` shipped in a June 17, 2026 overhaul.
+Claude Design's design-system import and its two-way sync with Claude Code shipped in a June 17, 2026 overhaul.
 
 ## The `/design*` command family
 
 | Command         | What it does                                                                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/design`       | Grant or revoke Claude agent access to your Design projects. The umbrella command for creating, editing, and syncing Design projects from the terminal    |
+| `/design`       | Grant or revoke Claude agent access to your Design projects. Also the entry point for creating, editing, and syncing Design projects from the terminal    |
 | `/design-sync`  | Push a React design system to `claude.ai/design`. Runs a converter that bundles the real component code (from Storybook or a bare package) and uploads it |
 | `/design-login` | Authorize design-system access for `/design-sync` with your `claude.ai` account                                                                           |
 
@@ -43,18 +44,18 @@ Run it when:
 - The session has no `claude.ai` login to piggyback on (an API-key, headless, or CI session), so there is nothing to attach the scope to.
 - You connected Claude Design as an MCP server (see [Connect as an MCP server](#connect-as-an-mcp-server)) and need to authenticate it.
 
-Once `/design-login` succeeds, the read steps (listing projects and files) run without further prompts. Only the write and plan-boundary steps prompt after that.
+Once `/design-login` succeeds, the read steps (listing projects and files) run without further prompts. Creating a project and the plan-boundary step (`finalize_plan`) still prompt for approval.
 
 ### `/design-sync`
 
 `/design-sync` converts a local React design system into preview and spec files and pushes them to a design-system project on `claude.ai/design`, incrementally, one component at a time, never as a wholesale replace. It leans entirely on your `claude.ai` login and finds the design-system projects you have write permission on, so there is no separate API key or config to manage.
 
-The sync is two-directional:
+Running it serves two roles over the life of a project:
 
-- **Pull**: your system goes up to Claude Design, so every screen the canvas generates uses your real components.
-- **Push**: after you implement or change a design in code, `/design-sync` pushes the current state back to Claude Design, keeping the canvas in sync with what you actually built.
+- **Initial import**: your component library goes up to Claude Design, so every screen the canvas generates uses your real components (same names, colors, and behaviors).
+- **Incremental re-sync**: after you change components in code, run it again to push the current state back up, keeping the canvas aligned with what you actually built.
 
-See [How `/design-sync` works](#how-design-sync-works) for the underlying pipeline.
+The reverse direction, handing a finished design from Claude Design back to Claude Code, is covered in [Handoff to Claude Code](#handoff-to-claude-code). See [How `/design-sync` works](#how-design-sync-works) for the pipeline.
 
 ### `/design`
 
@@ -64,12 +65,12 @@ See [How `/design-sync` works](#how-design-sync-works) for the underlying pipeli
 
 Under the hood, `/design-sync` drives the `DesignSync` tool through a fixed sequence:
 
-1. **Discover**: `list_projects` returns the design-system projects you can write to (name, owner, id, last-updated). If none exist, `create_project` makes one, or you target an existing project by UUID. `get_project` verifies the target is actually a design-system project (`type: PROJECT_TYPE_DESIGN_SYSTEM`, which is immutable at creation) before anything is pushed.
+1. **Discover**: `list_projects` returns the design-system projects you can write to (name, owner, id, last-updated). If none exist, `create_project` makes one, or you target an existing project by its project ID. `get_project` verifies the target is actually a design-system project (`type: PROJECT_TYPE_DESIGN_SYSTEM`, which is immutable at creation) before anything is pushed.
 1. **Diff**: `list_files` builds a structural diff of local paths versus remote paths. `get_file` (capped at 256 KiB) reads a specific remote component only when its content needs comparing.
 1. **Plan**: `finalize_plan` locks the exact set of paths that will be written and deleted, plus the source directory (`localDir`, defaulting to the current working directory), and returns a `planId`. You review and approve this plan. The structured path list and source directory are shown to you independent of Claude's narration.
 1. **Upload**: `write_files` and `delete_files` apply the approved plan, one component at a time. Files are read from disk by path (`localPath`), so their contents never enter Claude's context, and each call moves up to 256 files.
 
-Cards in the Design System pane come from a `<!-- @dsCard group="…" -->` marker on the first line of each preview HTML, compiled into a `_ds_manifest.json` by the app's self-check (explicit `register_assets` is now legacy, kept only for hand-authored projects). A render self-check writes a `.render-check.json` that flags components which render badly, thinly, or with identical variants, and `report_validate` reports the aggregate counts (total, bad, thin, identical variants, iterations) without leaking component names or paths.
+Cards in the Design System pane come from a `<!-- @dsCard group="…" -->` marker on the first line of each preview HTML, compiled into a `_ds_manifest.json` by the app's self-check. Explicit `register_assets` is legacy now that cards are built from those markers; it remains only for hand-authored projects that lack them. A render self-check writes a `.render-check.json`, and `report_validate` reports its aggregate counts (the total, how many render badly, thinly, or with identical variants, and the iteration count) without leaking component names or paths.
 
 ## Handoff to Claude Code
 
@@ -104,14 +105,14 @@ The required ordering is **read, then finalize_plan, then write or delete**. Cal
 - The finalized plan is a hard gate. Writes and deletes outside the approved path set, or without a valid `planId`, are refused.
 - Files uploaded via `localPath` are read, encoded, and uploaded directly, so their contents never pass through the model's context.
 
-## Best practices
+## Best Practices
 
 - Sync incrementally, component by component. Avoid wholesale replaces.
 - Keep a `@dsCard` marker on the first line of each preview HTML so cards index into the Design System pane automatically.
 - Verify the target project's type before pushing. Pushing to a regular project never turns it into a design system, because the type is fixed at creation.
 - In fresh, headless, or CI sessions with no `claude.ai` login attached, run `/design-login` once up front.
 
-## Current limitations
+## Current Limitations
 
 - **Beta**: not available on Free plans, and Enterprise requires admin enablement.
 - **React converter**: the `/design-sync` bundler targets React design systems (Storybook or a bare package). Other stacks import into Claude Design through a GitHub repo, design files, or raw uploads on the web side instead.
@@ -124,4 +125,4 @@ The required ordering is **read, then finalize_plan, then write or delete**. Cal
 - [Set up your design system in Claude Design](https://support.claude.com/en/articles/14604397-set-up-your-design-system-in-claude-design)
 - [Claude Design now stays on brand for daily work](https://claude.com/blog/claude-design-stays-on-brand-for-daily-work)
 - [Turn ideas into designs with Claude (product page)](https://claude.com/product/design)
-- Claude Code in-app command help and the `DesignSync` tool schema (Claude Code v2.1.x)
+- Claude Code in-app command help and the `DesignSync` tool schema
