@@ -43,7 +43,7 @@ Boris Cherny discusses the paradigm shift in software engineering driven by AI c
 ## Processing Method
 
 Chapters were extracted from YouTube's native chapter markers, then each chapter was processed
-independently using [youtube-gemini-processor](https://github.com/asivura/youtube-gemini-processor)
+independently using [vannevar](https://github.com/asivura/vannevar)
 with `--split` mode and Gemini 3 Pro via Vertex AI.
 
 Total cost: ~$1.52 for 26 chapters (562K tokens).
